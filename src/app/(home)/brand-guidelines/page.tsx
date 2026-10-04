@@ -224,8 +224,8 @@ export default function BrandPage() {
             </PanelContent>
           </Panel>
 
-          {/* Bottom spacer */}
-          <div className="h-4 border-x border-line" />
+          {/* Bottom separator, matches the home page */}
+          <div className="stripe-divider h-8 w-full border-x border-line" />
         </div>
 
         <DocRightCol>
