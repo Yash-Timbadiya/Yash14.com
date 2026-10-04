@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import type { ProfilePage, WithContext } from "schema-dts";
 
 import { JsonLdScript } from "@/lib/json-ld";
-import { personJsonLd } from "@/config/json-ld";
 import { absoluteUrl, cn } from "@/lib/utils";
+import { personJsonLd } from "@/config/json-ld";
 import { USER } from "@/features/portfolio/data/user";
 import { Hello } from "@/features/portfolio/components/hello";
 import { Overview } from "@/features/portfolio/components/overview";
