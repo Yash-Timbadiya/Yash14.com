@@ -35,7 +35,7 @@ export const USER: User = {
 - Creator of [yash14.com](https://github.com/Yash-Timbadiya/Yash14.com)
 `,
   avatar: cdn("/assets/yash.webp"),
-  ogImage: cdn("/screenshots/screenshot-og-image-dark.png?v=2"),
+  ogImage: cdn("/screenshots/screenshot-og-image-dark.png"),
   namePronunciationUrl: cdn("/audio/yashtimbadiya.mp3"),
   timeZone: "Asia/Kolkata",
   keywords: [

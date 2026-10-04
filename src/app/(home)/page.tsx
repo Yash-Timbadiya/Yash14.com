@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import type { ProfilePage, WithContext } from "schema-dts";
 
 import { JsonLdScript } from "@/lib/json-ld";
-import { JSON_LD_ID } from "@/config/json-ld";
 import { absoluteUrl, cn } from "@/lib/utils";
+import { personJsonLd } from "@/config/json-ld";
 import { USER } from "@/features/portfolio/data/user";
 import { Hello } from "@/features/portfolio/components/hello";
 import { Overview } from "@/features/portfolio/components/overview";
@@ -59,9 +59,9 @@ function getProfilePageJsonLd(): WithContext<ProfilePage> {
     "@id": absoluteUrl("/"),
     dateCreated: new Date(USER.dateCreated).toISOString(),
     dateModified: new Date().toISOString(),
-    // Reference the Person defined in the WebSite node (rendered globally in
-    // the root layout) so both blocks resolve to the same entity.
-    mainEntity: { "@id": JSON_LD_ID.person },
+    // Google requires mainEntity to be an inline Person; a bare @id reference
+    // to a node not on the page fails with "Invalid object type".
+    mainEntity: personJsonLd,
   };
 }
 
