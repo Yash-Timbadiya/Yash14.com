@@ -10,16 +10,19 @@ export const SOCIAL = {
     title: "X",
     handle: "@Yash_1434_",
     href: "https://x.com/Yash_1434_",
+    sameAs: true,
   },
   github: {
     title: "GitHub",
     handle: "Yash-Timbadiya",
     href: "https://github.com/Yash-Timbadiya",
+    sameAs: true,
   },
   linkedin: {
     title: "LinkedIn",
     handle: "Yash Timbadiya",
     href: "https://www.linkedin.com/in/yash-timbadiya-51a972249",
+    sameAs: true,
   },
 } satisfies Record<string, SocialProfile>;
 
