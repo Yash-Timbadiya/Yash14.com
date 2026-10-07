@@ -10,7 +10,7 @@ Next.js 16 (App Router) portfolio and shadcn registry website.
 | -------------------------------------- | ----------------------------------------------------------- |
 | `src/app/`                             | App Router pages, layouts, API routes                       |
 | `src/components/`                      | Shared UI components                                        |
-| `src/registry/`                        | Registry source (components, hooks, blocks, examples, lib)  |
+| `src/registry/`                        | Registry source (components, hooks, examples, lib)  |
 | `src/features/`                        | Feature modules: `doc`, `portfolio`, `sponsor`      |
 | `src/config/`                          | Site (`site.ts`) and registry (`registry.ts`) configuration |
 | `src/hooks/`, `src/lib/`, `src/utils/` | Hooks, libraries, utilities                                 |
@@ -25,7 +25,6 @@ Built on shadcn/ui. Registry types and their definition files:
 | -------------------- | -------------------------------------- |
 | `registry:component` | `src/registry/components/_registry.ts` |
 | `registry:hook`      | `src/registry/hooks/_registry.ts`      |
-| `registry:block`     | `src/registry/blocks/_registry.ts`     |
 | `registry:example`   | `src/registry/examples/_registry.ts`   |
 | `registry:lib`       | `src/registry/lib/_registry.ts`        |
 

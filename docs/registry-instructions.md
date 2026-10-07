@@ -115,7 +115,7 @@ bun run registry:validate
 
 ---
 
-## Adding other item types (hooks, blocks, styles)
+## Adding other item types (hooks, styles)
 
 Currently only `components` exists. To add a group:
 
