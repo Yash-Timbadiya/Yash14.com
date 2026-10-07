@@ -5,7 +5,6 @@ const eventSchema = z.object({
   name: z.enum([
     "copy_npm_command",
     "copy_code_block",
-    "copy_block_code",
     "copy_email",
     "copy_phone_number",
     "play_name_pronunciation",
@@ -17,11 +16,6 @@ const eventSchema = z.object({
     "toc_minimap_hover",
     "toc_minimap_item_click",
     "keyboard_shortcut_navigate",
-    "block_viewer_tab_change",
-    "block_viewer_resize",
-    "block_viewer_open_preview",
-    "block_viewer_refresh_preview",
-    "block_viewer_theme_change",
   ]),
   // declare type AllowedPropertyValues = string | number | boolean | null
   properties: z

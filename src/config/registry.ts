@@ -58,7 +58,7 @@ export const componentCategories = [
     name: "marketing",
     title: "Marketing",
     description:
-      "Pre-composed UI blocks and sections optimized for landing pages to surface social proof, build trust, and present promotional content.",
+      "Pre-composed UI components optimized for landing pages to surface social proof, build trust, and present promotional content.",
   },
   {
     name: "data-display",
