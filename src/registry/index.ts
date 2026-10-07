@@ -10,7 +10,6 @@ export const registry = {
 
     // Add more groups here as you grow the registry, e.g.:
     // ...hooks,
-    // ...blocks,
     // ...styles,
   ],
 } satisfies Registry;
