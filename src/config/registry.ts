@@ -73,24 +73,3 @@ export const componentCategories = [
       "Functional helpers and often invisible wrappers that provide underlying system capabilities, sensory user feedback, or abstract business logic.",
   },
 ];
-
-export const blockCategories = [
-  {
-    name: "marketing",
-    title: "Marketing",
-    description:
-      "Landing pages, sections, blog templates, and high-converting testimonial blocks.",
-  },
-  {
-    name: "application",
-    title: "Application",
-    description:
-      "Dashboard layouts, metric cards, settings pages, and core web app interfaces.",
-  },
-  {
-    name: "ecommerce",
-    title: "Ecommerce",
-    description:
-      "Product grids, shopping carts, filters, and streamlined checkout components.",
-  },
-];

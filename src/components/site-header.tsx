@@ -4,7 +4,6 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MAIN_NAV } from "@/config/site";
 import { YTMark } from "@/components/yt-mark";
-import blocks from "@/registry/__blocks__.json";
 import { NavDesktop } from "@/components/nav-desktop";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -41,7 +40,7 @@ export function SiteHeader() {
         <NavDesktop items={MAIN_NAV} />
 
         <div className="flex items-center *:first:mr-2 max-sm:*:data-[slot=command-menu-trigger]:hidden">
-          <CommandMenu docs={docPreviews} blocks={blocks} enabledHotkeys />
+          <CommandMenu docs={docPreviews} enabledHotkeys />
           <NavItemGitHub />
           <Separator
             orientation="vertical"

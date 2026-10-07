@@ -17,6 +17,7 @@ import { useTiks } from "@rexa-developer/tiks/react";
 import { USER } from "@/features/portfolio/data/user";
 import { copyToClipboardWithEvent } from "@/utils/copy";
 import { useClickSound } from "@/hooks/soundcn/use-click-sound";
+import { EmailIcon, PhoneIcon, SearchIcon } from "./icons";
 import { useMutationObserver } from "@/hooks/use-mutation-observer";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { SOCIAL_LINKS } from "@/features/portfolio/data/social-links";
@@ -28,13 +29,6 @@ import {
   decodePhoneNumber,
   formatPhoneNumber,
 } from "@/utils/string";
-import {
-  EmailIcon,
-  GridViewIcon,
-  PhoneIcon,
-  ReactIcon,
-  SearchIcon,
-} from "./icons";
 import {
   CommandDialog,
   CommandEmpty,
@@ -62,7 +56,7 @@ import {
   TypeIcon,
 } from "lucide-react";
 
-type CommandKind = "command" | "page" | "link" | "component" | "block";
+type CommandKind = "command" | "page" | "link" | "component";
 
 type CommandLinkItem = {
   title: string;
@@ -75,12 +69,6 @@ type CommandLinkItem = {
   openInNewTab?: boolean;
   copyText?: string;
   copyEvent?: "copy_email" | "copy_phone_number";
-};
-
-type BlockItem = {
-  name: string;
-  description: string;
-  categories: string[];
 };
 
 const MENU_LINKS: CommandLinkItem[] = [
@@ -97,20 +85,6 @@ const MENU_LINKS: CommandLinkItem[] = [
     kind: "page",
     icon: <SquareDashedIcon />,
     shortcut: "GY",
-  },
-  {
-    title: "Components",
-    href: "/components",
-    kind: "page",
-    icon: <ReactIcon />,
-    shortcut: "GC",
-  },
-  {
-    title: "Blocks",
-    href: "/blocks",
-    kind: "page",
-    icon: <GridViewIcon />,
-    shortcut: "GB",
   },
 ];
 
@@ -220,11 +194,9 @@ const OTHER_LINK_ITEMS: CommandLinkItem[] = [
 
 export function CommandMenu({
   docs,
-  blocks,
   enabledHotkeys = false,
 }: {
   docs: DocPreview[];
-  blocks: BlockItem[];
   enabledHotkeys?: boolean;
 }) {
   const router = useRouter();
@@ -359,37 +331,6 @@ export function CommandMenu({
     );
   }, [components, handleOpenLink]);
 
-  const blocksGroup = useMemo(() => {
-    if (!blocks || blocks.length === 0) {
-      return null;
-    }
-
-    return (
-      <CommandGroup heading="Blocks">
-        {blocks.map((block) => {
-          return (
-            <CommandMenuItem
-              key={block.name}
-              keywords={["block"]}
-              onHighlight={() => {
-                setSelectedCommandKind("block");
-              }}
-              onSelect={() => {
-                handleOpenLink(`/blocks/${block.categories[0]}/${block.name}`);
-              }}
-            >
-              <GridViewIcon />
-              <p className="line-clamp-1">{block.description}</p>
-              <span className="ml-auto font-mono text-xs font-normal text-muted-foreground tabular-nums max-sm:hidden">
-                {block.name}
-              </span>
-            </CommandMenuItem>
-          );
-        })}
-      </CommandGroup>
-    );
-  }, [blocks, handleOpenLink]);
-
   const handleLinkHighlight = useCallback((link: CommandLinkItem) => {
     setSelectedCommandKind(link.kind);
   }, []);
@@ -442,8 +383,6 @@ export function CommandMenu({
               />
 
               {componentsGroup}
-
-              {blocksGroup}
 
               <CommandLinkGroup
                 heading="Social Links"
@@ -722,7 +661,6 @@ const ENTER_ACTION_LABELS: Record<CommandKind, string> = {
   page: "Go to Page",
   link: "Open Link",
   component: "Go to Component",
-  block: "Go to Block",
 };
 
 function CommandMenuFooter({
