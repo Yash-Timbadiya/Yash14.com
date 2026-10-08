@@ -1,10 +1,12 @@
+import path from "node:path";
 // Submits every URL in the live sitemap to IndexNow.
 // The key file must already be deployed at https://yash14.com/{key}.txt.
 //
-// Usage (after a production deploy):
+// Usage:
 //   pnpm indexnow
+// Also runs from .husky/pre-push. That ping uses the live site, so the
+// key file has to be deployed before a submission can succeed.
 import { readdirSync, readFileSync } from "node:fs";
-import path from "node:path";
 
 const HOST = "yash14.com";
 const ORIGIN = `https://${HOST}`;
@@ -56,9 +58,7 @@ const response = await fetch("https://api.indexnow.org/indexnow", {
 });
 
 const body = await response.text();
-console.log(
-  `IndexNow ${response.status}${body ? `: ${body}` : ""}`,
-);
+console.log(`IndexNow ${response.status}${body ? `: ${body}` : ""}`);
 console.log(`Submitted ${urlList.length} URL(s)`);
 
 if (response.status !== 200 && response.status !== 202) {
