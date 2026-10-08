@@ -31,6 +31,7 @@
     "registry:build": "bun run ./src/scripts/build-registry.mts && shadcn build",
     "cdn:login": "pnpm dlx --allow-build=esbuild --allow-build=workerd wrangler login",
     "cdn:upload": "node ./src/scripts/upload-cdn.mjs",
+    "indexnow": "node ./src/scripts/indexnow.mjs",
     "registry:validate": "shadcn registry validate ./registry.json"
   },
   "dependencies": {
