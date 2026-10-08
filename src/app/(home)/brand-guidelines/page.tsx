@@ -109,7 +109,7 @@ export default function BrandPage() {
 
         <h1
           data-slot="doc-title"
-          className="screen-line-bottom px-4 text-3xl font-semibold tracking-tight text-balance"
+          className="screen-line-bottom overflow-x-clip px-4 text-4xl font-medium tracking-tight text-balance"
         >
           {PAGE_TITLE}
         </h1>
