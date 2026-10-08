@@ -50,7 +50,7 @@ export function NavLink({
   return (
     <Link
       className={cn(
-        "text-sm font-medium text-muted-foreground transition-[color] hover:text-foreground aria-[current=page]:text-foreground",
+        "text-sm font-medium tracking-wide text-muted-foreground transition-[color] hover:text-foreground aria-[current=page]:text-foreground",
         className,
       )}
       {...props}

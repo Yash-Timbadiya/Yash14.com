@@ -94,9 +94,9 @@ export function ProfileHeader() {
       </div>
 
       <div className="flex flex-col">
-        <div className="mt-auto border-t border-line">
-          <div className="flex items-center gap-2 pl-4">
-            <h1 className="-translate-y-px text-xl sm:text-3xl font-semibold tracking-tight">
+        <div className="z-1 mt-auto border-t border-line">
+          <div className="flex -translate-x-px items-center gap-2 pl-4">
+            <h1 className="-translate-y-px text-[2rem]/none font-medium tracking-tight">
               {USER.displayName}
             </h1>
 

@@ -1,11 +1,11 @@
 @utility screen-line-top-* {
   &:before {
-    background-color: --value(--color-*, [color]);
+    background-color: --value(--color-*, [color]) !important;
   }
 }
 
 @utility screen-line-bottom-* {
   &:after {
-    background-color: --value(--color-*, [color]);
+    background-color: --value(--color-*, [color]) !important;
   }
 }

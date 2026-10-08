@@ -475,23 +475,27 @@ function CommandMenuTrigger({ ...props }: React.ComponentProps<typeof Button>) {
   return (
     <Button
       data-slot="command-menu-trigger"
-      className="gap-1.5 rounded-full pl-2 text-muted-foreground shadow-none select-none hover:bg-background hover:text-muted-foreground dark:hover:bg-input/30"
-      variant="outline"
+      className="gap-1.5 border-none px-1.5 text-muted-foreground will-change-[scale] select-none"
+      variant="ghost"
       size="sm"
       {...props}
     >
       <SearchIcon />
 
-      <span className="font-sans text-sm/4 font-medium sm:hidden">Search…</span>
+      <span className="font-sans text-sm/4 font-medium sm:sr-only">
+        Search…
+      </span>
 
-      <KbdGroup className="hidden sm:in-[.os-macos_&]:flex">
-        <Kbd className="w-5 min-w-5">⌘</Kbd>
-        <Kbd className="w-5 min-w-5">K</Kbd>
+      {/* Tablets rarely have a keyboard, and the header has no room for the
+      hint until md. */}
+      <KbdGroup className="hidden gap-0.75 md:in-[.os-macos_&]:flex">
+        <Kbd className="w-5 min-w-auto">⌘</Kbd>
+        <Kbd className="w-5 min-w-auto">K</Kbd>
       </KbdGroup>
 
-      <KbdGroup className="hidden sm:not-[.os-macos_&]:flex">
+      <KbdGroup className="hidden gap-0.75 md:not-[.os-macos_&]:flex">
         <Kbd>Ctrl</Kbd>
-        <Kbd className="w-5 min-w-5">K</Kbd>
+        <Kbd className="w-5 min-w-auto">K</Kbd>
       </KbdGroup>
     </Button>
   );
