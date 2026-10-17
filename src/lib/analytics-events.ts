@@ -72,6 +72,9 @@ export const ANALYTICS_EVENTS = {
   // Profile
   NAME_PRONUNCIATION_PLAYED: "name_pronunciation_played",
 
+  // Tech stack
+  TECH_STACK_CLICK: "tech_stack_click",
+
   // Isometric YT mark and its right-click car picker
   YT_MARK_CLICK: "yt_mark_click",
   YT_MARK_RIGHT_CLICK: "yt_mark_right_click",
@@ -90,6 +93,7 @@ export const ANALYTICS_SECTIONS = {
   BRAND_GUIDELINES: "brand_guidelines",
   OVERVIEW: "overview",
   SOCIAL_LINKS: "social_links",
+  TECH_STACK: "tech_stack",
   /** Global keyboard shortcuts, which are not tied to one part of the page. */
   KEYBOARD: "keyboard",
 } as const;
