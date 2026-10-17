@@ -37,6 +37,28 @@ export const ANALYTICS_EVENTS = {
   COPY_MARK_SVG: "copy_mark_svg",
   COPY_LOGOTYPE_SVG: "copy_logotype_svg",
   DOWNLOAD_BRAND_ASSETS: "download_brand_assets",
+  DOWNLOAD_MARK_SVG: "download_mark_svg",
+  DOWNLOAD_LOGOTYPE_SVG: "download_logotype_svg",
+
+  // Page actions: copy page and its options menu
+  COPY_PAGE: "copy_page",
+  PAGE_OPTIONS_OPENED: "page_options_opened",
+  VIEW_PAGE_MARKDOWN: "view_page_markdown",
+  OPEN_IN_CHATGPT: "open_in_chatgpt",
+  OPEN_IN_CLAUDE: "open_in_claude",
+  OPEN_IN_CURSOR: "open_in_cursor",
+  OPEN_IN_GROK: "open_in_grok",
+  OPEN_IN_SCIRA: "open_in_scira",
+
+  // Table of contents minimap
+  TOC_OPENED: "toc_opened",
+
+  // Share menu
+  SHARE_MENU_OPENED: "share_menu_opened",
+  COPY_PAGE_LINK: "copy_page_link",
+  SHARE_ON_X: "share_on_x",
+  SHARE_ON_LINKEDIN: "share_on_linkedin",
+  SHARE_NATIVE: "share_native",
 
   // Outbound links
   REDIRECT_TO_GITHUB: "redirect_to_github",
@@ -82,6 +104,10 @@ export type AnalyticsSection =
  */
 export const ANALYTICS_SOURCES = {
   LOGO_MENU: "logo_menu",
+  TOOLBAR: "toolbar",
+  ASSET_BUTTONS: "asset_buttons",
+  TOC: "toc",
+  HEADING: "heading",
 } as const;
 
 export type AnalyticsSource =

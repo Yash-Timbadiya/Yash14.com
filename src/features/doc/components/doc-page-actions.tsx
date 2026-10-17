@@ -3,12 +3,15 @@
 "use client";
 
 import type { CopyState } from "@/hooks/use-copy-to-clipboard";
+import type { AnalyticsEvent, AnalyticsSection } from "@/lib/analytics-events";
 
+import { trackEvent } from "@/lib/analytics";
 import { ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMemo, useRef, useState } from "react";
 import { useTiks } from "@rexa-developer/tiks/react";
 import { CopyStateIcon } from "@/components/copy-button";
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
 import { IconCheck, IconCopy, IconX } from "@tabler/icons-react";
 import {
   ButtonGroup,
@@ -32,7 +35,13 @@ import {
 
 const cache = new Map<string, string>();
 
-export function LLMCopyButton({ markdownUrl }: { markdownUrl: string }) {
+export function LLMCopyButton({
+  markdownUrl,
+  section,
+}: {
+  markdownUrl: string;
+  section: AnalyticsSection;
+}) {
   const [state, setState] = useState<CopyState>("idle");
   const [isCopying, setIsCopying] = useState(false);
   const operationRef = useRef(false);
@@ -64,6 +73,7 @@ export function LLMCopyButton({ markdownUrl }: { markdownUrl: string }) {
           }),
         ]);
       }
+      trackEvent(ANALYTICS_EVENTS.COPY_PAGE, { section, url: markdownUrl });
       success();
       setState("done");
     } catch {
@@ -105,9 +115,11 @@ function getPrompt(url: string) {
 export function ViewOptions({
   markdownUrl,
   githubUrl,
+  section,
 }: {
   markdownUrl: string;
   githubUrl?: string;
+  section: AnalyticsSection;
 }) {
   const items = useMemo(() => {
     const fullMarkdownUrl =
@@ -117,11 +129,17 @@ export function ViewOptions({
 
     const q = getPrompt(fullMarkdownUrl);
 
-    const _items = [
+    const _items: {
+      title: string;
+      href: string;
+      icon: React.ComponentType;
+      event: AnalyticsEvent;
+    }[] = [
       {
         title: "View as Markdown",
         href: fullMarkdownUrl,
         icon: MarkdownIcon,
+        event: ANALYTICS_EVENTS.VIEW_PAGE_MARKDOWN,
       },
       ...(githubUrl
         ? [
@@ -129,6 +147,7 @@ export function ViewOptions({
               title: "Open in GitHub",
               href: githubUrl,
               icon: GitHubIcon,
+              event: ANALYTICS_EVENTS.REDIRECT_TO_GITHUB,
             },
           ]
         : []),
@@ -139,6 +158,7 @@ export function ViewOptions({
           q,
         })}`,
         icon: OpenAIIcon,
+        event: ANALYTICS_EVENTS.OPEN_IN_CHATGPT,
       },
       {
         title: "Open in Claude",
@@ -146,6 +166,7 @@ export function ViewOptions({
           q,
         })}`,
         icon: ClaudeIcon,
+        event: ANALYTICS_EVENTS.OPEN_IN_CLAUDE,
       },
       {
         title: "Open in Cursor",
@@ -153,6 +174,7 @@ export function ViewOptions({
           text: q,
         })}`,
         icon: CursorIcon,
+        event: ANALYTICS_EVENTS.OPEN_IN_CURSOR,
       },
       {
         title: "Open in Grok",
@@ -160,6 +182,7 @@ export function ViewOptions({
           q,
         })}`,
         icon: GrokIcon,
+        event: ANALYTICS_EVENTS.OPEN_IN_GROK,
       },
       {
         title: "Open in Scira AI",
@@ -167,6 +190,7 @@ export function ViewOptions({
           q,
         })}`,
         icon: SciraIcon,
+        event: ANALYTICS_EVENTS.OPEN_IN_SCIRA,
       },
     ];
 
@@ -174,7 +198,13 @@ export function ViewOptions({
   }, [markdownUrl, githubUrl]);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) {
+          trackEvent(ANALYTICS_EVENTS.PAGE_OPTIONS_OPENED, { section });
+        }
+      }}
+    >
       <DropdownMenuTrigger asChild>
         <Button
           className="size-7 border-none active:scale-none"
@@ -193,9 +223,14 @@ export function ViewOptions({
         collisionPadding={16}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        {items.map(({ title, href, icon: Icon }) => (
+        {items.map(({ title, href, icon: Icon, event }) => (
           <DropdownMenuItem key={href} asChild>
-            <a href={href} rel="noopener" target="_blank">
+            <a
+              href={href}
+              rel="noopener"
+              target="_blank"
+              onClick={() => trackEvent(event, { section, url: markdownUrl })}
+            >
               <Icon />
               {title}
             </a>
@@ -209,15 +244,21 @@ export function ViewOptions({
 export function LLMCopyButtonWithViewOptions({
   markdownUrl,
   githubUrl,
+  section,
 }: {
   markdownUrl: string;
   githubUrl?: string;
+  section: AnalyticsSection;
 }) {
   return (
     <ButtonGroup>
-      <LLMCopyButton markdownUrl={markdownUrl} />
+      <LLMCopyButton markdownUrl={markdownUrl} section={section} />
       <ButtonGroupSeparator className="border-y-4 border-secondary dark:bg-white/20 data-vertical:my-0" />
-      <ViewOptions markdownUrl={markdownUrl} githubUrl={githubUrl} />
+      <ViewOptions
+        markdownUrl={markdownUrl}
+        githubUrl={githubUrl}
+        section={section}
+      />
     </ButtonGroup>
   );
 }
