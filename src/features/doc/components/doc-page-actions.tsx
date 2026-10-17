@@ -4,7 +4,7 @@
 
 import type { CopyState } from "@/hooks/use-copy-to-clipboard";
 
-import { trackEvent } from "@/lib/events";
+import { trackEvent } from "@/lib/analytics";
 import { ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMemo, useRef, useState } from "react";
@@ -65,7 +65,7 @@ export function LLMCopyButton({ markdownUrl }: { markdownUrl: string }) {
           }),
         ]);
       }
-      trackEvent({ name: "copy_document_page" });
+      trackEvent("content_copied", { item: "page_markdown", url: markdownUrl });
       success();
       setState("done");
     } catch {

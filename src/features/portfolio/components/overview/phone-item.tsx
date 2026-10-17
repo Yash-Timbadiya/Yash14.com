@@ -2,13 +2,13 @@
 
 import { useId } from "react";
 import { toast } from "sonner";
+import { copyText } from "@/utils/copy";
 import { PhoneIcon } from "lucide-react";
-import { trackEvent } from "@/lib/events";
+import { trackEvent } from "@/lib/analytics";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useIsClient } from "@/hooks/use-is-client";
 import { useTiks } from "@rexa-developer/tiks/react";
 import { CopyButton } from "@/components/copy-button";
-import { copyToClipboardWithEvent } from "@/utils/copy";
 import { RevealEncodedTextScript } from "./reveal-encoded-text";
 import { decodePhoneNumber, formatPhoneNumber } from "@/utils/string";
 import {
@@ -31,13 +31,11 @@ export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
   const { success } = useTiks();
 
   useHotkeys("shift+p", () => {
-    copyToClipboardWithEvent(phoneNumberDecoded, {
-      name: "copy_phone_number",
-      properties: {
-        method: "keyboard",
-        key: "shift+p",
-      },
+    trackEvent("keyboard_shortcut_used", {
+      shortcut: "shift+p",
+      action: "copy_phone",
     });
+    copyText(phoneNumberDecoded, "phone");
     success();
     toast.success("Phone number copied");
   });
@@ -64,14 +62,8 @@ export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
           variant="ghost"
           size="icon-xs"
           text={() => phoneNumberDecoded}
-          onCopySuccess={() => {
-            trackEvent({
-              name: "copy_phone_number",
-              properties: {
-                method: "button",
-              },
-            });
-          }}
+          aria-label="Copy phone number"
+          trackAs="phone"
         />
       </div>
 

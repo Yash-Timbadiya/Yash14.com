@@ -3,7 +3,6 @@
 import type { TOCItemType } from "./toc";
 
 import { cn } from "@/lib/utils";
-import { trackEvent } from "@/lib/events";
 import { useSound } from "@/hooks/soundcn/use-sound";
 import { AnchorProvider, useActiveAnchor, useItems } from "./toc";
 import { uMiniMapOpenSound } from "@/lib/soundcn/u-mini-map-open";
@@ -35,7 +34,6 @@ export function TOCMinimap({
           onOpenChange={(open) => {
             if (open) {
               play();
-              trackEvent({ name: "toc_minimap_hover" });
             }
           }}
         >
@@ -105,12 +103,6 @@ function scrollToHeading(url: string) {
 function handleItemClick(e: React.MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();
   const url = e.currentTarget.getAttribute("href") ?? "";
-  const title = e.currentTarget.textContent ?? "";
-  const depth = Number(e.currentTarget.getAttribute("data-depth"));
-  trackEvent({
-    name: "toc_minimap_item_click",
-    properties: { url, title, depth },
-  });
   scrollToHeading(url);
 }
 

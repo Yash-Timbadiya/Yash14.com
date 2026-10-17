@@ -43,3 +43,9 @@ next-env.d.ts
 # local copies of files served from Cloudflare R2 (assets.yash14.com)
 /cdn/
 .env
+
+# local AI agent configuration
+/.agents/
+/.claude/
+/.codex/
+/.cursor/

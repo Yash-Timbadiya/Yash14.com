@@ -3,6 +3,7 @@
 import { Kbd } from "./ui/kbd";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
+import { trackEvent } from "@/lib/analytics";
 import { useHotkeys } from "react-hotkeys-hook";
 import { META_THEME_COLORS } from "@/config/site";
 import { MoonIcon } from "./animated-icons/moon-icon";
@@ -27,8 +28,13 @@ export function ThemeToggle() {
     );
   };
 
-  const switchTheme = () => {
+  const switchTheme = (method: "click" | "keyboard") => {
     click();
+
+    trackEvent("theme_changed", {
+      theme: resolvedTheme === "dark" ? "light" : "dark",
+      method,
+    });
 
     if (
       typeof document === "undefined" ||
@@ -44,7 +50,13 @@ export function ThemeToggle() {
     });
   };
 
-  useHotkeys("d", () => switchTheme());
+  useHotkeys("d", () => {
+    trackEvent("keyboard_shortcut_used", {
+      shortcut: "d",
+      action: "toggle_theme",
+    });
+    switchTheme("keyboard");
+  });
 
   return (
     <Tooltip>
@@ -55,7 +67,7 @@ export function ThemeToggle() {
             variant="ghost"
             size="icon-sm"
             aria-label="Toggle Mode"
-            onClick={() => switchTheme()}
+            onClick={() => switchTheme("click")}
           >
             <span
               className="absolute size-12 pointer-fine:hidden"

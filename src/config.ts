@@ -17,11 +17,6 @@ export const config = {
     url: process.env.NEXT_PUBLIC_DMCA_URL,
   },
 
-  analytics: {
-    posthogProjectToken: process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN,
-    posthogHost: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-  },
-
   /**
    * Stamped into the bundle by `next.config.ts` (its `env` option), so they
    * also work in client components.

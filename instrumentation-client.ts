@@ -16,10 +16,28 @@ if (!projectToken) {
     );
   }
 } else {
+  // Web analytics only: pageviews and pageleaves. Every other product is
+  // disabled here so that turning one on in the PostHog project settings
+  // cannot start collecting data from this site.
   posthog.init(projectToken, {
     api_host: host,
     defaults: "2026-01-30",
-    capture_exceptions: true,
+    capture_pageview: "history_change",
+    capture_pageleave: true,
+    person_profiles: "identified_only",
+    autocapture: false,
+    rageclick: false,
+    capture_dead_clicks: false,
+    capture_heatmaps: false,
+    capture_exceptions: false,
+    capture_performance: false,
+    disable_session_recording: true,
+    disable_surveys: true,
+    disable_product_tours: true,
+    disable_conversations: true,
+    disable_web_experiments: true,
+    advanced_disable_flags: true,
+    disable_external_dependency_loading: true,
     debug: process.env.NODE_ENV === "development",
   });
 }

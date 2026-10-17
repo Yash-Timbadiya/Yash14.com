@@ -1,19 +1,17 @@
-import type { Event } from "@/lib/events";
+import { trackEvent } from "@/lib/analytics";
 
-import { trackEvent } from "@/lib/events";
-
-export const copyText = async (text: string) => {
+/**
+ * Copies text to the clipboard. When `item` is given, a successful copy is
+ * recorded as a `content_copied` event for that item.
+ */
+export const copyText = async (text: string, item?: string) => {
   try {
     await navigator.clipboard.writeText(text);
+    if (item) {
+      trackEvent("content_copied", { item });
+    }
     return true;
   } catch {
     return false;
   }
 };
-
-export function copyToClipboardWithEvent(value: string, event?: Event) {
-  if (event) {
-    trackEvent(event);
-  }
-  return copyText(value);
-}

@@ -22,6 +22,7 @@ export function PanelTitleCopy({
       text={() => createHeadingUrl(id || "")}
       idleIcon={<LinkIcon />}
       aria-label="Copy link to section"
+      trackAs={`section_link:${id}`}
       {...props}
     />
   );

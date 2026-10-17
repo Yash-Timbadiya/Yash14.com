@@ -5,6 +5,7 @@ import type { CopyState } from "@/hooks/use-copy-to-clipboard";
 
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { IconSwap, IconSwapItem } from "@/components/icon-swap";
 import { CheckIcon, CircleXIcon, CopyIcon } from "lucide-react";
@@ -47,6 +48,8 @@ export type CopyButtonProps = ComponentProps<typeof Button> & {
   onCopySuccess?: (text: string) => void;
   /** Called with the error if the copy operation fails. */
   onCopyError?: (error: Error) => void;
+  /** Name of the copied item, recorded as a `content_copied` event. */
+  trackAs?: string;
 } & Omit<CopyStateIconProps, "state">;
 
 export function CopyButton({
@@ -60,10 +63,16 @@ export function CopyButton({
   onClick,
   onCopySuccess,
   onCopyError,
+  trackAs,
   ...props
 }: CopyButtonProps) {
   const { state, copy } = useCopyToClipboard({
-    onCopySuccess,
+    onCopySuccess: (copiedText) => {
+      trackEvent("content_copied", {
+        item: trackAs ?? props["aria-label"] ?? "unknown",
+      });
+      onCopySuccess?.(copiedText);
+    },
     onCopyError,
   });
 
