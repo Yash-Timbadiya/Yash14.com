@@ -5,6 +5,7 @@ import { YTMark } from "@/components/yt-mark";
 import { NavDesktop } from "@/components/nav-desktop";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { NavItemGitHub } from "@/components/nav-item-github";
 
 const BrandContextMenu = dynamic(
@@ -32,7 +33,7 @@ export function SiteHeader() {
             orientation="vertical"
             className="mr-2 max-sm:hidden data-vertical:h-5 data-vertical:self-center"
           />
-          <CommandMenu enabledHotkeys />
+          <CommandMenu section={ANALYTICS_SECTIONS.HEADER} enabledHotkeys />
           <Separator
             orientation="vertical"
             className="mx-2 max-sm:hidden data-vertical:h-5 data-vertical:self-center"

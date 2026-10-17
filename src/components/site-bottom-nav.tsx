@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { MOBILE_NAV } from "@/config/site";
 import { Separator } from "@/components/ui/separator";
+import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 const CommandMenu = dynamic(() => import("@/components/command-menu"));
 const NavMobile = dynamic(() => import("@/components/nav-mobile"));
@@ -14,7 +15,7 @@ export function SiteBottomNav() {
         "*:data-[slot=command-menu-trigger]:min-w-20 *:data-[slot=command-menu-trigger]:gap-2 *:data-[slot=command-menu-trigger]:rounded-none *:data-[slot=command-menu-trigger]:border-none *:data-[slot=command-menu-trigger]:bg-transparent *:data-[slot=command-menu-trigger]:px-0 *:data-[slot=command-menu-trigger]:hover:bg-transparent *:data-[slot=command-menu-trigger]:active:scale-none",
       )}
     >
-      <CommandMenu />
+      <CommandMenu section={ANALYTICS_SECTIONS.BOTTOM_NAV} />
       <Separator
         orientation="vertical"
         className="mr-1 ml-2.5 data-vertical:h-6 data-vertical:self-center"

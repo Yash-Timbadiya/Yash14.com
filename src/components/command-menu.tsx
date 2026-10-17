@@ -1,5 +1,7 @@
 "use client";
 
+import type { AnalyticsSection } from "@/lib/analytics-events";
+
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
@@ -20,6 +22,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useMutationObserver } from "@/hooks/use-mutation-observer";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { SOCIAL_LINKS } from "@/features/portfolio/data/social-links";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { SOCIAL_ICONS } from "@/features/portfolio/components/social-link-icons";
 import {
   decodeEmail,
@@ -180,8 +183,11 @@ const OTHER_LINK_ITEMS: CommandLinkItem[] = [
 
 export function CommandMenu({
   enabledHotkeys = false,
+  section,
 }: {
   enabledHotkeys?: boolean;
+  /** Where this instance of the menu is rendered, sent with its events. */
+  section: AnalyticsSection;
 }) {
   const router = useRouter();
 
@@ -197,14 +203,20 @@ export function CommandMenu({
       setOpenState((current) => {
         const resolved = typeof next === "function" ? next(current) : next;
         if (current !== resolved) {
-          trackEvent(resolved ? "command_menu_opened" : "command_menu_closed", {
-            method,
-          });
+          trackEvent(
+            resolved
+              ? ANALYTICS_EVENTS.COMMAND_MENU_OPENED
+              : ANALYTICS_EVENTS.COMMAND_MENU_CLOSED,
+            {
+              method,
+              section,
+            },
+          );
         }
         return resolved;
       });
     },
-    [],
+    [section],
   );
 
   const [selectedCommandKind, setSelectedCommandKind] =
@@ -252,10 +264,11 @@ export function CommandMenu({
   const createThemeHandler = useCallback(
     (theme: "light" | "dark" | "system") => () => {
       click();
-      trackEvent("theme_changed", {
+      trackEvent(ANALYTICS_EVENTS.THEME_CHANGED, {
         from: resolvedTheme ?? null,
         to: theme,
         method: "command_menu",
+        section: ANALYTICS_SECTIONS.COMMAND_MENU,
       });
       setOpen(false, "action");
 

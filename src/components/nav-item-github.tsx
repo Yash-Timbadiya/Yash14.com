@@ -2,6 +2,7 @@ import { config } from "@/config";
 import { unstable_cache } from "next/cache";
 import { GitHubStars } from "@/components/github-stars";
 import { SOURCE_CODE_GITHUB_REPO } from "@/config/site";
+import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 const getStargazerCount = unstable_cache(
   async () => {
@@ -40,6 +41,7 @@ export async function NavItemGitHub() {
     <GitHubStars
       repo={SOURCE_CODE_GITHUB_REPO}
       stargazersCount={stargazersCount}
+      section={ANALYTICS_SECTIONS.HEADER}
     />
   );
 }

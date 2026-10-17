@@ -1,6 +1,12 @@
+"use client";
+
+import type { AnalyticsSection } from "@/lib/analytics-events";
+
 import { UTM_PARAMS } from "@/config/site";
+import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
 import { Button } from "@/components/ui/button";
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
 import {
   Tooltip,
   TooltipContent,
@@ -10,9 +16,16 @@ import {
 type GitHubStarsProps = {
   repo: string;
   stargazersCount: number;
+  section: AnalyticsSection;
 };
 
-export function GitHubStars({ repo, stargazersCount }: GitHubStarsProps) {
+export function GitHubStars({
+  repo,
+  stargazersCount,
+  section,
+}: GitHubStarsProps) {
+  const url = addQueryParams(`https://github.com/${repo}`, UTM_PARAMS);
+
   return (
     <Tooltip>
       <TooltipTrigger
@@ -24,7 +37,13 @@ export function GitHubStars({ repo, stargazersCount }: GitHubStarsProps) {
             asChild
           >
             <a
-              href={addQueryParams(`https://github.com/${repo}`, UTM_PARAMS)}
+              href={url}
+              onClick={() =>
+                trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_GITHUB, {
+                  section,
+                  url,
+                })
+              }
               target="_blank"
               rel="noopener"
             >

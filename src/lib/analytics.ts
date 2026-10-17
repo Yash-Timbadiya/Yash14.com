@@ -1,21 +1,24 @@
+import type { AnalyticsEvent, AnalyticsSection } from "@/lib/analytics-events";
+
 import posthog from "posthog-js";
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
 
-export type AnalyticsEventName =
-  | "theme_changed"
-  | "command_menu_opened"
-  | "command_menu_closed"
-  | "name_pronunciation_played";
-
-export type AnalyticsProperties = Record<
-  string,
-  string | number | boolean | null | undefined
->;
+export type AnalyticsProperties = {
+  section: AnalyticsSection;
+} & Record<string, string | number | boolean | null | undefined>;
 
 export function trackEvent(
-  name: AnalyticsEventName,
-  properties?: AnalyticsProperties,
+  event: AnalyticsEvent,
+  properties: AnalyticsProperties,
 ) {
   // posthog is only initialized when the project token and host are set.
   if (!posthog.__loaded) return;
-  posthog.capture(name, properties);
+  posthog.capture(event, properties);
+}
+
+/** Tracks a click on a site navigation item, for the items that have an event. */
+export function trackNavItemClick(href: string, section: AnalyticsSection) {
+  if (href === "/brand-guidelines") {
+    trackEvent(ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES, { section });
+  }
 }

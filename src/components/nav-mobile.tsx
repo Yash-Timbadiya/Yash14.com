@@ -8,7 +8,9 @@ import { haptic } from "@/lib/haptic";
 import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { trackNavItemClick } from "@/lib/analytics";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   Popover,
   PopoverContent,
@@ -58,7 +60,10 @@ export function NavMobile({ items }: { items: NavItem<Route>[] }) {
                 href={link.href}
                 aria-current={isActive ? "page" : undefined}
                 className="rounded-lg px-3 py-1.5 text-base aria-[current=page]:bg-accent"
-                onClick={() => handleOpenChange(false)}
+                onClick={() => {
+                  trackNavItemClick(link.href, ANALYTICS_SECTIONS.BOTTOM_NAV);
+                  handleOpenChange(false);
+                }}
               >
                 {link.title}
               </Link>
