@@ -25,6 +25,11 @@ export const ANALYTICS_EVENTS = {
 
   // Profile
   NAME_PRONUNCIATION_PLAYED: "name_pronunciation_played",
+
+  // Isometric YT mark and its right-click car picker
+  YT_MARK_CLICK: "yt_mark_click",
+  YT_MARK_RIGHT_CLICK: "yt_mark_right_click",
+  CAR_MODEL_CHANGED: "car_model_changed",
 } as const;
 
 export type AnalyticsEvent =

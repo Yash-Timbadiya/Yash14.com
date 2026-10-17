@@ -2,10 +2,12 @@
 
 import type { Transition } from "motion/react";
 
+import { trackEvent } from "@/lib/analytics";
 import { useEffect, useId, useState } from "react";
 import { useSound } from "@/hooks/soundcn/use-sound";
 import { metalClickSound } from "@/lib/soundcn/metal-click";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -23,7 +25,12 @@ const GRID = [
 const COLS = 6;
 const ROWS = 4;
 
-import { type CarModel, CarPreview, VehicleShape } from "./car-models";
+import {
+  CAR_MODEL_NAMES,
+  type CarModel,
+  CarPreview,
+  VehicleShape,
+} from "./car-models";
 
 const CAR_MODELS: CarModel[] = ["detailed", "supercar", "f1", "truck"];
 
@@ -430,7 +437,17 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
     : [1 + BAND_FILL_FEATHER, BAND_FILL_FEATHER];
 
   return (
-    <ContextMenu>
+    <ContextMenu
+      onOpenChange={(open) => {
+        if (open) {
+          trackEvent(ANALYTICS_EVENTS.YT_MARK_RIGHT_CLICK, {
+            section: ANALYTICS_SECTIONS.PROFILE_HEADER,
+            traffic: active ? "on" : "off",
+            car: CAR_MODEL_NAMES[carModel],
+          });
+        }
+      }}
+    >
       <ContextMenuTrigger asChild>
         <motion.svg
           className="relative isolate h-auto w-full touch-manipulation overflow-visible cursor-pointer transition-all duration-300 [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]"
@@ -443,6 +460,11 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
           whileTap="pressed"
           onTap={() => {
             play();
+            trackEvent(ANALYTICS_EVENTS.YT_MARK_CLICK, {
+              section: ANALYTICS_SECTIONS.PROFILE_HEADER,
+              traffic: active ? "off" : "on",
+              car: CAR_MODEL_NAMES[carModel],
+            });
             setActive((on) => !on);
             onActivate?.();
           }}
@@ -703,7 +725,15 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
           <ContextMenuItem
             key={model}
             asChild
-            onSelect={() => setCarModel(model)}
+            onSelect={() => {
+              trackEvent(ANALYTICS_EVENTS.CAR_MODEL_CHANGED, {
+                section: ANALYTICS_SECTIONS.PROFILE_HEADER,
+                from: CAR_MODEL_NAMES[carModel],
+                to: CAR_MODEL_NAMES[model],
+                traffic: active ? "on" : "off",
+              });
+              setCarModel(model);
+            }}
           >
             <div
               className={`p-1.5 rounded-xl border-2 transition-all duration-200 cursor-default select-none shadow-[0px_-1px_0px_0px_var(--color-line)_inset] dark:shadow-[0px_-1px_0px_0px_var(--color-line)_inset]
