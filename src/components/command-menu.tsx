@@ -7,6 +7,7 @@ import { copyText } from "@/utils/copy";
 import { Kbd, KbdGroup } from "./ui/kbd";
 import { CopyButton } from "./copy-button";
 import { BRAND_ASSETS } from "@/config/site";
+import { trackEvent } from "@/lib/analytics";
 import { getMarkSVG, YTMark } from "./yt-mark";
 import { getWordmarkSVG } from "./yt-wordmark";
 import { useRouter } from "@bprogress/next/app";
@@ -63,6 +64,7 @@ type CommandLinkItem = {
   keywords?: string[];
   openInNewTab?: boolean;
   copyText?: string;
+  copyItem?: string;
 };
 
 const MENU_LINKS: CommandLinkItem[] = [
@@ -134,6 +136,7 @@ const CONTACT_LINKS: CommandLinkItem[] = [
     icon: <EmailIcon />,
     keywords: ["email", "contact", "mail"],
     copyText: CONTACT_EMAIL,
+    copyItem: "email",
   },
   {
     title: formatPhoneNumber(CONTACT_PHONE),
@@ -142,6 +145,7 @@ const CONTACT_LINKS: CommandLinkItem[] = [
     icon: <PhoneIcon />,
     keywords: ["phone", "contact", "number", "call"],
     copyText: CONTACT_PHONE,
+    copyItem: "phone",
   },
 ];
 
@@ -186,7 +190,25 @@ export function CommandMenu({
 
   const { setTheme } = useTheme();
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
+
+  const setOpen = useCallback(
+    (
+      next: boolean | ((current: boolean) => boolean),
+      method: "keyboard" | "click" | "dismiss" | "action",
+    ) => {
+      setOpenState((current) => {
+        const resolved = typeof next === "function" ? next(current) : next;
+        if (current !== resolved) {
+          trackEvent(resolved ? "command_menu_opened" : "command_menu_closed", {
+            method,
+          });
+        }
+        return resolved;
+      });
+    },
+    [],
+  );
 
   const [selectedCommandKind, setSelectedCommandKind] =
     useState<CommandKind | null>(null);
@@ -200,14 +222,19 @@ export function CommandMenu({
     (e) => {
       e.preventDefault();
 
-      setOpen((open) => !open);
+      setOpen((current) => !current, "keyboard");
     },
     { enabled: enabledHotkeys },
   );
 
   const handleOpenLink = useCallback(
     (href: string, openInNewTab = false) => {
-      setOpen(false);
+      trackEvent("command_menu_action", {
+        action: "navigate",
+        target: href,
+        new_tab: openInNewTab,
+      });
+      setOpen(false, "action");
 
       if (openInNewTab) {
         window.open(href, "_blank", "noopener");
@@ -217,27 +244,30 @@ export function CommandMenu({
         router.push(href);
       }
     },
-    [router],
+    [router, setOpen],
   );
 
   const handleCopyText = useCallback(
-    (text: string, message: string) => {
-      setOpen(false);
-      copyText(text);
+    (text: string, message: string, item: string) => {
+      trackEvent("command_menu_action", { action: "copy", target: item });
+      setOpen(false, "action");
+      copyText(text, item);
       toast.success(message);
       tiksSuccess();
     },
-    [tiksSuccess],
+    [tiksSuccess, setOpen],
   );
 
   const createThemeHandler = useCallback(
     (theme: "light" | "dark" | "system") => () => {
       click();
-      setOpen(false);
+      trackEvent("command_menu_action", { action: "theme", target: theme });
+      trackEvent("theme_changed", { theme, method: "command_menu" });
+      setOpen(false, "action");
 
       setTheme(theme);
     },
-    [click, setTheme],
+    [click, setTheme, setOpen],
   );
 
   const handleLinkHighlight = useCallback((link: CommandLinkItem) => {
@@ -252,11 +282,14 @@ export function CommandMenu({
     <>
       <CommandMenuTrigger
         onClick={() => {
-          setOpen(true);
+          setOpen(true, "click");
         }}
       />
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog
+        open={open}
+        onOpenChange={(next) => setOpen(next, "dismiss")}
+      >
         <CommandMenuInput />
 
         <div className="rounded-xl bg-background ring-1 ring-border">
@@ -296,7 +329,11 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
-                    handleCopyText(getMarkSVG(), "Mark as SVG copied");
+                    handleCopyText(
+                      getMarkSVG(),
+                      "Mark as SVG copied",
+                      "brand_mark_svg",
+                    );
                   }}
                 >
                   <YTMark />
@@ -306,7 +343,11 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
-                    handleCopyText(getWordmarkSVG(), "Logotype as SVG copied");
+                    handleCopyText(
+                      getWordmarkSVG(),
+                      "Logotype as SVG copied",
+                      "brand_logotype_svg",
+                    );
                   }}
                 >
                   <TypeIcon />
@@ -316,6 +357,10 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
+                    trackEvent("command_menu_action", {
+                      action: "download",
+                      target: "brand_assets",
+                    });
                     const anchor = document.createElement("a");
                     anchor.href = BRAND_ASSETS.url;
                     anchor.download = "";
@@ -407,7 +452,11 @@ function CommandMenuInput() {
 
   useEffect(() => {
     if (searchValue.length >= 2) {
-      const timeoutId = setTimeout(() => {}, 500);
+      const timeoutId = setTimeout(() => {
+        trackEvent("command_menu_searched", {
+          query_length: searchValue.length,
+        });
+      }, 500);
 
       return () => clearTimeout(timeoutId);
     }
@@ -526,6 +575,8 @@ function CommandLinkGroup({
                 className="pointer-events-auto ml-auto size-7 shrink-0 text-muted-foreground hover:text-foreground"
                 variant="ghost"
                 text={link.copyText}
+                aria-label={`Copy ${link.copyItem ?? link.title}`}
+                trackAs={link.copyItem}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}

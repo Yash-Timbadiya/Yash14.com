@@ -14,6 +14,8 @@ export function CopyBrandSvgButton({ type }: { type: "mark" | "logotype" }) {
       variant="outline"
       size="sm"
       text={getSVG}
+      aria-label={`Copy ${label} as SVG`}
+      trackAs={type === "mark" ? "brand_mark_svg" : "brand_logotype_svg"}
       onCopySuccess={() => toast.success(`${label} as SVG copied`)}
       className="px-2"
     />

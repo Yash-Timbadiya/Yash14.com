@@ -5,6 +5,7 @@ import type { VolumeIconHandle } from "@/components/animated-icons/volume-icon";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useSound } from "@/hooks/use-sound";
+import { trackEvent } from "@/lib/analytics";
 import { useHotkeys } from "react-hotkeys-hook";
 import { VolumeIcon } from "@/components/animated-icons/volume-icon";
 
@@ -19,12 +20,19 @@ export function PronounceMyName({
 
   const volumeIconRef = useRef<VolumeIconHandle>(null);
 
-  const handlePlayClick = () => {
+  const handlePlay = (method: "click" | "keyboard") => {
+    trackEvent("name_pronunciation_played", { method });
     volumeIconRef.current?.startAnimation();
     play();
   };
 
-  useHotkeys("p", handlePlayClick);
+  useHotkeys("p", () => {
+    trackEvent("keyboard_shortcut_used", {
+      shortcut: "p",
+      action: "play_name_pronunciation",
+    });
+    handlePlay("keyboard");
+  });
 
   return (
     <button
@@ -33,7 +41,7 @@ export function PronounceMyName({
         "relative flex touch-manipulation items-center justify-center text-muted-foreground transition-[color,scale] will-change-[scale] select-none hover:text-foreground active:scale-[0.9]",
         className,
       )}
-      onClick={handlePlayClick}
+      onClick={() => handlePlay("click")}
       aria-label="Pronounce my name"
     >
       <span className="absolute size-12 pointer-fine:hidden" aria-hidden />
