@@ -2,14 +2,13 @@
 
 import { useId } from "react";
 import { toast } from "sonner";
+import { copyText } from "@/utils/copy";
 import { MailIcon } from "lucide-react";
-import { trackEvent } from "@/lib/events";
 import { decodeEmail } from "@/utils/string";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useIsClient } from "@/hooks/use-is-client";
 import { useTiks } from "@rexa-developer/tiks/react";
 import { CopyButton } from "@/components/copy-button";
-import { copyToClipboardWithEvent } from "@/utils/copy";
 import { RevealEncodedTextScript } from "./reveal-encoded-text";
 import {
   IntroItem,
@@ -30,13 +29,7 @@ export function EmailItem({ emailB64 }: EmailItemProps) {
   const { success } = useTiks();
 
   useHotkeys("shift+e", () => {
-    copyToClipboardWithEvent(emailDecoded, {
-      name: "copy_email",
-      properties: {
-        method: "keyboard",
-        key: "shift+e",
-      },
-    });
+    copyText(emailDecoded);
     success();
     toast.success("Email copied");
   });
@@ -63,14 +56,6 @@ export function EmailItem({ emailB64 }: EmailItemProps) {
           variant="ghost"
           size="icon-xs"
           text={() => emailDecoded}
-          onCopySuccess={() => {
-            trackEvent({
-              name: "copy_email",
-              properties: {
-                method: "button",
-              },
-            });
-          }}
         />
       </div>
 
