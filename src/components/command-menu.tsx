@@ -1,7 +1,5 @@
 "use client";
 
-import type { DocPreview } from "@/features/doc/types/document";
-
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
@@ -18,11 +16,10 @@ import { USER } from "@/features/portfolio/data/user";
 import { copyToClipboardWithEvent } from "@/utils/copy";
 import { EmailIcon, PhoneIcon, SearchIcon } from "./icons";
 import { useClickSound } from "@/hooks/soundcn/use-click-sound";
+import React, { useCallback, useEffect, useState } from "react";
 import { useMutationObserver } from "@/hooks/use-mutation-observer";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { SOCIAL_LINKS } from "@/features/portfolio/data/social-links";
-import { ComponentIcon } from "@/features/doc/components/component-icon";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { SOCIAL_ICONS } from "@/features/portfolio/components/social-link-icons";
 import {
   decodeEmail,
@@ -49,14 +46,13 @@ import {
   MonitorIcon,
   MoonStarIcon,
   PaletteIcon,
-  RssIcon,
   SquareDashedIcon,
   SunMediumIcon,
   TextInitialIcon,
   TypeIcon,
 } from "lucide-react";
 
-type CommandKind = "command" | "page" | "link" | "component";
+type CommandKind = "command" | "page" | "link";
 
 type CommandLinkItem = {
   title: string;
@@ -183,20 +179,11 @@ const OTHER_LINK_ITEMS: CommandLinkItem[] = [
     icon: <FileTextIcon />,
     openInNewTab: true,
   },
-  {
-    title: "RSS Feed",
-    href: "/rss",
-    kind: "link",
-    icon: <RssIcon />,
-    openInNewTab: true,
-  },
 ];
 
 export function CommandMenu({
-  docs,
   enabledHotkeys = false,
 }: {
-  docs: DocPreview[];
   enabledHotkeys?: boolean;
 }) {
   const router = useRouter();
@@ -241,7 +228,6 @@ export function CommandMenu({
         name: "command_menu_action",
         properties: {
           action: "navigate",
-          href: href,
           open_in_new_tab: openInNewTab,
         },
       });
@@ -264,7 +250,6 @@ export function CommandMenu({
         name: "command_menu_action",
         properties: {
           action: "copy",
-          text: text,
         },
       });
       toast.success(message);
@@ -290,46 +275,6 @@ export function CommandMenu({
     },
     [click, setTheme],
   );
-
-  const components = useMemo(
-    () =>
-      docs
-        .filter((doc) => doc.category === "components")
-        .sort((a, b) =>
-          a.title.localeCompare(b.title, "en", {
-            sensitivity: "base",
-          }),
-        ),
-    [docs],
-  );
-
-  const componentsGroup = useMemo(() => {
-    if (!components || components.length === 0) {
-      return null;
-    }
-
-    return (
-      <CommandGroup heading="Components">
-        {components.map((component) => {
-          return (
-            <CommandMenuItem
-              key={component.slug}
-              keywords={["component"]}
-              onHighlight={() => {
-                setSelectedCommandKind("component");
-              }}
-              onSelect={() => {
-                handleOpenLink(`/components/${component.slug}`);
-              }}
-            >
-              <ComponentIcon slug={component.slug} />
-              <p className="line-clamp-1">{component.title}</p>
-            </CommandMenuItem>
-          );
-        })}
-      </CommandGroup>
-    );
-  }, [components, handleOpenLink]);
 
   const handleLinkHighlight = useCallback((link: CommandLinkItem) => {
     setSelectedCommandKind(link.kind);
@@ -381,8 +326,6 @@ export function CommandMenu({
                 onLinkHighlight={handleLinkHighlight}
                 onLinkSelect={handleOpenLink}
               />
-
-              {componentsGroup}
 
               <CommandLinkGroup
                 heading="Social Links"
@@ -510,7 +453,6 @@ function CommandMenuInput() {
         trackEvent({
           name: "command_menu_search",
           properties: {
-            query: searchValue,
             query_length: searchValue.length,
           },
         });
@@ -664,7 +606,6 @@ const ENTER_ACTION_LABELS: Record<CommandKind, string> = {
   command: "Run Command",
   page: "Go to Page",
   link: "Open Link",
-  component: "Go to Component",
 };
 
 function CommandMenuFooter({

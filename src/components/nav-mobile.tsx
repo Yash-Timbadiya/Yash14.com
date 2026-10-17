@@ -4,9 +4,9 @@ import type { Route } from "next";
 import type { NavItem } from "@/types/nav";
 
 import Link from "next/link";
+import { haptic } from "@/lib/haptic";
 import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
-import { haptic } from "@/registry/lib/haptic";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import {

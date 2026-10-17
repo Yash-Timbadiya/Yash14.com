@@ -1,5 +1,4 @@
 import tseslint from "typescript-eslint";
-import reactHooks from "eslint-plugin-react-hooks";
 import perfectionist from "eslint-plugin-perfectionist";
 
 // Import sorting only. Everything else (linting, formatting) stays with Biome,
@@ -12,7 +11,6 @@ export default [
       "dist/**",
       "build/**",
       "public/**",
-      "src/registry/__index__.tsx",
     ],
   },
   {
@@ -23,12 +21,8 @@ export default [
         ecmaFeatures: { jsx: true },
       },
     },
-    // react-hooks and @typescript-eslint are registered without enabling any
-    // rules so the eslint-disable comments shipped in src/registry resolve.
     plugins: {
       perfectionist,
-      "react-hooks": reactHooks,
-      "@typescript-eslint": tseslint.plugin,
     },
     rules: {
       "perfectionist/sort-imports": [

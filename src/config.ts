@@ -13,11 +13,6 @@ export const config = {
     url: process.env.NEXT_PUBLIC_CDN_URL,
   },
 
-  registry: {
-    namespace: process.env.NEXT_PUBLIC_REGISTRY_NAMESPACE,
-    namespaceUrl: process.env.NEXT_PUBLIC_REGISTRY_NAMESPACE_URL,
-  },
-
   github: {
     apiToken: process.env.GITHUB_API_TOKEN,
     contributionsApiUrl: process.env.GITHUB_CONTRIBUTIONS_API_URL,

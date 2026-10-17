@@ -1,5 +1,3 @@
-import type { DocPreview } from "@/features/doc/types/document";
-
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MAIN_NAV } from "@/config/site";
@@ -7,7 +5,6 @@ import { YTMark } from "@/components/yt-mark";
 import { NavDesktop } from "@/components/nav-desktop";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { getAllDocs } from "@/features/doc/data/documents";
 import { NavItemGitHub } from "@/components/nav-item-github";
 
 const BrandContextMenu = dynamic(
@@ -17,15 +14,6 @@ const BrandContextMenu = dynamic(
 const CommandMenu = dynamic(() => import("@/components/command-menu"));
 
 export function SiteHeader() {
-  const docs = getAllDocs();
-
-  // Minimize data serialized to client component - only send necessary fields
-  const docPreviews: DocPreview[] = docs.map((doc) => ({
-    slug: doc.slug,
-    title: doc.metadata.title,
-    category: doc.metadata.category,
-  }));
-
   return (
     <header className="sticky top-0 z-50 max-w-screen overflow-x-clip bg-background px-2">
       <div className="screen-line-top screen-line-bottom mx-auto flex h-(--header-height) items-center gap-2 border-x screen-line-bottom-border screen-line-top-border pr-2 pl-4 group-has-data-[slot=layout-wide]/layout:container after:z-1 sm:gap-4 md:max-w-4xl">
@@ -44,7 +32,7 @@ export function SiteHeader() {
             orientation="vertical"
             className="mr-2 max-sm:hidden data-vertical:h-5 data-vertical:self-center"
           />
-          <CommandMenu docs={docPreviews} enabledHotkeys />
+          <CommandMenu enabledHotkeys />
           <Separator
             orientation="vertical"
             className="mx-2 max-sm:hidden data-vertical:h-5 data-vertical:self-center"

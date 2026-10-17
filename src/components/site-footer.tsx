@@ -3,7 +3,6 @@
 import type { BuildInfo } from "@/lib/build-info";
 
 import { cn } from "@/lib/utils";
-import registry from "../../registry.json";
 import packageJson from "../../package.json";
 import { addQueryParams } from "@/utils/url";
 import { LinkPreview } from "@/components/link-preview";
@@ -68,11 +67,6 @@ export function SiteFooter() {
               <time dateTime={build.date}>{build.date}</time>
             </Field>
 
-            <Field label="Registry">
-              {registry.items.length}{" "}
-              {registry.items.length === 1 ? "item" : "items"}
-            </Field>
-
             <Field label="Deployed on">
               {shouldReduceMotion ? (
                 <span className="font-sans" aria-hidden>
@@ -113,6 +107,21 @@ export function SiteFooter() {
 
             <Field label="Typeface">Geist</Field>
 
+            <Field label="Analytics">
+              <ul className="flex flex-col gap-0.5">
+                <li className="w-fit transition-transform duration-200 hover:translate-x-0.5">
+                  <a
+                    className="link-underline"
+                    href={addQueryParams("https://posthog.com", UTM_PARAMS)}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    PostHog
+                  </a>
+                </li>
+              </ul>
+            </Field>
+
             <Field className="col-span-2" label="Stack">
               <ul className="flex flex-col gap-0.5">
                 {stack.map((item) => (
@@ -133,22 +142,7 @@ export function SiteFooter() {
               </ul>
             </Field>
 
-            <Field label="Analytics">
-              <ul className="flex flex-col gap-0.5">
-                <li className="w-fit transition-transform duration-200 hover:translate-x-0.5">
-                  <a
-                    className="link-underline"
-                    href={addQueryParams("https://posthog.com", UTM_PARAMS)}
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    PostHog
-                  </a>
-                </li>
-              </ul>
-            </Field>
-
-            <Field label="For agents">
+            <Field className="col-span-2" label="For agents">
               <ul className="flex flex-col gap-0.5">
                 <li className="w-fit transition-transform duration-200 hover:translate-x-0.5">
                   <a
