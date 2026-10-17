@@ -1,6 +1,7 @@
 "use client";
 
-import type { AnalyticsSection } from "@/lib/analytics-events";
+import type { AnalyticsProperties } from "@/lib/analytics";
+import type { AnalyticsEvent, AnalyticsSection } from "@/lib/analytics-events";
 
 import { toast } from "sonner";
 import { Button } from "./ui/button";
@@ -21,14 +22,21 @@ import { useClickSound } from "@/hooks/soundcn/use-click-sound";
 import React, { useCallback, useEffect, useState } from "react";
 import { useMutationObserver } from "@/hooks/use-mutation-observer";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
-import { SOCIAL_LINKS } from "@/features/portfolio/data/social-links";
-import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { SOCIAL_ICONS } from "@/features/portfolio/components/social-link-icons";
 import {
   decodeEmail,
   decodePhoneNumber,
   formatPhoneNumber,
 } from "@/utils/string";
+import {
+  SOCIAL_LINKS,
+  SOCIAL_REDIRECT_EVENTS,
+} from "@/features/portfolio/data/social-links";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_METHODS,
+  ANALYTICS_SECTIONS,
+} from "@/lib/analytics-events";
 import {
   CommandDialog,
   CommandEmpty,
@@ -67,6 +75,11 @@ type CommandLinkItem = {
   keywords?: string[];
   openInNewTab?: boolean;
   copyText?: string;
+  /** Sent when the item is selected, with `section: "command_menu"` added. */
+  event?: AnalyticsEvent;
+  eventProperties?: Omit<AnalyticsProperties, "section">;
+  /** Sent when the item's copy button copies `copyText`. */
+  copyEvent?: AnalyticsEvent;
 };
 
 const MENU_LINKS: CommandLinkItem[] = [
@@ -76,6 +89,7 @@ const MENU_LINKS: CommandLinkItem[] = [
     kind: "page",
     icon: <YTMark />,
     shortcut: "GH",
+    event: ANALYTICS_EVENTS.VIEW_HOME,
   },
   {
     title: "Brand",
@@ -83,6 +97,7 @@ const MENU_LINKS: CommandLinkItem[] = [
     kind: "page",
     icon: <SquareDashedIcon />,
     shortcut: "GY",
+    event: ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES,
   },
 ];
 
@@ -91,30 +106,40 @@ const PORTFOLIO_LINKS: CommandLinkItem[] = [
     title: "Hello",
     href: "/#hello",
     kind: "page",
+    event: ANALYTICS_EVENTS.VIEW_SECTION,
+    eventProperties: { target: "hello" },
     icon: <TextInitialIcon />,
   },
   {
     title: "Experience",
     href: "/#experience",
     kind: "page",
+    event: ANALYTICS_EVENTS.VIEW_SECTION,
+    eventProperties: { target: "experience" },
     icon: <BriefcaseBusinessIcon />,
   },
   {
     title: "Projects",
     href: "/#projects",
     kind: "page",
+    event: ANALYTICS_EVENTS.VIEW_SECTION,
+    eventProperties: { target: "projects" },
     icon: <BoxIcon />,
   },
   {
     title: "Bookmarks",
     href: "/#bookmarks",
     kind: "page",
+    event: ANALYTICS_EVENTS.VIEW_SECTION,
+    eventProperties: { target: "bookmarks" },
     icon: <BookmarkIcon />,
   },
   {
     title: "Insights",
     href: "/#insights",
     kind: "page",
+    event: ANALYTICS_EVENTS.VIEW_SECTION,
+    eventProperties: { target: "insights" },
     icon: <LineChartIcon />,
   },
   {
@@ -124,6 +149,8 @@ const PORTFOLIO_LINKS: CommandLinkItem[] = [
     icon: <PaletteIcon />,
     keywords: ["creative", "portfolio", "design", "old portfolio"],
     openInNewTab: true,
+    event: ANALYTICS_EVENTS.REDIRECT_TO_CREATIVE_PORTFOLIO,
+    eventProperties: { url: "https://creative.yash14.com/" },
   },
 ];
 
@@ -138,6 +165,8 @@ const CONTACT_LINKS: CommandLinkItem[] = [
     icon: <EmailIcon />,
     keywords: ["email", "contact", "mail"],
     copyText: CONTACT_EMAIL,
+    event: ANALYTICS_EVENTS.EMAIL_CLICK,
+    copyEvent: ANALYTICS_EVENTS.EMAIL_COPY,
   },
   {
     title: formatPhoneNumber(CONTACT_PHONE),
@@ -146,6 +175,8 @@ const CONTACT_LINKS: CommandLinkItem[] = [
     icon: <PhoneIcon />,
     keywords: ["phone", "contact", "number", "call"],
     copyText: CONTACT_PHONE,
+    event: ANALYTICS_EVENTS.PHONE_NUMBER_CLICK,
+    copyEvent: ANALYTICS_EVENTS.PHONE_NUMBER_COPY,
   },
 ];
 
@@ -155,6 +186,8 @@ const SOCIAL_LINK_ITEMS: CommandLinkItem[] = SOCIAL_LINKS.map((item) => ({
   kind: "link",
   icon: SOCIAL_ICONS[item.name],
   openInNewTab: true,
+  event: SOCIAL_REDIRECT_EVENTS[item.name],
+  eventProperties: { url: item.href },
 }));
 
 const COMMAND_MENU_ACTIVE_LAYOUT_ID = "command-menu-active";
@@ -171,6 +204,7 @@ const OTHER_LINK_ITEMS: CommandLinkItem[] = [
     href: "/vcard",
     kind: "command",
     icon: <DownloadIcon />,
+    event: ANALYTICS_EVENTS.DOWNLOAD_VCARD,
   },
   {
     title: "llms.txt",
@@ -178,6 +212,7 @@ const OTHER_LINK_ITEMS: CommandLinkItem[] = [
     kind: "link",
     icon: <FileTextIcon />,
     openInNewTab: true,
+    event: ANALYTICS_EVENTS.VIEW_LLMS_TXT,
   },
 ];
 
@@ -231,13 +266,24 @@ export function CommandMenu({
     (e) => {
       e.preventDefault();
 
+      trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
+        section: ANALYTICS_SECTIONS.KEYBOARD,
+        shortcut: e.key === "/" ? "/" : "mod+k",
+        action: "toggle_command_menu",
+      });
       setOpen((current) => !current, "keyboard");
     },
     { enabled: enabledHotkeys },
   );
 
   const handleOpenLink = useCallback(
-    (href: string, openInNewTab = false) => {
+    ({ href, openInNewTab, event, eventProperties }: CommandLinkItem) => {
+      if (event) {
+        trackEvent(event, {
+          ...eventProperties,
+          section: ANALYTICS_SECTIONS.COMMAND_MENU,
+        });
+      }
       setOpen(false, "action");
 
       if (openInNewTab) {
@@ -252,7 +298,8 @@ export function CommandMenu({
   );
 
   const handleCopyText = useCallback(
-    (text: string, message: string) => {
+    (text: string, message: string, event: AnalyticsEvent) => {
+      trackEvent(event, { section: ANALYTICS_SECTIONS.COMMAND_MENU });
       setOpen(false, "action");
       copyText(text);
       toast.success(message);
@@ -336,7 +383,11 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
-                    handleCopyText(getMarkSVG(), "Mark as SVG copied");
+                    handleCopyText(
+                      getMarkSVG(),
+                      "Mark as SVG copied",
+                      ANALYTICS_EVENTS.COPY_MARK_SVG,
+                    );
                   }}
                 >
                   <YTMark />
@@ -346,7 +397,11 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
-                    handleCopyText(getWordmarkSVG(), "Logotype as SVG copied");
+                    handleCopyText(
+                      getWordmarkSVG(),
+                      "Logotype as SVG copied",
+                      ANALYTICS_EVENTS.COPY_LOGOTYPE_SVG,
+                    );
                   }}
                 >
                   <TypeIcon />
@@ -356,6 +411,10 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
+                    trackEvent(ANALYTICS_EVENTS.DOWNLOAD_BRAND_ASSETS, {
+                      section: ANALYTICS_SECTIONS.COMMAND_MENU,
+                      url: BRAND_ASSETS.url,
+                    });
                     const anchor = document.createElement("a");
                     anchor.href = BRAND_ASSETS.url;
                     anchor.download = "";
@@ -527,7 +586,7 @@ function CommandLinkGroup({
   links: CommandLinkItem[];
   fallbackIcon?: React.ReactElement;
   onLinkHighlight: (link: CommandLinkItem) => void;
-  onLinkSelect: (href: string, openInNewTab?: boolean) => void;
+  onLinkSelect: (link: CommandLinkItem) => void;
 }) {
   return (
     <CommandGroup heading={heading}>
@@ -539,7 +598,7 @@ function CommandLinkGroup({
             key={link.href}
             keywords={link.keywords}
             onHighlight={() => onLinkHighlight(link)}
-            onSelect={() => onLinkSelect(link.href, link.openInNewTab)}
+            onSelect={() => onLinkSelect(link)}
           >
             {link?.iconImage ? (
               <img
@@ -566,6 +625,12 @@ function CommandLinkGroup({
                   e.stopPropagation();
                 }}
                 onCopySuccess={() => {
+                  if (link.copyEvent) {
+                    trackEvent(link.copyEvent, {
+                      section: ANALYTICS_SECTIONS.COMMAND_MENU,
+                      method: ANALYTICS_METHODS.BUTTON,
+                    });
+                  }
                   toast.success("Copied to clipboard");
                 }}
               />

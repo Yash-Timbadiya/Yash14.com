@@ -8,9 +8,9 @@ import { haptic } from "@/lib/haptic";
 import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { trackNavItemClick } from "@/lib/analytics";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
+import { trackEvent, trackNavItemClick } from "@/lib/analytics";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   Popover,
   PopoverContent,
@@ -26,6 +26,12 @@ export function NavMobile({ items }: { items: NavItem<Route>[] }) {
 
   const handleOpenChange = useCallback((open: boolean) => {
     haptic();
+    trackEvent(
+      open
+        ? ANALYTICS_EVENTS.MOBILE_MENU_OPENED
+        : ANALYTICS_EVENTS.MOBILE_MENU_CLOSED,
+      { section: ANALYTICS_SECTIONS.BOTTOM_NAV },
+    );
     setOpen(open);
   }, []);
 

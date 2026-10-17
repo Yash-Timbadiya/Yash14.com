@@ -1,4 +1,7 @@
+import type { AnalyticsEvent } from "@/lib/analytics-events";
 import type { SocialProfile } from "@/features/portfolio/types/social-links";
+
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
 
 /**
  * Keyed registry of social profiles — the single source of truth. Icons are
@@ -27,6 +30,16 @@ export const SOCIAL = {
 } satisfies Record<string, SocialProfile>;
 
 export type SocialName = keyof typeof SOCIAL;
+
+/**
+ * Event sent when a profile link is opened. Keyed like `SOCIAL`, so adding a
+ * profile fails to compile until it has an event here.
+ */
+export const SOCIAL_REDIRECT_EVENTS = {
+  x: ANALYTICS_EVENTS.REDIRECT_TO_X,
+  github: ANALYTICS_EVENTS.REDIRECT_TO_GITHUB,
+  linkedin: ANALYTICS_EVENTS.REDIRECT_TO_LINKEDIN,
+} satisfies Record<SocialName, AnalyticsEvent>;
 
 export type SocialLink = SocialProfile & { name: SocialName };
 

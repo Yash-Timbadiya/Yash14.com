@@ -35,16 +35,4 @@ export function IntroItemContent({
   return <p className={cn("text-balance", className)} {...props} />;
 }
 
-export function IntroItemLink({
-  className,
-  ...props
-}: React.ComponentProps<"a">) {
-  return (
-    <a
-      className={cn("link", className)}
-      target="_blank"
-      rel="noopener"
-      {...props}
-    />
-  );
-}
+export { IntroItemLink } from "./intro-item-link";

@@ -4,6 +4,7 @@ import { useId } from "react";
 import { toast } from "sonner";
 import { copyText } from "@/utils/copy";
 import { MailIcon } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { decodeEmail } from "@/utils/string";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useIsClient } from "@/hooks/use-is-client";
@@ -16,6 +17,11 @@ import {
   IntroItemIcon,
   IntroItemLink,
 } from "./intro-item";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_METHODS,
+  ANALYTICS_SECTIONS,
+} from "@/lib/analytics-events";
 
 type EmailItemProps = {
   emailB64: string;
@@ -29,6 +35,15 @@ export function EmailItem({ emailB64 }: EmailItemProps) {
   const { success } = useTiks();
 
   useHotkeys("shift+e", () => {
+    trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
+      section: ANALYTICS_SECTIONS.KEYBOARD,
+      shortcut: "shift+e",
+      action: "copy_email",
+    });
+    trackEvent(ANALYTICS_EVENTS.EMAIL_COPY, {
+      section: ANALYTICS_SECTIONS.OVERVIEW,
+      method: ANALYTICS_METHODS.SHORTCUT,
+    });
     copyText(emailDecoded);
     success();
     toast.success("Email copied");
@@ -45,6 +60,8 @@ export function EmailItem({ emailB64 }: EmailItemProps) {
           id={id}
           href={isClient ? `mailto:${emailDecoded}` : ""}
           suppressHydrationWarning
+          event={ANALYTICS_EVENTS.EMAIL_CLICK}
+          eventProperties={{ section: ANALYTICS_SECTIONS.OVERVIEW }}
         >
           {isClient ? emailDecoded : ""}
         </IntroItemLink>
@@ -56,6 +73,12 @@ export function EmailItem({ emailB64 }: EmailItemProps) {
           variant="ghost"
           size="icon-xs"
           text={() => emailDecoded}
+          onCopySuccess={() =>
+            trackEvent(ANALYTICS_EVENTS.EMAIL_COPY, {
+              section: ANALYTICS_SECTIONS.OVERVIEW,
+              method: ANALYTICS_METHODS.BUTTON,
+            })
+          }
         />
       </div>
 

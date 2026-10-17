@@ -18,7 +18,9 @@ export function trackEvent(
 
 /** Tracks a click on a site navigation item, for the items that have an event. */
 export function trackNavItemClick(href: string, section: AnalyticsSection) {
-  if (href === "/brand-guidelines") {
+  if (href === "/") {
+    trackEvent(ANALYTICS_EVENTS.VIEW_HOME, { section });
+  } else if (href === "/brand-guidelines") {
     trackEvent(ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES, { section });
   }
 }

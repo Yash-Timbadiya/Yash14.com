@@ -53,7 +53,14 @@ export function ThemeToggle() {
     });
   };
 
-  useHotkeys("d", () => switchTheme("keyboard"));
+  useHotkeys("d", () => {
+    trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
+      section: ANALYTICS_SECTIONS.KEYBOARD,
+      shortcut: "d",
+      action: "toggle_theme",
+    });
+    switchTheme("keyboard");
+  });
 
   return (
     <Tooltip>
