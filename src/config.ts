@@ -1,9 +1,4 @@
 export const config = {
-  runtime: {
-    nodeEnv: process.env.NODE_ENV,
-    isProduction: process.env.NODE_ENV === "production",
-  },
-
   app: {
     url: process.env.NEXT_PUBLIC_APP_URL || "https://yash14.com",
   },

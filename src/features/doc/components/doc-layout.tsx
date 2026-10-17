@@ -42,12 +42,6 @@ export function DocLeftCol({
   );
 }
 
-export function DocContentCol(
-  props: React.ComponentProps<typeof DocContainer>,
-) {
-  return <DocContainer data-slot="doc-content-col" {...props} />;
-}
-
 export function DocRightCol({
   className,
   ...props

@@ -50,7 +50,7 @@ export async function register() {
     resource: resourceFromAttributes({
       "service.name": "yash14.com",
     }),
-    processors: [new BatchLogRecordProcessor(exporter)],
+    processors: [new BatchLogRecordProcessor({ exporter })],
   });
 }
 

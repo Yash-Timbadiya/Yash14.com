@@ -1,10 +1,10 @@
 import sharp from "sharp";
 import VCard from "vcard-creator";
-import { SeverityNumber } from "@opentelemetry/api-logs";
 import { after, NextResponse } from "next/server";
-import { getPostHogLogger, posthogLoggerProvider } from "@/instrumentation";
 import { USER } from "@/features/portfolio/data/user";
+import { SeverityNumber } from "@opentelemetry/api-logs";
 import { decodeEmail, decodePhoneNumber } from "@/utils/string";
+import { getPostHogLogger, posthogLoggerProvider } from "@/instrumentation";
 
 export const revalidate = false;
 export const dynamic = "force-static";
