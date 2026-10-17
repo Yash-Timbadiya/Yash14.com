@@ -23,6 +23,11 @@ export const ANALYTICS_EVENTS = {
   VIEW_SECTION: "view_section",
   VIEW_EXPERIENCE: "view_experience",
   VIEW_LLMS_TXT: "view_llms_txt",
+  VIEW_INDEX_MD: "view_index_md",
+  VIEW_RSS: "view_rss",
+  VIEW_LICENSE: "view_license",
+  VIEW_DMCA: "view_dmca",
+  COPY_LINK: "copy_link",
 
   // Contact
   EMAIL_CLICK: "email_click",
@@ -66,6 +71,7 @@ export const ANALYTICS_EVENTS = {
   REDIRECT_TO_LINKEDIN: "redirect_to_linkedin",
   REDIRECT_TO_COMPANY: "redirect_to_company",
   REDIRECT_TO_WEBSITE: "redirect_to_website",
+  REDIRECT_TO_POSTHOG: "redirect_to_posthog",
   REDIRECT_TO_CREATIVE_PORTFOLIO: "redirect_to_creative_portfolio",
   VIEW_LOCATION_MAP: "view_location_map",
 
@@ -106,6 +112,7 @@ export const ANALYTICS_SECTIONS = {
   TECH_STACK: "tech_stack",
   EXPERIENCE: "experience",
   EDUCATION: "education",
+  FOOTER: "footer",
   /** Global keyboard shortcuts, which are not tied to one part of the page. */
   KEYBOARD: "keyboard",
 } as const;
@@ -124,6 +131,12 @@ export const ANALYTICS_SOURCES = {
   ASSET_BUTTONS: "asset_buttons",
   TOC: "toc",
   HEADING: "heading",
+  CRAFTED_BY: "crafted_by",
+  BUILD_COMMIT: "build_commit",
+  SOURCE_CODE: "source_code",
+  STACK: "stack",
+  FOR_AGENTS: "for_agents",
+  FOOTER_LINKS: "footer_links",
 } as const;
 
 export type AnalyticsSource =

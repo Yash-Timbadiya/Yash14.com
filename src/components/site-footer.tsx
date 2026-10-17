@@ -4,6 +4,7 @@ import type { BuildInfo } from "@/lib/build-info";
 
 import { cn } from "@/lib/utils";
 import packageJson from "../../package.json";
+import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
 import { LinkPreview } from "@/components/link-preview";
 import { motion, useReducedMotion } from "motion/react";
@@ -12,6 +13,13 @@ import { SOCIAL } from "@/features/portfolio/data/social-links";
 import { SiteFooterLinks } from "@/components/site-footer-links";
 import { LICENSE, SOURCE_CODE_GITHUB_URL, UTM_PARAMS } from "@/config/site";
 import { SiteFooterInteractiveLogotype } from "@/components/site-footer-brand";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_SECTIONS,
+  ANALYTICS_SOURCES,
+} from "@/lib/analytics-events";
+
+const POSTHOG_URL = "https://posthog.com";
 
 const INSPIRED_BY = [
   "Tailwind CSS",
@@ -53,6 +61,13 @@ export function SiteFooter() {
                 <LinkPreview
                   url={addQueryParams(xLink.href, UTM_PARAMS)}
                   className="link-underline"
+                  onClick={() =>
+                    trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_X, {
+                      section: ANALYTICS_SECTIONS.FOOTER,
+                      source: ANALYTICS_SOURCES.CRAFTED_BY,
+                      url: xLink.href,
+                    })
+                  }
                 >
                   {xLink.handle}
                 </LinkPreview>
@@ -94,13 +109,30 @@ export function SiteFooter() {
               <LinkPreview
                 url={SOURCE_CODE_GITHUB_URL}
                 className="link-underline"
+                onClick={() =>
+                  trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_GITHUB, {
+                    section: ANALYTICS_SECTIONS.FOOTER,
+                    source: ANALYTICS_SOURCES.SOURCE_CODE,
+                    url: SOURCE_CODE_GITHUB_URL,
+                  })
+                }
               >
                 GitHub
               </LinkPreview>
             </Field>
 
             <Field label="License">
-              <LinkPreview url={LICENSE.url} className="link-underline">
+              <LinkPreview
+                url={LICENSE.url}
+                className="link-underline"
+                onClick={() =>
+                  trackEvent(ANALYTICS_EVENTS.VIEW_LICENSE, {
+                    section: ANALYTICS_SECTIONS.FOOTER,
+                    license: LICENSE.name,
+                    url: LICENSE.url,
+                  })
+                }
+              >
                 {LICENSE.name}
               </LinkPreview>
             </Field>
@@ -112,9 +144,15 @@ export function SiteFooter() {
                 <li className="w-fit transition-transform duration-200 hover:translate-x-0.5">
                   <a
                     className="link-underline"
-                    href={addQueryParams("https://posthog.com", UTM_PARAMS)}
+                    href={addQueryParams(POSTHOG_URL, UTM_PARAMS)}
                     target="_blank"
                     rel="noopener"
+                    onClick={() =>
+                      trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_POSTHOG, {
+                        section: ANALYTICS_SECTIONS.FOOTER,
+                        url: POSTHOG_URL,
+                      })
+                    }
                   >
                     PostHog
                   </a>
@@ -134,6 +172,15 @@ export function SiteFooter() {
                       href={addQueryParams(item.href, UTM_PARAMS)}
                       target="_blank"
                       rel="noopener"
+                      onClick={() =>
+                        trackEvent(ANALYTICS_EVENTS.TECH_STACK_CLICK, {
+                          section: ANALYTICS_SECTIONS.FOOTER,
+                          source: ANALYTICS_SOURCES.STACK,
+                          tech: item.name,
+                          version: item.version,
+                          url: item.href,
+                        })
+                      }
                     >
                       {item.name}@{item.version}
                     </a>
@@ -150,6 +197,12 @@ export function SiteFooter() {
                     href="/llms.txt"
                     target="_blank"
                     rel="noopener"
+                    onClick={() =>
+                      trackEvent(ANALYTICS_EVENTS.VIEW_LLMS_TXT, {
+                        section: ANALYTICS_SECTIONS.FOOTER,
+                        source: ANALYTICS_SOURCES.FOR_AGENTS,
+                      })
+                    }
                   >
                     llms.txt
                   </a>
@@ -160,6 +213,12 @@ export function SiteFooter() {
                     href="/index.md"
                     target="_blank"
                     rel="noopener"
+                    onClick={() =>
+                      trackEvent(ANALYTICS_EVENTS.VIEW_INDEX_MD, {
+                        section: ANALYTICS_SECTIONS.FOOTER,
+                        source: ANALYTICS_SOURCES.FOR_AGENTS,
+                      })
+                    }
                   >
                     index.md
                   </a>
@@ -242,7 +301,17 @@ function BuildValue({ build }: { build: BuildInfo }) {
   return (
     <>
       {build.commitUrl ? (
-        <LinkPreview url={build.commitUrl} className="link-underline">
+        <LinkPreview
+          url={build.commitUrl}
+          className="link-underline"
+          onClick={() =>
+            trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_GITHUB, {
+              section: ANALYTICS_SECTIONS.FOOTER,
+              source: ANALYTICS_SOURCES.BUILD_COMMIT,
+              url: build.commitUrl ?? null,
+            })
+          }
+        >
           {build.commitShortSha}
         </LinkPreview>
       ) : (

@@ -26,6 +26,7 @@ type LinkPreviewProps = {
   target?: string;
   rel?: string;
   side?: "top" | "bottom" | "left" | "right";
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 } & (
   | { isStatic: true; imageSrc: string }
   | { isStatic?: false; imageSrc?: never }
@@ -44,6 +45,7 @@ export function LinkPreview({
   target = "_blank",
   rel = "noopener",
   side = "top",
+  onClick,
 }: LinkPreviewProps) {
   let src: string;
   if (!isStatic) {
@@ -89,6 +91,7 @@ export function LinkPreview({
           target={target}
           rel={rel}
           onMouseMove={handleMouseMove}
+          onClick={onClick}
           className={cn("text-foreground", className)}
         >
           {children}
@@ -125,6 +128,7 @@ export function LinkPreview({
                 href={url}
                 target={target}
                 rel={rel}
+                onClick={onClick}
                 className="block rounded-xl border-2 border-transparent bg-neutral-300 dark:bg-zinc-800 p-1 shadow hover:border-border"
                 style={{ fontSize: 0 }}
               >
