@@ -17,6 +17,11 @@ import {
   IntroItemIcon,
   IntroItemLink,
 } from "./intro-item";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_METHODS,
+  ANALYTICS_SECTIONS,
+} from "@/lib/analytics-events";
 
 type PhoneItemProps = {
   phoneNumberB64: string;
@@ -31,11 +36,16 @@ export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
   const { success } = useTiks();
 
   useHotkeys("shift+p", () => {
-    trackEvent("keyboard_shortcut_used", {
+    trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
+      section: ANALYTICS_SECTIONS.KEYBOARD,
       shortcut: "shift+p",
-      action: "copy_phone",
+      action: "copy_phone_number",
     });
-    copyText(phoneNumberDecoded, "phone");
+    trackEvent(ANALYTICS_EVENTS.PHONE_NUMBER_COPY, {
+      section: ANALYTICS_SECTIONS.OVERVIEW,
+      method: ANALYTICS_METHODS.SHORTCUT,
+    });
+    copyText(phoneNumberDecoded);
     success();
     toast.success("Phone number copied");
   });
@@ -51,6 +61,8 @@ export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
           id={id}
           href={isClient ? `tel:${phoneNumberDecoded}` : ""}
           suppressHydrationWarning
+          event={ANALYTICS_EVENTS.PHONE_NUMBER_CLICK}
+          eventProperties={{ section: ANALYTICS_SECTIONS.OVERVIEW }}
         >
           {isClient ? phoneNumberFormatted : ""}
         </IntroItemLink>
@@ -62,8 +74,12 @@ export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
           variant="ghost"
           size="icon-xs"
           text={() => phoneNumberDecoded}
-          aria-label="Copy phone number"
-          trackAs="phone"
+          onCopySuccess={() =>
+            trackEvent(ANALYTICS_EVENTS.PHONE_NUMBER_COPY, {
+              section: ANALYTICS_SECTIONS.OVERVIEW,
+              method: ANALYTICS_METHODS.BUTTON,
+            })
+          }
         />
       </div>
 

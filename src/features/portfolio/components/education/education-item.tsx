@@ -7,6 +7,7 @@ import { Separator } from "@/components/base/ui/separator";
 import { GraduationCapIcon, InfinityIcon } from "lucide-react";
 import { CollapsibleTrigger } from "@/components/base/ui/collapsible";
 import { MarkdownLinkPreview } from "@/components/markdown-link-preview";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   Collapsible,
   CollapsibleChevronsUpDownIcon,
@@ -26,7 +27,17 @@ export function EducationItem({ item }: { item: Education }) {
         <span className="size-full -translate-y-2.25 rounded-bl-sm border-b border-l" />
       </div>
 
-      <Collapsible defaultOpen={item.isExpanded} disabled={!item.description}>
+      <Collapsible
+        defaultOpen={item.isExpanded}
+        disabled={!item.description}
+        openEvent={ANALYTICS_EVENTS.EDUCATION_OPENED}
+        closeEvent={ANALYTICS_EVENTS.EDUCATION_CLOSED}
+        eventProperties={{
+          section: ANALYTICS_SECTIONS.EDUCATION,
+          school: item.school,
+          degree: item.degree ?? null,
+        }}
+      >
         <CollapsibleTrigger
           className={cn(
             "group block w-full text-left",
@@ -100,7 +111,14 @@ export function EducationItem({ item }: { item: Education }) {
         <CollapsibleMotionContent>
           {item.description && (
             <div className="typeset typeset-description pt-3 pb-1 pl-9">
-              <MarkdownLinkPreview>{item.description}</MarkdownLinkPreview>
+              <MarkdownLinkPreview
+                eventProperties={{
+                  section: ANALYTICS_SECTIONS.EDUCATION,
+                  school: item.school,
+                }}
+              >
+                {item.description}
+              </MarkdownLinkPreview>
             </div>
           )}
         </CollapsibleMotionContent>

@@ -4,7 +4,9 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
+import { TrackedLink } from "@/components/tracked-link";
 import { ExperiencePositionItem } from "./experience-position-item";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 export function ExperienceItem({ experience }: { experience: Experience }) {
   return (
@@ -50,14 +52,20 @@ export function ExperienceItem({ experience }: { experience: Experience }) {
         <div className="flex min-w-0 flex-1 flex-col gap-x-3 gap-y-1 pr-1 sm:flex-row sm:items-baseline sm:justify-between">
           <h3 className="text-xl/6 font-medium">
             {experience.companyWebsite ? (
-              <a
+              <TrackedLink
                 className="link"
                 href={addQueryParams(experience.companyWebsite, UTM_PARAMS)}
                 target="_blank"
                 rel="noopener"
+                event={ANALYTICS_EVENTS.REDIRECT_TO_COMPANY}
+                eventProperties={{
+                  section: ANALYTICS_SECTIONS.EXPERIENCE,
+                  company: experience.companyName,
+                  url: experience.companyWebsite,
+                }}
               >
                 {experience.companyName}
-              </a>
+              </TrackedLink>
             ) : (
               experience.companyName
             )}
@@ -90,7 +98,11 @@ export function ExperienceItem({ experience }: { experience: Experience }) {
 
       <div className="relative space-y-4 before:absolute before:left-3 before:h-full before:w-px before:bg-border">
         {experience.positions.map((position) => (
-          <ExperiencePositionItem key={position.id} position={position} />
+          <ExperiencePositionItem
+            key={position.id}
+            position={position}
+            companyName={experience.companyName}
+          />
         ))}
       </div>
     </div>

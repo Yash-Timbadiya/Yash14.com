@@ -4,7 +4,13 @@ import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
 import { TECH_STACK } from "../data/tech-stack";
 import { PanelTitleCopy } from "./panel-title-copy";
+import { TrackedLink } from "@/components/tracked-link";
 import { Panel, PanelHeader, PanelTitle } from "./panel";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_SECTIONS,
+  ANALYTICS_SOURCES,
+} from "@/lib/analytics-events";
 
 const ID = "stack";
 
@@ -13,8 +19,18 @@ export function TechStack() {
     <Panel id={ID}>
       <PanelHeader>
         <PanelTitle>
-          <a href={`#${ID}`}>Stack</a>
-          <PanelTitleCopy id={ID} />
+          <TrackedLink
+            href={`#${ID}`}
+            event={ANALYTICS_EVENTS.VIEW_SECTION}
+            eventProperties={{
+              section: ANALYTICS_SECTIONS.TECH_STACK,
+              source: ANALYTICS_SOURCES.HEADING,
+              target: ID,
+            }}
+          >
+            Stack
+          </TrackedLink>
+          <PanelTitleCopy id={ID} section={ANALYTICS_SECTIONS.TECH_STACK} />
         </PanelTitle>
       </PanelHeader>
 
@@ -53,15 +69,23 @@ export function TechStack() {
                   {items.map((item) => {
                     return (
                       <li key={item.key} className="flex">
-                        <a
+                        <TrackedLink
                           href={addQueryParams(item.href, UTM_PARAMS)}
                           target="_blank"
                           rel="noopener"
+                          event={ANALYTICS_EVENTS.TECH_STACK_CLICK}
+                          eventProperties={{
+                            section: ANALYTICS_SECTIONS.TECH_STACK,
+                            tech: item.title,
+                            key: item.key,
+                            category,
+                            url: item.href,
+                          }}
                           className="flex h-(--badge-height) items-center justify-center gap-1.25 rounded-full bg-zinc-50/80 px-2 font-mono text-xs text-foreground inset-ring-1 inset-ring-border dark:bg-zinc-900/80 [&_svg]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0 [&_svg]:text-muted-foreground/80"
                         >
                           {item.icon}
                           {item.title}
-                        </a>
+                        </TrackedLink>
                       </li>
                     );
                   })}

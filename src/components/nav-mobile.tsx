@@ -9,6 +9,8 @@ import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { trackEvent, trackNavItemClick } from "@/lib/analytics";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   Popover,
   PopoverContent,
@@ -24,6 +26,12 @@ export function NavMobile({ items }: { items: NavItem<Route>[] }) {
 
   const handleOpenChange = useCallback((open: boolean) => {
     haptic();
+    trackEvent(
+      open
+        ? ANALYTICS_EVENTS.MOBILE_MENU_OPENED
+        : ANALYTICS_EVENTS.MOBILE_MENU_CLOSED,
+      { section: ANALYTICS_SECTIONS.BOTTOM_NAV },
+    );
     setOpen(open);
   }, []);
 
@@ -58,7 +66,10 @@ export function NavMobile({ items }: { items: NavItem<Route>[] }) {
                 href={link.href}
                 aria-current={isActive ? "page" : undefined}
                 className="rounded-lg px-3 py-1.5 text-base aria-[current=page]:bg-accent"
-                onClick={() => handleOpenChange(false)}
+                onClick={() => {
+                  trackNavItemClick(link.href, ANALYTICS_SECTIONS.BOTTOM_NAV);
+                  handleOpenChange(false);
+                }}
               >
                 {link.title}
               </Link>

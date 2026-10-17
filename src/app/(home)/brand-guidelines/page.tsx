@@ -2,13 +2,13 @@ import type React from "react";
 import type { Metadata } from "next";
 import type { TOCItemType } from "@/components/toc";
 
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { YTMark } from "@/components/yt-mark";
 import { Button } from "@/components/ui/button";
 import { TOCMinimap } from "@/components/toc-minimap";
 import { YTWordmark } from "@/components/yt-wordmark";
 import { USER } from "@/features/portfolio/data/user";
+import { TrackedLink } from "@/components/tracked-link";
 import { BRAND_ASSETS, SITE_INFO } from "@/config/site";
 import { CopyBrandSvgButton } from "./copy-brand-svg-button";
 import { ArrowLeftIcon, Download, LinkIcon } from "lucide-react";
@@ -19,6 +19,11 @@ import {
   YTWordmarkClearSpace,
 } from "@/components/yt-clear-space";
 import { LLMCopyButtonWithViewOptions } from "@/features/doc/components/doc-page-actions";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_SECTIONS,
+  ANALYTICS_SOURCES,
+} from "@/lib/analytics-events";
 import {
   DocContainer,
   DocGrid,
@@ -91,15 +96,29 @@ export default function BrandPage() {
             size="sm"
             asChild
           >
-            <Link href="/">
+            <TrackedLink
+              href="/"
+              event={ANALYTICS_EVENTS.VIEW_HOME}
+              eventProperties={{
+                section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
+                source: ANALYTICS_SOURCES.TOOLBAR,
+              }}
+            >
               <ArrowLeftIcon />
               Home
-            </Link>
+            </TrackedLink>
           </Button>
 
           <div className="flex items-center gap-2">
-            <LLMCopyButtonWithViewOptions markdownUrl="/brand.md" />
-            <DocShareMenu title={PAGE_TITLE} url="/brand-guidelines" />
+            <LLMCopyButtonWithViewOptions
+              markdownUrl="/brand.md"
+              section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}
+            />
+            <DocShareMenu
+              title={PAGE_TITLE}
+              url="/brand-guidelines"
+              section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}
+            />
           </div>
         </div>
 
@@ -133,7 +152,7 @@ export default function BrandPage() {
               <AnchorHeading id="mark">Mark</AnchorHeading>
             </PanelHeader>
 
-            <BrandContextMenu>
+            <BrandContextMenu section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}>
               <PanelContent className="flex items-center justify-center py-16">
                 <YTMark className="h-16 w-auto text-foreground sm:h-20" />
               </PanelContent>
@@ -141,10 +160,19 @@ export default function BrandPage() {
 
             <div className="screen-line-top flex flex-wrap justify-center gap-2 p-4">
               <Button asChild variant="outline" size="sm">
-                <a href={MARK_ASSET} download>
+                <TrackedLink
+                  href={MARK_ASSET}
+                  download
+                  event={ANALYTICS_EVENTS.DOWNLOAD_MARK_SVG}
+                  eventProperties={{
+                    section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
+                    source: ANALYTICS_SOURCES.ASSET_BUTTONS,
+                    url: MARK_ASSET,
+                  }}
+                >
                   <Download />
                   Download Mark
-                </a>
+                </TrackedLink>
               </Button>
               <CopyBrandSvgButton type="mark" />
             </div>
@@ -156,7 +184,7 @@ export default function BrandPage() {
               <AnchorHeading id="logotype">Logotype</AnchorHeading>
             </PanelHeader>
 
-            <BrandContextMenu>
+            <BrandContextMenu section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}>
               <PanelContent className="flex items-center justify-center px-8 py-16">
                 <YTWordmark className="h-8 w-auto text-foreground sm:h-10" />
               </PanelContent>
@@ -164,10 +192,19 @@ export default function BrandPage() {
 
             <div className="screen-line-top flex flex-wrap justify-center gap-2 p-4">
               <Button asChild variant="outline" size="sm">
-                <a href={LOGOTYPE_ASSET} download>
+                <TrackedLink
+                  href={LOGOTYPE_ASSET}
+                  download
+                  event={ANALYTICS_EVENTS.DOWNLOAD_LOGOTYPE_SVG}
+                  eventProperties={{
+                    section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
+                    source: ANALYTICS_SOURCES.ASSET_BUTTONS,
+                    url: LOGOTYPE_ASSET,
+                  }}
+                >
                   <Download />
                   Download Logotype
-                </a>
+                </TrackedLink>
               </Button>
               <CopyBrandSvgButton type="logotype" />
             </div>
@@ -216,10 +253,19 @@ export default function BrandPage() {
                 logotype, and icon in SVG.
               </p>
               <Button asChild>
-                <a href={BRAND_ASSETS.url} download>
+                <TrackedLink
+                  href={BRAND_ASSETS.url}
+                  download
+                  event={ANALYTICS_EVENTS.DOWNLOAD_BRAND_ASSETS}
+                  eventProperties={{
+                    section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
+                    source: ANALYTICS_SOURCES.ASSET_BUTTONS,
+                    url: BRAND_ASSETS.url,
+                  }}
+                >
                   <Download />
                   Download Brand Assets
-                </a>
+                </TrackedLink>
               </Button>
             </PanelContent>
           </Panel>
@@ -230,7 +276,10 @@ export default function BrandPage() {
 
         <DocRightCol>
           <div className="sticky top-[calc(var(--doc-cols-top,0)+(--spacing(3)))] translate-x-2 opacity-0 in-data-doc-cols-ready:opacity-100">
-            <TOCMinimap items={TOC_ITEMS} />
+            <TOCMinimap
+              items={TOC_ITEMS}
+              section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}
+            />
           </div>
         </DocRightCol>
       </DocGrid>
@@ -247,16 +296,22 @@ function AnchorHeading({
 }) {
   return (
     <PanelTitle id={id} className="scroll-mt-20">
-      <a
+      <TrackedLink
         href={`#${id}`}
         className="group/anchor inline-flex items-center gap-2 no-underline"
+        event={ANALYTICS_EVENTS.VIEW_SECTION}
+        eventProperties={{
+          section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
+          source: ANALYTICS_SOURCES.HEADING,
+          target: id,
+        }}
       >
         {children}
         <LinkIcon
           className="size-5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/panel-title:opacity-100"
           aria-hidden
         />
-      </a>
+      </TrackedLink>
     </PanelTitle>
   );
 }

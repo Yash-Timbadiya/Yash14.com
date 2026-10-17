@@ -2,16 +2,26 @@
 
 import type { Transition } from "motion/react";
 
-import { useEffect, useId, useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 import { useSound } from "@/hooks/soundcn/use-sound";
+import { useEffect, useId, useRef, useState } from "react";
 import { metalClickSound } from "@/lib/soundcn/metal-click";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "motion/react";
 
 const GRID = [
   [true, true, true, true, false, true],
@@ -23,7 +33,12 @@ const GRID = [
 const COLS = 6;
 const ROWS = 4;
 
-import { type CarModel, CarPreview, VehicleShape } from "./car-models";
+import {
+  CAR_MODEL_NAMES,
+  type CarModel,
+  CarPreview,
+  VehicleShape,
+} from "./car-models";
 
 const CAR_MODELS: CarModel[] = ["detailed", "supercar", "f1", "truck"];
 
@@ -371,11 +386,28 @@ type YTMarkIsometricProps = {
   onActivate?: () => void;
 };
 
+const HIGHLIGHT_SPRING = { stiffness: 300, damping: 30, mass: 0.1 };
+
 export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
   const patternId = `yt-hatch${useId().replace(/:/g, "")}`;
   const bandId0 = `yt-band-0${useId().replace(/:/g, "")}`;
   const bandId1 = `yt-band-1${useId().replace(/:/g, "")}`;
   const bandClipId = `yt-band-clip${useId().replace(/:/g, "")}`;
+  const highlightId = `yt-edge-highlight${useId().replace(/:/g, "")}`;
+  const svgRef = useRef<SVGSVGElement>(null);
+  const isInView = useInView(svgRef, { margin: "80px" });
+
+  // Edge highlight that follows the cursor across the whole window.
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  const highlightCx = useSpring(
+    useTransform(mouseX, [0, 1], [VIEWBOX.x, VIEWBOX.x + VIEWBOX.w]),
+    HIGHLIGHT_SPRING,
+  );
+  const highlightCy = useSpring(
+    useTransform(mouseY, [0, 1], [VIEWBOX.y, VIEWBOX.y + VIEWBOX.h]),
+    HIGHLIGHT_SPRING,
+  );
   const reduceMotion = useReducedMotion();
   const [animateTraffic, setAnimateTraffic] = useState(false);
   const [active, setActive] = useState(false);
@@ -398,6 +430,20 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
 
     return () => window.clearTimeout(markTimer);
   }, [reduceMotion]);
+
+  useEffect(() => {
+    // Only listen while the mark is on screen, and skip touch-only devices.
+    if (reduceMotion || !isInView) return;
+    if (window.matchMedia("(hover: none)").matches) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX / window.innerWidth);
+      mouseY.set(e.clientY / window.innerHeight);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [reduceMotion, isInView, mouseX, mouseY]);
 
   const transition: Transition = reduceMotion
     ? { duration: 0 }
@@ -430,9 +476,20 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
     : [1 + BAND_FILL_FEATHER, BAND_FILL_FEATHER];
 
   return (
-    <ContextMenu>
+    <ContextMenu
+      onOpenChange={(open) => {
+        if (open) {
+          trackEvent(ANALYTICS_EVENTS.YT_MARK_RIGHT_CLICK, {
+            section: ANALYTICS_SECTIONS.PROFILE_HEADER,
+            traffic: active ? "on" : "off",
+            car: CAR_MODEL_NAMES[carModel],
+          });
+        }
+      }}
+    >
       <ContextMenuTrigger asChild>
         <motion.svg
+          ref={svgRef}
           className="relative isolate h-auto w-full touch-manipulation overflow-visible cursor-pointer transition-all duration-300 [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]"
           viewBox="-31 -20 617 315"
           fill="none"
@@ -443,11 +500,34 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
           whileTap="pressed"
           onTap={() => {
             play();
+            trackEvent(ANALYTICS_EVENTS.YT_MARK_CLICK, {
+              section: ANALYTICS_SECTIONS.PROFILE_HEADER,
+              traffic: active ? "off" : "on",
+              car: CAR_MODEL_NAMES[carModel],
+            });
             setActive((on) => !on);
             onActivate?.();
           }}
         >
           <defs>
+            <motion.radialGradient
+              id={highlightId}
+              cx={highlightCx}
+              cy={highlightCy}
+              r="200"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop
+                className="dark:[stop-color:#fff]"
+                stopColor="var(--color-zinc-700)"
+              />
+              <stop
+                className="dark:[stop-color:var(--color-zinc-600)]"
+                offset="1"
+                stopColor="var(--color-zinc-400)"
+                stopOpacity="0"
+              />
+            </motion.radialGradient>
             <pattern
               id={patternId}
               x="0"
@@ -621,6 +701,16 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
                 transition={transition}
               />
             ))}
+            {WALL_EDGES_BEHIND_TRAFFIC.map((shape, i) => (
+              <motion.path
+                key={`wall-edge-behind-highlight-${i}`}
+                d={shape.normal}
+                stroke={`url(#${highlightId})`}
+                strokeWidth="1"
+                variants={variantsFor(shape)}
+                transition={transition}
+              />
+            ))}
 
             {active ? (
               <AnimatePresence>
@@ -665,6 +755,16 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
                 transition={transition}
               />
             ))}
+            {WALL_EDGES.map((shape, i) => (
+              <motion.path
+                key={`wall-edge-highlight-${i}`}
+                d={shape.normal}
+                stroke={`url(#${highlightId})`}
+                strokeWidth="1"
+                variants={variantsFor(shape)}
+                transition={transition}
+              />
+            ))}
 
             {TOP_FILLS.map((shape, i) => (
               <motion.path
@@ -695,6 +795,16 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
                 transition={transition}
               />
             ))}
+            {TOP_EDGES.map((shape, i) => (
+              <motion.path
+                key={`top-edge-highlight-${i}`}
+                d={shape.normal}
+                stroke={`url(#${highlightId})`}
+                strokeWidth="1"
+                variants={variantsFor(shape)}
+                transition={transition}
+              />
+            ))}
           </g>
         </motion.svg>
       </ContextMenuTrigger>
@@ -703,7 +813,15 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
           <ContextMenuItem
             key={model}
             asChild
-            onSelect={() => setCarModel(model)}
+            onSelect={() => {
+              trackEvent(ANALYTICS_EVENTS.CAR_MODEL_CHANGED, {
+                section: ANALYTICS_SECTIONS.PROFILE_HEADER,
+                from: CAR_MODEL_NAMES[carModel],
+                to: CAR_MODEL_NAMES[model],
+                traffic: active ? "on" : "off",
+              });
+              setCarModel(model);
+            }}
           >
             <div
               className={`p-1.5 rounded-xl border-2 transition-all duration-200 cursor-default select-none shadow-[0px_-1px_0px_0px_var(--color-line)_inset] dark:shadow-[0px_-1px_0px_0px_var(--color-line)_inset]

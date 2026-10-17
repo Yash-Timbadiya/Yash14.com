@@ -3,8 +3,10 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { ArrowUpIcon } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/base/ui/button";
 import { useMotionValueEvent, useScroll } from "motion/react";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 export function ScrollToTop({
   className,
@@ -38,7 +40,13 @@ export function ScrollToTop({
       variant="secondary"
       size="icon-sm"
       aria-label="Scroll to top"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={() => {
+        trackEvent(ANALYTICS_EVENTS.SCROLL_TO_TOP, {
+          section: ANALYTICS_SECTIONS.PAGE,
+          scroll_y: Math.round(window.scrollY),
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }}
       {...props}
     >
       <ArrowUpIcon />

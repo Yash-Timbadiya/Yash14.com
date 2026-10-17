@@ -10,11 +10,13 @@ export function Nav({
   activeId,
   className,
   exactMatch = false,
+  onItemClick,
 }: {
   items: NavItem<Route>[];
   activeId?: string;
   className?: string;
   exactMatch?: boolean;
+  onItemClick?: (href: Route) => void;
 }) {
   return (
     <nav
@@ -34,6 +36,7 @@ export function Nav({
             key={href}
             href={href}
             aria-current={isActive ? "page" : undefined}
+            onClick={onItemClick ? () => onItemClick(href) : undefined}
           >
             {title}
           </NavLink>

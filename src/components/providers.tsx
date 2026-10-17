@@ -4,7 +4,6 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { Provider as JotaiProvider } from "jotai";
 import { ProgressProvider } from "@bprogress/next/app";
-import { ClickTracker } from "@/components/click-tracker";
 import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
 import { TooltipProvider as RadixTooltipProvider } from "@/components/ui/tooltip";
 import { TooltipProvider as BaseTooltipProvider } from "@/components/base/ui/tooltip";
@@ -31,7 +30,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
           </BaseTooltipProvider>
 
           <KeyboardShortcuts />
-          <ClickTracker />
         </ProgressProvider>
 
         <Toaster position="top-center" />

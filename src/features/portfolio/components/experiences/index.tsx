@@ -3,6 +3,7 @@ import type { Experience } from "@/features/portfolio/types/experiences";
 import { ChevronDownIcon } from "lucide-react";
 import { ExperienceItem } from "./experience-item";
 import { Button } from "@/components/base/ui/button";
+import { TrackedLink } from "@/components/tracked-link";
 import { EXPERIENCES } from "@/features/portfolio/data/experiences";
 import { CollapsibleTrigger } from "@/components/base/ui/collapsible";
 import { PanelTitleCopy } from "@/features/portfolio/components/panel-title-copy";
@@ -15,6 +16,11 @@ import {
   Collapsible,
   CollapsibleMotionContent,
 } from "@/components/base/collapsible-animated";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_SECTIONS,
+  ANALYTICS_SOURCES,
+} from "@/lib/analytics-events";
 
 const ID = "experience";
 const MAX = 3;
@@ -24,8 +30,18 @@ export function Experiences() {
     <Panel id={ID}>
       <PanelHeader>
         <PanelTitle>
-          <a href={`#${ID}`}>Experience</a>
-          <PanelTitleCopy id={ID} />
+          <TrackedLink
+            href={`#${ID}`}
+            event={ANALYTICS_EVENTS.VIEW_SECTION}
+            eventProperties={{
+              section: ANALYTICS_SECTIONS.EXPERIENCE,
+              source: ANALYTICS_SOURCES.HEADING,
+              target: ID,
+            }}
+          >
+            Experience
+          </TrackedLink>
+          <PanelTitleCopy id={ID} section={ANALYTICS_SECTIONS.EXPERIENCE} />
         </PanelTitle>
       </PanelHeader>
 
@@ -34,7 +50,15 @@ export function Experiences() {
       </div>
 
       {EXPERIENCES.length > MAX && (
-        <Collapsible className="group/collapsible">
+        <Collapsible
+          className="group/collapsible"
+          openEvent={ANALYTICS_EVENTS.EXPERIENCE_SHOW_MORE}
+          closeEvent={ANALYTICS_EVENTS.EXPERIENCE_SHOW_LESS}
+          eventProperties={{
+            section: ANALYTICS_SECTIONS.EXPERIENCE,
+            hidden_count: EXPERIENCES.length - MAX,
+          }}
+        >
           <CollapsibleMotionContent className="pr-2 pl-4">
             <ExperienceList experiences={EXPERIENCES.slice(MAX)} />
           </CollapsibleMotionContent>

@@ -1,10 +1,13 @@
 "use client";
 
+import type { AnalyticsSection } from "@/lib/analytics-events";
+
 import { toast } from "sonner";
 import { copyText } from "@/utils/copy";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/base/ui/button";
 import { LinkedInIcon, XIcon } from "@/components/icons";
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
 import { EllipsisIcon, LinkIcon, ShareIcon } from "lucide-react";
 import {
   DropdownMenu,
@@ -13,7 +16,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/base/ui/dropdown-menu";
 
-export function DocShareMenu({ title, url }: { title: string; url: string }) {
+export function DocShareMenu({
+  title,
+  url,
+  section,
+}: {
+  title: string;
+  url: string;
+  section: AnalyticsSection;
+}) {
   const absoluteUrl = url.startsWith("http")
     ? url
     : typeof window !== "undefined"
@@ -23,7 +34,13 @@ export function DocShareMenu({ title, url }: { title: string; url: string }) {
   const urlEncoded = encodeURIComponent(absoluteUrl);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) {
+          trackEvent(ANALYTICS_EVENTS.SHARE_MENU_OPENED, { section, url });
+        }
+      }}
+    >
       <DropdownMenuTrigger
         render={
           <Button
@@ -45,8 +62,8 @@ export function DocShareMenu({ title, url }: { title: string; url: string }) {
       >
         <DropdownMenuItem
           onClick={async () => {
-            if (await copyText(absoluteUrl, "page_link")) {
-              trackEvent("page_shared", { channel: "copy_link", url });
+            if (await copyText(absoluteUrl)) {
+              trackEvent(ANALYTICS_EVENTS.COPY_PAGE_LINK, { section, url });
               toast.success("Link copied");
             }
           }}
@@ -59,7 +76,9 @@ export function DocShareMenu({ title, url }: { title: string; url: string }) {
           render={
             <a
               href={`https://x.com/intent/tweet?url=${urlEncoded}`}
-              onClick={() => trackEvent("page_shared", { channel: "x", url })}
+              onClick={() =>
+                trackEvent(ANALYTICS_EVENTS.SHARE_ON_X, { section, url })
+              }
               target="_blank"
               rel="noopener"
             >
@@ -74,7 +93,7 @@ export function DocShareMenu({ title, url }: { title: string; url: string }) {
             <a
               href={`https://www.linkedin.com/sharing/share-offsite?url=${urlEncoded}`}
               onClick={() =>
-                trackEvent("page_shared", { channel: "linkedin", url })
+                trackEvent(ANALYTICS_EVENTS.SHARE_ON_LINKEDIN, { section, url })
               }
               target="_blank"
               rel="noopener"
@@ -92,7 +111,7 @@ export function DocShareMenu({ title, url }: { title: string; url: string }) {
               navigator
                 .share({ title, url: absoluteUrl })
                 .then(() =>
-                  trackEvent("page_shared", { channel: "native", url }),
+                  trackEvent(ANALYTICS_EVENTS.SHARE_NATIVE, { section, url }),
                 )
                 .catch(() => {});
             }}

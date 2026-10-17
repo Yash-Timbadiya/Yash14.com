@@ -1,5 +1,6 @@
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   BriefcaseBusinessIcon,
   CodeXmlIcon,
@@ -39,9 +40,20 @@ export function JobItem({
                 href: `#experience-${experienceId}`,
                 target: "_self",
                 rel: "",
+                event: ANALYTICS_EVENTS.VIEW_EXPERIENCE,
+                eventProperties: {
+                  section: ANALYTICS_SECTIONS.OVERVIEW,
+                  company,
+                },
               }
             : {
                 href: addQueryParams(website, UTM_PARAMS),
+                event: ANALYTICS_EVENTS.REDIRECT_TO_COMPANY,
+                eventProperties: {
+                  section: ANALYTICS_SECTIONS.OVERVIEW,
+                  company,
+                  url: website,
+                },
               })}
         >
           {company}

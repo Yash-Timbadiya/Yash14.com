@@ -8,6 +8,7 @@ import { useSound } from "@/hooks/use-sound";
 import { trackEvent } from "@/lib/analytics";
 import { useHotkeys } from "react-hotkeys-hook";
 import { VolumeIcon } from "@/components/animated-icons/volume-icon";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 export function PronounceMyName({
   className,
@@ -21,13 +22,17 @@ export function PronounceMyName({
   const volumeIconRef = useRef<VolumeIconHandle>(null);
 
   const handlePlay = (method: "click" | "keyboard") => {
-    trackEvent("name_pronunciation_played", { method });
+    trackEvent(ANALYTICS_EVENTS.NAME_PRONUNCIATION_PLAYED, {
+      method,
+      section: ANALYTICS_SECTIONS.PROFILE_HEADER,
+    });
     volumeIconRef.current?.startAnimation();
     play();
   };
 
   useHotkeys("p", () => {
-    trackEvent("keyboard_shortcut_used", {
+    trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
+      section: ANALYTICS_SECTIONS.KEYBOARD,
       shortcut: "p",
       action: "play_name_pronunciation",
     });

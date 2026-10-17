@@ -7,6 +7,7 @@ import { PhoneItem } from "./phone-item";
 import { Panel, PanelContent } from "../panel";
 import { USER } from "@/features/portfolio/data/user";
 import { CurrentLocalTimeItem } from "./current-local-time-item";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   IntroItem,
   IntroItemContent,
@@ -20,6 +21,8 @@ import {
   NonBinaryIcon,
   VenusIcon,
 } from "lucide-react";
+
+const LOCATION_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(USER.address)}`;
 
 export function Overview() {
   return (
@@ -45,8 +48,13 @@ export function Overview() {
           </IntroItemIcon>
           <IntroItemContent>
             <IntroItemLink
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(USER.address)}`}
+              href={LOCATION_MAP_URL}
               aria-label={`Location: ${USER.address}`}
+              event={ANALYTICS_EVENTS.VIEW_LOCATION_MAP}
+              eventProperties={{
+                section: ANALYTICS_SECTIONS.OVERVIEW,
+                url: LOCATION_MAP_URL,
+              }}
             >
               {USER.address}
             </IntroItemLink>
@@ -67,6 +75,11 @@ export function Overview() {
             <IntroItemLink
               href={USER.website}
               aria-label={`Personal website: ${urlToName(USER.website)}`}
+              event={ANALYTICS_EVENTS.REDIRECT_TO_WEBSITE}
+              eventProperties={{
+                section: ANALYTICS_SECTIONS.OVERVIEW,
+                url: USER.website,
+              }}
             >
               {urlToName(USER.website)}
             </IntroItemLink>

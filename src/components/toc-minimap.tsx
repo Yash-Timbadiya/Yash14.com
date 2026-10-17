@@ -1,11 +1,14 @@
 "use client";
 
 import type { TOCItemType } from "./toc";
+import type { AnalyticsSection } from "@/lib/analytics-events";
 
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 import { useSound } from "@/hooks/soundcn/use-sound";
 import { AnchorProvider, useActiveAnchor, useItems } from "./toc";
 import { uMiniMapOpenSound } from "@/lib/soundcn/u-mini-map-open";
+import { ANALYTICS_EVENTS, ANALYTICS_SOURCES } from "@/lib/analytics-events";
 import {
   HoverCard,
   HoverCardContent,
@@ -16,10 +19,13 @@ export function TOCMinimap({
   items,
   options,
   className,
+  section,
 }: {
   items: TOCItemType[];
   options?: IntersectionObserverInit;
   className?: string;
+  /** Where the minimap is shown, sent with its events. */
+  section: AnalyticsSection;
 }) {
   const [play] = useSound(uMiniMapOpenSound, { volume: 0.3 });
 
@@ -33,6 +39,7 @@ export function TOCMinimap({
         <HoverCard
           onOpenChange={(open) => {
             if (open) {
+              trackEvent(ANALYTICS_EVENTS.TOC_OPENED, { section });
               play();
             }
           }}
@@ -56,7 +63,7 @@ export function TOCMinimap({
             positionMethod="fixed"
           >
             <div className="flex max-h-[calc(100dvh-var(--doc-cols-top,0)+(--spacing(-24)))] overflow-y-auto overscroll-contain">
-              <TOCList />
+              <TOCList section={section} />
             </div>
           </HoverCardContent>
         </HoverCard>
@@ -100,13 +107,18 @@ function scrollToHeading(url: string) {
   });
 }
 
-function handleItemClick(e: React.MouseEvent<HTMLAnchorElement>) {
-  e.preventDefault();
-  const url = e.currentTarget.getAttribute("href") ?? "";
-  scrollToHeading(url);
-}
+function TOCList({ section }: { section: AnalyticsSection }) {
+  const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const url = e.currentTarget.getAttribute("href") ?? "";
+    trackEvent(ANALYTICS_EVENTS.VIEW_SECTION, {
+      section,
+      source: ANALYTICS_SOURCES.TOC,
+      target: url.replace("#", ""),
+    });
+    scrollToHeading(url);
+  };
 
-function TOCList() {
   const items = useItems();
 
   return (

@@ -1141,6 +1141,15 @@ export const GT_CAR_PRIMS = buildGTCar();
 
 export type CarModel = "detailed" | "f1" | "truck" | "supercar" | "gt";
 
+/** Readable name for each model, as sent with analytics events. */
+export const CAR_MODEL_NAMES: Record<CarModel, string> = {
+  detailed: "sedan",
+  f1: "f1",
+  truck: "truck",
+  supercar: "lamborghini",
+  gt: "gt",
+};
+
 const MODEL_PRIMS: Record<CarModel, Prim[]> = {
   detailed: DETAILED_CAR_PRIMS,
   f1: F1_CAR_PRIMS,

@@ -2,9 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { UTM_PARAMS } from "@/config/site";
+import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
 import { Button } from "@/components/base/ui/button";
-import { SOCIAL_LINKS } from "@/features/portfolio/data/social-links";
+import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 import { Panel, PanelContent } from "@/features/portfolio/components/panel";
 import { SOCIAL_ICONS } from "@/features/portfolio/components/social-link-icons";
@@ -13,6 +14,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/base/ui/tooltip";
+import {
+  SOCIAL_LINKS,
+  SOCIAL_REDIRECT_EVENTS,
+} from "@/features/portfolio/data/social-links";
 
 const EASE_OUT_QUINT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -137,6 +142,12 @@ export function SocialLinks() {
                           href={addQueryParams(item.href, UTM_PARAMS)}
                           target="_blank"
                           rel="noopener"
+                          onClick={() =>
+                            trackEvent(SOCIAL_REDIRECT_EVENTS[item.name], {
+                              section: ANALYTICS_SECTIONS.SOCIAL_LINKS,
+                              url: item.href,
+                            })
+                          }
                         >
                           {SOCIAL_ICONS[item.name]}
                           <span className="sr-only">{item.title}</span>

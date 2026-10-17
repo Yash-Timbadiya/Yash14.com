@@ -1,11 +1,13 @@
 "use client";
 
 import type React from "react";
+import type { AnalyticsSection } from "@/lib/analytics-events";
 
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { copyText } from "@/utils/copy";
 import { BRAND_ASSETS } from "@/config/site";
+import { trackEvent } from "@/lib/analytics";
 import { useCallback, useState } from "react";
 import { getMarkSVG, YTMark } from "./yt-mark";
 import { getWordmarkSVG } from "./yt-wordmark";
@@ -13,6 +15,7 @@ import { useRouter } from "@bprogress/next/app";
 import { useTiks } from "@rexa-developer/tiks/react";
 import { motion, useReducedMotion } from "motion/react";
 import { Download, SquareDashed, Type } from "lucide-react";
+import { ANALYTICS_EVENTS, ANALYTICS_SOURCES } from "@/lib/analytics-events";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -32,7 +35,14 @@ type ActiveRect = {
   height: number;
 };
 
-export function BrandContextMenu({ children }: { children: React.ReactNode }) {
+export function BrandContextMenu({
+  children,
+  section,
+}: {
+  children: React.ReactNode;
+  /** Where the logo this menu wraps is shown, sent with its events. */
+  section: AnalyticsSection;
+}) {
   const router = useRouter();
   const { success } = useTiks();
   const reduceMotion = useReducedMotion();
@@ -52,7 +62,9 @@ export function BrandContextMenu({ children }: { children: React.ReactNode }) {
   return (
     <ContextMenu
       onOpenChange={(open) => {
-        if (!open) {
+        if (open) {
+          trackEvent(ANALYTICS_EVENTS.LOGO_RIGHT_CLICK, { section });
+        } else {
           clearActive();
         }
       }}
@@ -79,7 +91,11 @@ export function BrandContextMenu({ children }: { children: React.ReactNode }) {
           <BrandMenuItem
             onActivate={activateFromElement}
             onSelect={() => {
-              copyText(getMarkSVG(), "brand_mark_svg");
+              trackEvent(ANALYTICS_EVENTS.COPY_MARK_SVG, {
+                section,
+                source: ANALYTICS_SOURCES.LOGO_MENU,
+              });
+              copyText(getMarkSVG());
               toast.success("Mark as SVG copied");
               success();
             }}
@@ -91,7 +107,11 @@ export function BrandContextMenu({ children }: { children: React.ReactNode }) {
           <BrandMenuItem
             onActivate={activateFromElement}
             onSelect={() => {
-              copyText(getWordmarkSVG(), "brand_logotype_svg");
+              trackEvent(ANALYTICS_EVENTS.COPY_LOGOTYPE_SVG, {
+                section,
+                source: ANALYTICS_SOURCES.LOGO_MENU,
+              });
+              copyText(getWordmarkSVG());
               toast.success("Logotype as SVG copied");
               success();
             }}
@@ -104,7 +124,13 @@ export function BrandContextMenu({ children }: { children: React.ReactNode }) {
 
           <BrandMenuItem
             onActivate={activateFromElement}
-            onSelect={() => router.push("/brand-guidelines")}
+            onSelect={() => {
+              trackEvent(ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES, {
+                section,
+                source: ANALYTICS_SOURCES.LOGO_MENU,
+              });
+              router.push("/brand-guidelines");
+            }}
           >
             <SquareDashed />
             Brand Guidelines
@@ -113,6 +139,11 @@ export function BrandContextMenu({ children }: { children: React.ReactNode }) {
           <BrandMenuItem
             onActivate={activateFromElement}
             onSelect={() => {
+              trackEvent(ANALYTICS_EVENTS.DOWNLOAD_BRAND_ASSETS, {
+                section,
+                source: ANALYTICS_SOURCES.LOGO_MENU,
+                url: BRAND_ASSETS.url,
+              });
               const anchor = document.createElement("a");
               anchor.href = BRAND_ASSETS.url;
               anchor.download = "";

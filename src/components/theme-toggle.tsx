@@ -11,6 +11,7 @@ import { useMetaColor } from "@/hooks/use-meta-color";
 import { useClickSound } from "@/hooks/soundcn/use-click-sound";
 import { SunMediumIcon } from "./animated-icons/sun-medium-icon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./base/ui/tooltip";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -31,9 +32,11 @@ export function ThemeToggle() {
   const switchTheme = (method: "click" | "keyboard") => {
     click();
 
-    trackEvent("theme_changed", {
-      theme: resolvedTheme === "dark" ? "light" : "dark",
+    trackEvent(ANALYTICS_EVENTS.THEME_CHANGED, {
+      from: resolvedTheme ?? null,
+      to: resolvedTheme === "dark" ? "light" : "dark",
       method,
+      section: ANALYTICS_SECTIONS.HEADER,
     });
 
     if (
@@ -51,7 +54,8 @@ export function ThemeToggle() {
   };
 
   useHotkeys("d", () => {
-    trackEvent("keyboard_shortcut_used", {
+    trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
+      section: ANALYTICS_SECTIONS.KEYBOARD,
       shortcut: "d",
       action: "toggle_theme",
     });

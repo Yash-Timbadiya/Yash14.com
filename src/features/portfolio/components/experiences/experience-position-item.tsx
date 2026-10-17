@@ -8,6 +8,7 @@ import { Separator } from "@/components/base/ui/separator";
 import { BriefcaseBusinessIcon, InfinityIcon } from "lucide-react";
 import { CollapsibleTrigger } from "@/components/base/ui/collapsible";
 import { MarkdownLinkPreview } from "@/components/markdown-link-preview";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   Collapsible,
   CollapsibleChevronsUpDownIcon,
@@ -16,8 +17,10 @@ import {
 
 export function ExperiencePositionItem({
   position,
+  companyName,
 }: {
   position: ExperiencePosition;
+  companyName: string;
 }) {
   const { start, end } = position.employmentPeriod;
   const isOngoing = !end;
@@ -28,6 +31,13 @@ export function ExperiencePositionItem({
       className="group/experience-position relative"
       defaultOpen={position.isExpanded}
       disabled={!position.description}
+      openEvent={ANALYTICS_EVENTS.EXPERIENCE_POSITION_OPENED}
+      closeEvent={ANALYTICS_EVENTS.EXPERIENCE_POSITION_CLOSED}
+      eventProperties={{
+        section: ANALYTICS_SECTIONS.EXPERIENCE,
+        company: companyName,
+        position: position.title,
+      }}
     >
       <div className="pointer-events-none absolute bottom-0 left-3 hidden size-4 bg-background group-last/experience-position:flex">
         <span className="size-full -translate-y-2.25 rounded-bl-sm border-b border-l" />
@@ -103,7 +113,15 @@ export function ExperiencePositionItem({
       <CollapsibleMotionContent>
         {position.description && (
           <div className="typeset typeset-description pt-3 pb-1 pl-9">
-            <MarkdownLinkPreview>{position.description}</MarkdownLinkPreview>
+            <MarkdownLinkPreview
+              eventProperties={{
+                section: ANALYTICS_SECTIONS.EXPERIENCE,
+                company: companyName,
+                position: position.title,
+              }}
+            >
+              {position.description}
+            </MarkdownLinkPreview>
           </div>
         )}
       </CollapsibleMotionContent>
