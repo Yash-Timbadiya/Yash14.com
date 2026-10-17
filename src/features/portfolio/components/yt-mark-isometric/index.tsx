@@ -3,10 +3,9 @@
 import type { Transition } from "motion/react";
 
 import { trackEvent } from "@/lib/analytics";
-import { useEffect, useId, useState } from "react";
 import { useSound } from "@/hooks/soundcn/use-sound";
+import { useEffect, useId, useRef, useState } from "react";
 import { metalClickSound } from "@/lib/soundcn/metal-click";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   ContextMenu,
@@ -14,6 +13,15 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "motion/react";
 
 const GRID = [
   [true, true, true, true, false, true],
@@ -378,11 +386,28 @@ type YTMarkIsometricProps = {
   onActivate?: () => void;
 };
 
+const HIGHLIGHT_SPRING = { stiffness: 300, damping: 30, mass: 0.1 };
+
 export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
   const patternId = `yt-hatch${useId().replace(/:/g, "")}`;
   const bandId0 = `yt-band-0${useId().replace(/:/g, "")}`;
   const bandId1 = `yt-band-1${useId().replace(/:/g, "")}`;
   const bandClipId = `yt-band-clip${useId().replace(/:/g, "")}`;
+  const highlightId = `yt-edge-highlight${useId().replace(/:/g, "")}`;
+  const svgRef = useRef<SVGSVGElement>(null);
+  const isInView = useInView(svgRef, { margin: "80px" });
+
+  // Edge highlight that follows the cursor across the whole window.
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  const highlightCx = useSpring(
+    useTransform(mouseX, [0, 1], [VIEWBOX.x, VIEWBOX.x + VIEWBOX.w]),
+    HIGHLIGHT_SPRING,
+  );
+  const highlightCy = useSpring(
+    useTransform(mouseY, [0, 1], [VIEWBOX.y, VIEWBOX.y + VIEWBOX.h]),
+    HIGHLIGHT_SPRING,
+  );
   const reduceMotion = useReducedMotion();
   const [animateTraffic, setAnimateTraffic] = useState(false);
   const [active, setActive] = useState(false);
@@ -405,6 +430,20 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
 
     return () => window.clearTimeout(markTimer);
   }, [reduceMotion]);
+
+  useEffect(() => {
+    // Only listen while the mark is on screen, and skip touch-only devices.
+    if (reduceMotion || !isInView) return;
+    if (window.matchMedia("(hover: none)").matches) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX / window.innerWidth);
+      mouseY.set(e.clientY / window.innerHeight);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [reduceMotion, isInView, mouseX, mouseY]);
 
   const transition: Transition = reduceMotion
     ? { duration: 0 }
@@ -450,6 +489,7 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
     >
       <ContextMenuTrigger asChild>
         <motion.svg
+          ref={svgRef}
           className="relative isolate h-auto w-full touch-manipulation overflow-visible cursor-pointer transition-all duration-300 [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]"
           viewBox="-31 -20 617 315"
           fill="none"
@@ -470,6 +510,24 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
           }}
         >
           <defs>
+            <motion.radialGradient
+              id={highlightId}
+              cx={highlightCx}
+              cy={highlightCy}
+              r="200"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop
+                className="dark:[stop-color:#fff]"
+                stopColor="var(--color-zinc-700)"
+              />
+              <stop
+                className="dark:[stop-color:var(--color-zinc-600)]"
+                offset="1"
+                stopColor="var(--color-zinc-400)"
+                stopOpacity="0"
+              />
+            </motion.radialGradient>
             <pattern
               id={patternId}
               x="0"
@@ -643,6 +701,16 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
                 transition={transition}
               />
             ))}
+            {WALL_EDGES_BEHIND_TRAFFIC.map((shape, i) => (
+              <motion.path
+                key={`wall-edge-behind-highlight-${i}`}
+                d={shape.normal}
+                stroke={`url(#${highlightId})`}
+                strokeWidth="1"
+                variants={variantsFor(shape)}
+                transition={transition}
+              />
+            ))}
 
             {active ? (
               <AnimatePresence>
@@ -687,6 +755,16 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
                 transition={transition}
               />
             ))}
+            {WALL_EDGES.map((shape, i) => (
+              <motion.path
+                key={`wall-edge-highlight-${i}`}
+                d={shape.normal}
+                stroke={`url(#${highlightId})`}
+                strokeWidth="1"
+                variants={variantsFor(shape)}
+                transition={transition}
+              />
+            ))}
 
             {TOP_FILLS.map((shape, i) => (
               <motion.path
@@ -712,6 +790,16 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
                 key={`top-edge-${i}`}
                 d={shape.normal}
                 stroke="var(--stroke)"
+                strokeWidth="1"
+                variants={variantsFor(shape)}
+                transition={transition}
+              />
+            ))}
+            {TOP_EDGES.map((shape, i) => (
+              <motion.path
+                key={`top-edge-highlight-${i}`}
+                d={shape.normal}
+                stroke={`url(#${highlightId})`}
                 strokeWidth="1"
                 variants={variantsFor(shape)}
                 transition={transition}
