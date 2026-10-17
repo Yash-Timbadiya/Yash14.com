@@ -1,4 +1,5 @@
 import { EducationItem } from "./education-item";
+import { TrackedLink } from "@/components/tracked-link";
 import { EDUCATION } from "@/features/portfolio/data/education";
 import { PanelTitleCopy } from "@/features/portfolio/components/panel-title-copy";
 import {
@@ -6,6 +7,11 @@ import {
   PanelHeader,
   PanelTitle,
 } from "@/features/portfolio/components/panel";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_SECTIONS,
+  ANALYTICS_SOURCES,
+} from "@/lib/analytics-events";
 
 const ID = "education";
 
@@ -14,8 +20,18 @@ export function Education() {
     <Panel id={ID}>
       <PanelHeader>
         <PanelTitle>
-          <a href={`#${ID}`}>Education</a>
-          <PanelTitleCopy id={ID} />
+          <TrackedLink
+            href={`#${ID}`}
+            event={ANALYTICS_EVENTS.VIEW_SECTION}
+            eventProperties={{
+              section: ANALYTICS_SECTIONS.EDUCATION,
+              source: ANALYTICS_SOURCES.HEADING,
+              target: ID,
+            }}
+          >
+            Education
+          </TrackedLink>
+          <PanelTitleCopy id={ID} section={ANALYTICS_SECTIONS.EDUCATION} />
         </PanelTitle>
       </PanelHeader>
 

@@ -6,7 +6,11 @@ import { TECH_STACK } from "../data/tech-stack";
 import { PanelTitleCopy } from "./panel-title-copy";
 import { TrackedLink } from "@/components/tracked-link";
 import { Panel, PanelHeader, PanelTitle } from "./panel";
-import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
+import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_SECTIONS,
+  ANALYTICS_SOURCES,
+} from "@/lib/analytics-events";
 
 const ID = "stack";
 
@@ -15,8 +19,18 @@ export function TechStack() {
     <Panel id={ID}>
       <PanelHeader>
         <PanelTitle>
-          <a href={`#${ID}`}>Stack</a>
-          <PanelTitleCopy id={ID} />
+          <TrackedLink
+            href={`#${ID}`}
+            event={ANALYTICS_EVENTS.VIEW_SECTION}
+            eventProperties={{
+              section: ANALYTICS_SECTIONS.TECH_STACK,
+              source: ANALYTICS_SOURCES.HEADING,
+              target: ID,
+            }}
+          >
+            Stack
+          </TrackedLink>
+          <PanelTitleCopy id={ID} section={ANALYTICS_SECTIONS.TECH_STACK} />
         </PanelTitle>
       </PanelHeader>
 

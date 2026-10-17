@@ -21,6 +21,8 @@ export const ANALYTICS_EVENTS = {
   VIEW_BRAND_GUIDELINES: "view_brand_guidelines",
   VIEW_HOME: "view_home",
   VIEW_SECTION: "view_section",
+  COPY_SECTION_LINK: "copy_section_link",
+  SCROLL_TO_TOP: "scroll_to_top",
   VIEW_EXPERIENCE: "view_experience",
   VIEW_LLMS_TXT: "view_llms_txt",
   VIEW_INDEX_MD: "view_index_md",
@@ -88,6 +90,13 @@ export const ANALYTICS_EVENTS = {
   EDUCATION_OPENED: "education_opened",
   EDUCATION_CLOSED: "education_closed",
 
+  // Links inside experience and education descriptions
+  DESCRIPTION_LINK_CLICK: "description_link_click",
+
+  // GitHub contributions graph legend
+  CONTRIBUTION_LEVEL_SELECTED: "contribution_level_selected",
+  CONTRIBUTION_LEVEL_CLEARED: "contribution_level_cleared",
+
   // Tech stack
   TECH_STACK_CLICK: "tech_stack_click",
 
@@ -113,6 +122,10 @@ export const ANALYTICS_SECTIONS = {
   EXPERIENCE: "experience",
   EDUCATION: "education",
   FOOTER: "footer",
+  GITHUB_CONTRIBUTIONS: "github_contributions",
+  /** Page-level controls that float over every section, like scroll to top. */
+  PAGE: "page",
+  NOT_FOUND: "not_found",
   /** Global keyboard shortcuts, which are not tied to one part of the page. */
   KEYBOARD: "keyboard",
 } as const;

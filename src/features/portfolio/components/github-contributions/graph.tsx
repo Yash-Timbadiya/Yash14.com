@@ -5,7 +5,9 @@ import type { Activity } from "@/features/portfolio/components/contribution-grap
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { LoaderIcon } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { use, useEffect, useRef, useState } from "react";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   Tooltip,
   TooltipContent,
@@ -115,11 +117,17 @@ export function GitHubContributionGraph({
                   selectedLevel === level &&
                     "outline-2 outline-offset-1 outline-ring",
                 )}
-                onClick={() =>
+                onClick={() => {
+                  trackEvent(
+                    selectedLevel === level
+                      ? ANALYTICS_EVENTS.CONTRIBUTION_LEVEL_CLEARED
+                      : ANALYTICS_EVENTS.CONTRIBUTION_LEVEL_SELECTED,
+                    { section: ANALYTICS_SECTIONS.GITHUB_CONTRIBUTIONS, level },
+                  );
                   setSelectedLevel((current) =>
                     current === level ? null : level,
-                  )
-                }
+                  );
+                }}
               >
                 <svg
                   aria-hidden="true"

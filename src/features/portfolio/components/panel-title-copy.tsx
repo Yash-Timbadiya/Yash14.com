@@ -1,16 +1,22 @@
 "use client";
 
+import type { AnalyticsSection } from "@/lib/analytics-events";
+
 import { cn } from "@/lib/utils";
 import { LinkIcon } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { CopyButton } from "@/components/copy-button";
 import { createHeadingUrl } from "@/components/heading";
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
 
 export function PanelTitleCopy({
   id,
+  section,
   className,
   ...props
 }: Omit<React.ComponentProps<typeof CopyButton>, "id" | "text"> & {
   id: string;
+  section: AnalyticsSection;
 }) {
   return (
     <CopyButton
@@ -22,6 +28,9 @@ export function PanelTitleCopy({
       text={() => createHeadingUrl(id || "")}
       idleIcon={<LinkIcon />}
       aria-label="Copy link to section"
+      onCopySuccess={() =>
+        trackEvent(ANALYTICS_EVENTS.COPY_SECTION_LINK, { section, target: id })
+      }
       {...props}
     />
   );

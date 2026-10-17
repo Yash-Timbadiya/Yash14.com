@@ -111,7 +111,14 @@ export function EducationItem({ item }: { item: Education }) {
         <CollapsibleMotionContent>
           {item.description && (
             <div className="typeset typeset-description pt-3 pb-1 pl-9">
-              <MarkdownLinkPreview>{item.description}</MarkdownLinkPreview>
+              <MarkdownLinkPreview
+                eventProperties={{
+                  section: ANALYTICS_SECTIONS.EDUCATION,
+                  school: item.school,
+                }}
+              >
+                {item.description}
+              </MarkdownLinkPreview>
             </div>
           )}
         </CollapsibleMotionContent>

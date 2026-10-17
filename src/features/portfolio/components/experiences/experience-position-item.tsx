@@ -113,7 +113,15 @@ export function ExperiencePositionItem({
       <CollapsibleMotionContent>
         {position.description && (
           <div className="typeset typeset-description pt-3 pb-1 pl-9">
-            <MarkdownLinkPreview>{position.description}</MarkdownLinkPreview>
+            <MarkdownLinkPreview
+              eventProperties={{
+                section: ANALYTICS_SECTIONS.EXPERIENCE,
+                company: companyName,
+                position: position.title,
+              }}
+            >
+              {position.description}
+            </MarkdownLinkPreview>
           </div>
         )}
       </CollapsibleMotionContent>

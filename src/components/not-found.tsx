@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ArrowRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TrackedLink } from "@/components/tracked-link";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 export function NotFound({ className }: { className?: string }) {
   return (
@@ -65,10 +66,14 @@ export function NotFound({ className }: { className?: string }) {
       </h1>
 
       <Button asChild>
-        <Link href="/">
+        <TrackedLink
+          href="/"
+          event={ANALYTICS_EVENTS.VIEW_HOME}
+          eventProperties={{ section: ANALYTICS_SECTIONS.NOT_FOUND }}
+        >
           Go to Home
           <ArrowRightIcon />
-        </Link>
+        </TrackedLink>
       </Button>
     </div>
   );
