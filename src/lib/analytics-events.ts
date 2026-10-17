@@ -78,6 +78,10 @@ export const ANALYTICS_EVENTS = {
   EXPERIENCE_POSITION_OPENED: "experience_position_opened",
   EXPERIENCE_POSITION_CLOSED: "experience_position_closed",
 
+  // Education
+  EDUCATION_OPENED: "education_opened",
+  EDUCATION_CLOSED: "education_closed",
+
   // Tech stack
   TECH_STACK_CLICK: "tech_stack_click",
 
@@ -101,6 +105,7 @@ export const ANALYTICS_SECTIONS = {
   SOCIAL_LINKS: "social_links",
   TECH_STACK: "tech_stack",
   EXPERIENCE: "experience",
+  EDUCATION: "education",
   /** Global keyboard shortcuts, which are not tied to one part of the page. */
   KEYBOARD: "keyboard",
 } as const;
