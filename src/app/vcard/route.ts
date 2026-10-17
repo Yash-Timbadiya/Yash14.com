@@ -1,14 +1,24 @@
 import sharp from "sharp";
 import VCard from "vcard-creator";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { USER } from "@/features/portfolio/data/user";
+import { SeverityNumber } from "@opentelemetry/api-logs";
 import { decodeEmail, decodePhoneNumber } from "@/utils/string";
+import { getPostHogLogger, posthogLoggerProvider } from "@/instrumentation";
 
 export const revalidate = false;
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
 export async function GET() {
+  const logger = getPostHogLogger("posthog-vcard-export");
+
+  logger?.emit({
+    body: "vcard_generation_started",
+    severityNumber: SeverityNumber.INFO,
+    attributes: { route: "/vcard" },
+  });
+
   const card = new VCard();
 
   card
@@ -27,6 +37,19 @@ export async function GET() {
     const company = USER.jobs[0];
     card.addCompany(company.company).addJobtitle(company.title);
   }
+
+  logger?.emit({
+    body: "vcard_generation_completed",
+    severityNumber: SeverityNumber.INFO,
+    attributes: {
+      route: "/vcard",
+      photo_attached: Boolean(photo),
+    },
+  });
+
+  after(async () => {
+    await posthogLoggerProvider?.forceFlush();
+  });
 
   return new NextResponse(card.toString(), {
     status: 200,

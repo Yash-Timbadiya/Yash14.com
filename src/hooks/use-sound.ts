@@ -5,13 +5,10 @@ import type {
   SoundControls,
   UseSoundOptions,
   UseSoundReturn,
-} from "@/registry/lib/sound/sound-types";
+} from "@/lib/sound/sound-types";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  fetchAndDecodeAudio,
-  getAudioContext,
-} from "@/registry/lib/sound/sound-engine";
+import { fetchAndDecodeAudio, getAudioContext } from "@/lib/sound/sound-engine";
 
 export function useSound(
   url: string,

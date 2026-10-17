@@ -31,20 +31,6 @@ const nextConfig: NextConfig = {
           destination: "/llms.txt",
         },
       ],
-      afterFiles: [
-        {
-          source: "/rss",
-          destination: "/components/rss",
-        },
-        {
-          source: "/registry/rss",
-          destination: "/components/rss",
-        },
-        {
-          source: "/components/:slug.mdx",
-          destination: "/doc.mdx/:slug",
-        },
-      ],
     };
   },
 };

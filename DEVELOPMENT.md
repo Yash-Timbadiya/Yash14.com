@@ -62,29 +62,3 @@ After building, start the application with:
 ```bash
 NODE_ENV=production pnpm start
 ```
-
-## Registry
-
-This project utilizes **shadcn Registry**, which allows you to manage and distribute custom components, hooks, pages, and other files across multiple React projects. By hosting a registry, you can reuse UI components easily without manually copying code between projects.
-
-### Using Registry in other React projects
-
-If you're working on a different React project and want to reuse the custom components from this repository, visit [yash14.com/components](https://yash14.com/components) for installation instructions and component documentation.
-
-> Note: These components are compatible with [Tailwind CSS v4](https://tailwindcss.com/blog/tailwindcss-v4) and [React 19](https://react.dev/blog/2024/12/05/react-19).
-
-### Registry configuration
-
-Documentation: [shadcn Registry Docs](https://ui.shadcn.com/docs/registry)
-
-Source files:
-
-- `./src/registry`
-
-Before using the registry, run the following command to build and generate the registry JSON files:
-
-```bash
-pnpm registry:build
-```
-
-When running the `npx shadcn add <registry-url>` command, the selected component will be automatically downloaded and integrated into your project.

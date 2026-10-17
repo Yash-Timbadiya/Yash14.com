@@ -1,9 +1,4 @@
 export const config = {
-  runtime: {
-    nodeEnv: process.env.NODE_ENV,
-    isProduction: process.env.NODE_ENV === "production",
-  },
-
   app: {
     url: process.env.NEXT_PUBLIC_APP_URL || "https://yash14.com",
   },
@@ -11,11 +6,6 @@ export const config = {
   cdn: {
     /** Public base URL of the Cloudflare R2 bucket (custom domain). */
     url: process.env.NEXT_PUBLIC_CDN_URL,
-  },
-
-  registry: {
-    namespace: process.env.NEXT_PUBLIC_REGISTRY_NAMESPACE,
-    namespaceUrl: process.env.NEXT_PUBLIC_REGISTRY_NAMESPACE_URL,
   },
 
   github: {

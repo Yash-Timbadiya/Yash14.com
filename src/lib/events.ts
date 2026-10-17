@@ -1,10 +1,9 @@
 import { z } from "zod";
 import posthog from "posthog-js";
+import { config } from "@/config";
 
 const eventSchema = z.object({
   name: z.enum([
-    "copy_npm_command",
-    "copy_code_block",
     "copy_email",
     "copy_phone_number",
     "play_name_pronunciation",
@@ -16,6 +15,8 @@ const eventSchema = z.object({
     "toc_minimap_hover",
     "toc_minimap_item_click",
     "keyboard_shortcut_navigate",
+    "copy_document_page",
+    "share_document_link",
   ]),
   // declare type AllowedPropertyValues = string | number | boolean | null
   properties: z
@@ -30,7 +31,11 @@ export type Event = z.infer<typeof eventSchema>;
 
 export function trackEvent(input: Event) {
   const event = eventSchema.parse(input);
-  if (event) {
+  if (
+    event &&
+    config.analytics.posthogProjectToken &&
+    config.analytics.posthogHost
+  ) {
     posthog.capture(event.name, event.properties);
   }
 }

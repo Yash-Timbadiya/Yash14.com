@@ -57,12 +57,6 @@
   },
   "overrides": [
     {
-      "includes": ["src/registry/__index__.tsx"],
-      "linter": {
-        "enabled": false
-      }
-    },
-    {
       "includes": ["src/styles/globals.css"],
       "linter": {
         "rules": {
@@ -84,8 +78,7 @@
         "src/components/site-footer-brand.tsx",
         "src/components/yt-*.tsx",
         "src/features/portfolio/components/verified-icon.tsx",
-        "src/features/portfolio/components/yt-mark-isometric/**",
-        "src/features/doc/components/component-icon.tsx"
+        "src/features/portfolio/components/yt-mark-isometric/**"
       ],
       "linter": {
         "rules": {
@@ -112,17 +105,6 @@
             "noDocumentCookie": "off"
           },
           "correctness": {
-            "useExhaustiveDependencies": "off"
-          }
-        }
-      }
-    },
-    {
-      "includes": ["src/registry/hooks/use-controllable-state/**"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "useHookAtTopLevel": "off",
             "useExhaustiveDependencies": "off"
           }
         }

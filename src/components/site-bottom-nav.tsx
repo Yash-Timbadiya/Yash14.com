@@ -1,24 +1,12 @@
-import type { DocPreview } from "@/features/doc/types/document";
-
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { MOBILE_NAV } from "@/config/site";
 import { Separator } from "@/components/ui/separator";
-import { getAllDocs } from "@/features/doc/data/documents";
 
 const CommandMenu = dynamic(() => import("@/components/command-menu"));
 const NavMobile = dynamic(() => import("@/components/nav-mobile"));
 
 export function SiteBottomNav() {
-  const docs = getAllDocs();
-
-  // Minimize data serialized to client component - only send necessary fields
-  const docPreviews: DocPreview[] = docs.map((doc) => ({
-    slug: doc.slug,
-    title: doc.metadata.title,
-    category: doc.metadata.category,
-  }));
-
   return (
     <div
       className={cn(
@@ -26,7 +14,7 @@ export function SiteBottomNav() {
         "*:data-[slot=command-menu-trigger]:min-w-20 *:data-[slot=command-menu-trigger]:gap-2 *:data-[slot=command-menu-trigger]:rounded-none *:data-[slot=command-menu-trigger]:border-none *:data-[slot=command-menu-trigger]:bg-transparent *:data-[slot=command-menu-trigger]:px-0 *:data-[slot=command-menu-trigger]:hover:bg-transparent *:data-[slot=command-menu-trigger]:active:scale-none",
       )}
     >
-      <CommandMenu docs={docPreviews} />
+      <CommandMenu />
       <Separator
         orientation="vertical"
         className="mr-1 ml-2.5 data-vertical:h-6 data-vertical:self-center"

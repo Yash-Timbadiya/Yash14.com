@@ -52,7 +52,6 @@ Next.js site on Vercel
 Do **not** move these to the CDN:
 
 - `public/logo/favicon*`, `apple-touch-icon.png` — browsers and the web manifest expect them on the site's own domain.
-- `public/r/*.json` — the shadcn registry must be served from `yash14.com/r/...`.
 - `public/assets/yash14-brand/*.svg` — the `<a download>` attribute only works for same-origin files; on the CDN they'd open in a tab instead of downloading.
 - `public/brand.md`.
 
