@@ -26,13 +26,7 @@ export function PronounceMyName({
     play();
   };
 
-  useHotkeys("p", () => {
-    trackEvent("keyboard_shortcut_used", {
-      shortcut: "p",
-      action: "play_name_pronunciation",
-    });
-    handlePlay("keyboard");
-  });
+  useHotkeys("p", () => handlePlay("keyboard"));
 
   return (
     <button

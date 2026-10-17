@@ -64,7 +64,6 @@ type CommandLinkItem = {
   keywords?: string[];
   openInNewTab?: boolean;
   copyText?: string;
-  copyItem?: string;
 };
 
 const MENU_LINKS: CommandLinkItem[] = [
@@ -136,7 +135,6 @@ const CONTACT_LINKS: CommandLinkItem[] = [
     icon: <EmailIcon />,
     keywords: ["email", "contact", "mail"],
     copyText: CONTACT_EMAIL,
-    copyItem: "email",
   },
   {
     title: formatPhoneNumber(CONTACT_PHONE),
@@ -145,7 +143,6 @@ const CONTACT_LINKS: CommandLinkItem[] = [
     icon: <PhoneIcon />,
     keywords: ["phone", "contact", "number", "call"],
     copyText: CONTACT_PHONE,
-    copyItem: "phone",
   },
 ];
 
@@ -188,7 +185,7 @@ export function CommandMenu({
 }) {
   const router = useRouter();
 
-  const { setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   const [open, setOpenState] = useState(false);
 
@@ -229,11 +226,6 @@ export function CommandMenu({
 
   const handleOpenLink = useCallback(
     (href: string, openInNewTab = false) => {
-      trackEvent("command_menu_action", {
-        action: "navigate",
-        target: href,
-        new_tab: openInNewTab,
-      });
       setOpen(false, "action");
 
       if (openInNewTab) {
@@ -248,10 +240,9 @@ export function CommandMenu({
   );
 
   const handleCopyText = useCallback(
-    (text: string, message: string, item: string) => {
-      trackEvent("command_menu_action", { action: "copy", target: item });
+    (text: string, message: string) => {
       setOpen(false, "action");
-      copyText(text, item);
+      copyText(text);
       toast.success(message);
       tiksSuccess();
     },
@@ -261,13 +252,16 @@ export function CommandMenu({
   const createThemeHandler = useCallback(
     (theme: "light" | "dark" | "system") => () => {
       click();
-      trackEvent("command_menu_action", { action: "theme", target: theme });
-      trackEvent("theme_changed", { theme, method: "command_menu" });
+      trackEvent("theme_changed", {
+        from: resolvedTheme ?? null,
+        to: theme,
+        method: "command_menu",
+      });
       setOpen(false, "action");
 
       setTheme(theme);
     },
-    [click, setTheme, setOpen],
+    [click, resolvedTheme, setTheme, setOpen],
   );
 
   const handleLinkHighlight = useCallback((link: CommandLinkItem) => {
@@ -329,11 +323,7 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
-                    handleCopyText(
-                      getMarkSVG(),
-                      "Mark as SVG copied",
-                      "brand_mark_svg",
-                    );
+                    handleCopyText(getMarkSVG(), "Mark as SVG copied");
                   }}
                 >
                   <YTMark />
@@ -343,11 +333,7 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
-                    handleCopyText(
-                      getWordmarkSVG(),
-                      "Logotype as SVG copied",
-                      "brand_logotype_svg",
-                    );
+                    handleCopyText(getWordmarkSVG(), "Logotype as SVG copied");
                   }}
                 >
                   <TypeIcon />
@@ -357,10 +343,6 @@ export function CommandMenu({
                 <CommandMenuItem
                   onHighlight={handleCommandHighlight}
                   onSelect={() => {
-                    trackEvent("command_menu_action", {
-                      action: "download",
-                      target: "brand_assets",
-                    });
                     const anchor = document.createElement("a");
                     anchor.href = BRAND_ASSETS.url;
                     anchor.download = "";
@@ -449,18 +431,6 @@ function CommandMenuTrigger({ ...props }: React.ComponentProps<typeof Button>) {
 
 function CommandMenuInput() {
   const [searchValue, setSearchValue] = useState("");
-
-  useEffect(() => {
-    if (searchValue.length >= 2) {
-      const timeoutId = setTimeout(() => {
-        trackEvent("command_menu_searched", {
-          query_length: searchValue.length,
-        });
-      }, 500);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [searchValue]);
 
   return (
     <div className="relative">
@@ -575,8 +545,7 @@ function CommandLinkGroup({
                 className="pointer-events-auto ml-auto size-7 shrink-0 text-muted-foreground hover:text-foreground"
                 variant="ghost"
                 text={link.copyText}
-                aria-label={`Copy ${link.copyItem ?? link.title}`}
-                trackAs={link.copyItem}
+                aria-label={`Copy ${link.title}`}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}

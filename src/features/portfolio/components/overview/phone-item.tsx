@@ -4,7 +4,6 @@ import { useId } from "react";
 import { toast } from "sonner";
 import { copyText } from "@/utils/copy";
 import { PhoneIcon } from "lucide-react";
-import { trackEvent } from "@/lib/analytics";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useIsClient } from "@/hooks/use-is-client";
 import { useTiks } from "@rexa-developer/tiks/react";
@@ -31,11 +30,7 @@ export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
   const { success } = useTiks();
 
   useHotkeys("shift+p", () => {
-    trackEvent("keyboard_shortcut_used", {
-      shortcut: "shift+p",
-      action: "copy_phone",
-    });
-    copyText(phoneNumberDecoded, "phone");
+    copyText(phoneNumberDecoded);
     success();
     toast.success("Phone number copied");
   });
@@ -62,8 +57,6 @@ export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
           variant="ghost"
           size="icon-xs"
           text={() => phoneNumberDecoded}
-          aria-label="Copy phone number"
-          trackAs="phone"
         />
       </div>
 

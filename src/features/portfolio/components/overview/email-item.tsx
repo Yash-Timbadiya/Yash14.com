@@ -4,7 +4,6 @@ import { useId } from "react";
 import { toast } from "sonner";
 import { copyText } from "@/utils/copy";
 import { MailIcon } from "lucide-react";
-import { trackEvent } from "@/lib/analytics";
 import { decodeEmail } from "@/utils/string";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useIsClient } from "@/hooks/use-is-client";
@@ -30,11 +29,7 @@ export function EmailItem({ emailB64 }: EmailItemProps) {
   const { success } = useTiks();
 
   useHotkeys("shift+e", () => {
-    trackEvent("keyboard_shortcut_used", {
-      shortcut: "shift+e",
-      action: "copy_email",
-    });
-    copyText(emailDecoded, "email");
+    copyText(emailDecoded);
     success();
     toast.success("Email copied");
   });
@@ -61,8 +56,6 @@ export function EmailItem({ emailB64 }: EmailItemProps) {
           variant="ghost"
           size="icon-xs"
           text={() => emailDecoded}
-          aria-label="Copy email"
-          trackAs="email"
         />
       </div>
 

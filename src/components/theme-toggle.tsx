@@ -32,7 +32,8 @@ export function ThemeToggle() {
     click();
 
     trackEvent("theme_changed", {
-      theme: resolvedTheme === "dark" ? "light" : "dark",
+      from: resolvedTheme ?? null,
+      to: resolvedTheme === "dark" ? "light" : "dark",
       method,
     });
 
@@ -50,13 +51,7 @@ export function ThemeToggle() {
     });
   };
 
-  useHotkeys("d", () => {
-    trackEvent("keyboard_shortcut_used", {
-      shortcut: "d",
-      action: "toggle_theme",
-    });
-    switchTheme("keyboard");
-  });
+  useHotkeys("d", () => switchTheme("keyboard"));
 
   return (
     <Tooltip>

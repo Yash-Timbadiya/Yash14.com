@@ -1,18 +1,12 @@
 "use client";
 
-import { trackEvent } from "@/lib/analytics";
 import { useRouter } from "@bprogress/next/app";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function KeyboardShortcuts() {
   const router = useRouter();
 
-  const navigate = (path: string, keys: string) => {
-    trackEvent("keyboard_shortcut_used", {
-      shortcut: keys,
-      action: "navigate",
-      destination: path,
-    });
+  const navigate = (path: string, _keys: string) => {
     router.push(path);
   };
 

@@ -98,7 +98,7 @@ function FooterLink({
       <ContextMenuContent className="w-fit">
         <ContextMenuItem
           onClick={() => {
-            copyText(absoluteUrl, "footer_link");
+            copyText(absoluteUrl);
             toast.success("Link copied");
           }}
         >

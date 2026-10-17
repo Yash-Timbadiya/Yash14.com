@@ -79,7 +79,7 @@ export function BrandContextMenu({ children }: { children: React.ReactNode }) {
           <BrandMenuItem
             onActivate={activateFromElement}
             onSelect={() => {
-              copyText(getMarkSVG(), "brand_mark_svg");
+              copyText(getMarkSVG());
               toast.success("Mark as SVG copied");
               success();
             }}
@@ -91,7 +91,7 @@ export function BrandContextMenu({ children }: { children: React.ReactNode }) {
           <BrandMenuItem
             onActivate={activateFromElement}
             onSelect={() => {
-              copyText(getWordmarkSVG(), "brand_logotype_svg");
+              copyText(getWordmarkSVG());
               toast.success("Logotype as SVG copied");
               success();
             }}
