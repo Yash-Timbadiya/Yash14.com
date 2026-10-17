@@ -72,6 +72,12 @@ export const ANALYTICS_EVENTS = {
   // Profile
   NAME_PRONUNCIATION_PLAYED: "name_pronunciation_played",
 
+  // Experience
+  EXPERIENCE_SHOW_MORE: "experience_show_more",
+  EXPERIENCE_SHOW_LESS: "experience_show_less",
+  EXPERIENCE_POSITION_OPENED: "experience_position_opened",
+  EXPERIENCE_POSITION_CLOSED: "experience_position_closed",
+
   // Tech stack
   TECH_STACK_CLICK: "tech_stack_click",
 
@@ -94,6 +100,7 @@ export const ANALYTICS_SECTIONS = {
   OVERVIEW: "overview",
   SOCIAL_LINKS: "social_links",
   TECH_STACK: "tech_stack",
+  EXPERIENCE: "experience",
   /** Global keyboard shortcuts, which are not tied to one part of the page. */
   KEYBOARD: "keyboard",
 } as const;

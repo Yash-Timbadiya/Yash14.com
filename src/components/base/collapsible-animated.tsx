@@ -1,12 +1,15 @@
 "use client";
 
 import type { Transition } from "motion/react";
+import type { AnalyticsProperties } from "@/lib/analytics";
+import type { AnalyticsEvent } from "@/lib/analytics-events";
 import type {
   ChevronDownIconHandle,
   ChevronDownIconProps,
 } from "@/components/animated-icons/chevron-down-icon";
 
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { ChevronDownIcon } from "@/components/animated-icons/chevron-down-icon";
@@ -39,8 +42,16 @@ function CollapsibleWithContext({
   defaultOpen,
   open: controlledOpen,
   onOpenChange,
+  openEvent,
+  closeEvent,
+  eventProperties,
   ...props
-}: React.ComponentProps<typeof CollapsibleRoot>) {
+}: React.ComponentProps<typeof CollapsibleRoot> & {
+  /** Sent when opened or closed. Serializable, so server components can set them. */
+  openEvent?: AnalyticsEvent;
+  closeEvent?: AnalyticsEvent;
+  eventProperties?: AnalyticsProperties;
+}) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(
     defaultOpen ?? false,
   );
@@ -53,6 +64,10 @@ function CollapsibleWithContext({
         onOpenChange={(open, eventDetails) => {
           if (controlledOpen === undefined) {
             setUncontrolledOpen(open);
+          }
+          const event = open ? openEvent : closeEvent;
+          if (event && eventProperties) {
+            trackEvent(event, eventProperties);
           }
           onOpenChange?.(open, eventDetails);
         }}

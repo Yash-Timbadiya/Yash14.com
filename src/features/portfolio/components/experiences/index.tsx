@@ -5,6 +5,7 @@ import { ExperienceItem } from "./experience-item";
 import { Button } from "@/components/base/ui/button";
 import { EXPERIENCES } from "@/features/portfolio/data/experiences";
 import { CollapsibleTrigger } from "@/components/base/ui/collapsible";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { PanelTitleCopy } from "@/features/portfolio/components/panel-title-copy";
 import {
   Panel,
@@ -34,7 +35,15 @@ export function Experiences() {
       </div>
 
       {EXPERIENCES.length > MAX && (
-        <Collapsible className="group/collapsible">
+        <Collapsible
+          className="group/collapsible"
+          openEvent={ANALYTICS_EVENTS.EXPERIENCE_SHOW_MORE}
+          closeEvent={ANALYTICS_EVENTS.EXPERIENCE_SHOW_LESS}
+          eventProperties={{
+            section: ANALYTICS_SECTIONS.EXPERIENCE,
+            hidden_count: EXPERIENCES.length - MAX,
+          }}
+        >
           <CollapsibleMotionContent className="pr-2 pl-4">
             <ExperienceList experiences={EXPERIENCES.slice(MAX)} />
           </CollapsibleMotionContent>
