@@ -13,6 +13,13 @@ export const ANALYTICS_EVENTS = {
   // Navigation
   VIEW_BRAND_GUIDELINES: "view_brand_guidelines",
 
+  // Logo and its right-click brand menu
+  LOGO_CLICK: "logo_click",
+  LOGO_RIGHT_CLICK: "logo_right_click",
+  COPY_MARK_SVG: "copy_mark_svg",
+  COPY_LOGOTYPE_SVG: "copy_logotype_svg",
+  DOWNLOAD_BRAND_ASSETS: "download_brand_assets",
+
   // Outbound links
   REDIRECT_TO_GITHUB: "redirect_to_github",
 
@@ -29,7 +36,20 @@ export const ANALYTICS_SECTIONS = {
   BOTTOM_NAV: "bottom_nav",
   COMMAND_MENU: "command_menu",
   PROFILE_HEADER: "profile_header",
+  BRAND_GUIDELINES: "brand_guidelines",
 } as const;
 
 export type AnalyticsSection =
   (typeof ANALYTICS_SECTIONS)[keyof typeof ANALYTICS_SECTIONS];
+
+/**
+ * What inside a section fired the event, sent as `source`. Tells apart the
+ * same event fired from different controls, such as `view_brand_guidelines`
+ * from the logo menu versus the header nav link.
+ */
+export const ANALYTICS_SOURCES = {
+  LOGO_MENU: "logo_menu",
+} as const;
+
+export type AnalyticsSource =
+  (typeof ANALYTICS_SOURCES)[keyof typeof ANALYTICS_SOURCES];

@@ -10,6 +10,7 @@ import { TOCMinimap } from "@/components/toc-minimap";
 import { YTWordmark } from "@/components/yt-wordmark";
 import { USER } from "@/features/portfolio/data/user";
 import { BRAND_ASSETS, SITE_INFO } from "@/config/site";
+import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { CopyBrandSvgButton } from "./copy-brand-svg-button";
 import { ArrowLeftIcon, Download, LinkIcon } from "lucide-react";
 import { DocPageRoot } from "@/features/doc/components/doc-page-root";
@@ -133,7 +134,7 @@ export default function BrandPage() {
               <AnchorHeading id="mark">Mark</AnchorHeading>
             </PanelHeader>
 
-            <BrandContextMenu>
+            <BrandContextMenu section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}>
               <PanelContent className="flex items-center justify-center py-16">
                 <YTMark className="h-16 w-auto text-foreground sm:h-20" />
               </PanelContent>
@@ -156,7 +157,7 @@ export default function BrandPage() {
               <AnchorHeading id="logotype">Logotype</AnchorHeading>
             </PanelHeader>
 
-            <BrandContextMenu>
+            <BrandContextMenu section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}>
               <PanelContent className="flex items-center justify-center px-8 py-16">
                 <YTWordmark className="h-8 w-auto text-foreground sm:h-10" />
               </PanelContent>
