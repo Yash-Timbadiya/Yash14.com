@@ -100,6 +100,12 @@ export const ANALYTICS_EVENTS = {
   // Tech stack
   TECH_STACK_CLICK: "tech_stack_click",
 
+  // Bookmarks
+  VIEW_BOOKMARKS: "view_bookmarks",
+  BOOKMARK_CLICK: "bookmark_click",
+  BOOKMARK_FILTER_CHANGED: "bookmark_filter_changed",
+  BOOKMARK_FILTER_CLEARED: "bookmark_filter_cleared",
+
   // Isometric YT mark and its right-click car picker
   YT_MARK_CLICK: "yt_mark_click",
   YT_MARK_RIGHT_CLICK: "yt_mark_right_click",
@@ -119,6 +125,10 @@ export const ANALYTICS_SECTIONS = {
   OVERVIEW: "overview",
   SOCIAL_LINKS: "social_links",
   TECH_STACK: "tech_stack",
+  /** The bookmarks panel on the home page. */
+  BOOKMARKS: "bookmarks",
+  /** The full /bookmarks page. */
+  BOOKMARKS_PAGE: "bookmarks_page",
   EXPERIENCE: "experience",
   EDUCATION: "education",
   FOOTER: "footer",
@@ -151,6 +161,8 @@ export const ANALYTICS_SOURCES = {
   STACK: "stack",
   FOR_AGENTS: "for_agents",
   FOOTER_LINKS: "footer_links",
+  VIEW_ALL: "view_all",
+  EMPTY_STATE: "empty_state",
 } as const;
 
 export type AnalyticsSource =

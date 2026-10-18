@@ -22,5 +22,7 @@ export function trackNavItemClick(href: string, section: AnalyticsSection) {
     trackEvent(ANALYTICS_EVENTS.VIEW_HOME, { section });
   } else if (href === "/brand-guidelines") {
     trackEvent(ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES, { section });
+  } else if (href === "/bookmarks") {
+    trackEvent(ANALYTICS_EVENTS.VIEW_BOOKMARKS, { section });
   }
 }

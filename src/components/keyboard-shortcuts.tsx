@@ -1,8 +1,8 @@
 "use client";
 
-import { trackEvent } from "@/lib/analytics";
 import { useRouter } from "@bprogress/next/app";
 import { useHotkeys } from "react-hotkeys-hook";
+import { trackEvent, trackNavItemClick } from "@/lib/analytics";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 export function KeyboardShortcuts() {
@@ -15,17 +15,13 @@ export function KeyboardShortcuts() {
       action: "navigate",
       destination: path,
     });
-    trackEvent(
-      path === "/"
-        ? ANALYTICS_EVENTS.VIEW_HOME
-        : ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES,
-      { section: ANALYTICS_SECTIONS.KEYBOARD },
-    );
+    trackNavItemClick(path, ANALYTICS_SECTIONS.KEYBOARD);
     router.push(path);
   };
 
   useHotkeys("g>h", () => navigate("/", "g>h"));
   useHotkeys("g>y", () => navigate("/brand-guidelines", "g>y"));
+  useHotkeys("g>b", () => navigate("/bookmarks", "g>b"));
 
   return null;
 }

@@ -25,6 +25,10 @@ export const META_THEME_COLORS = {
 
 export const MAIN_NAV: NavItem<Route>[] = [
   {
+    title: "Bookmarks",
+    href: "/bookmarks",
+  },
+  {
     title: "Brand",
     href: "/brand-guidelines",
   },

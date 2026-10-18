@@ -11,6 +11,7 @@ ${USER.about.trim()}
 ## Docs
 
 - [About](${SITE_INFO.url}/about.md): A quick intro to ${USER.displayName}, current work, and how to connect.
+- [Bookmarks](${SITE_INFO.url}/bookmarks.md): Articles, courses, books, references, and tools I recommend.
 - [Full context](${SITE_INFO.url}/llms-full.txt): Everything on this site in a single document.
 
 ## Connect

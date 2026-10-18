@@ -7,6 +7,7 @@ import { personJsonLd } from "@/config/json-ld";
 import { USER } from "@/features/portfolio/data/user";
 import { Hello } from "@/features/portfolio/components/hello";
 import { Overview } from "@/features/portfolio/components/overview";
+import { Bookmarks } from "@/features/portfolio/components/bookmarks";
 import { Education } from "@/features/portfolio/components/education";
 import { TechStack } from "@/features/portfolio/components/tech-stack";
 import { Experiences } from "@/features/portfolio/components/experiences";
@@ -45,6 +46,9 @@ export default function HomePage() {
           <Separator />
 
           <Education />
+          <Separator />
+
+          <Bookmarks />
           <Separator />
         </div>
       </div>

@@ -99,6 +99,15 @@ const MENU_LINKS: CommandLinkItem[] = [
     shortcut: "GY",
     event: ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES,
   },
+  {
+    title: "Bookmarks",
+    href: "/bookmarks",
+    kind: "page",
+    icon: <BookmarkIcon />,
+    shortcut: "GB",
+    keywords: ["links", "resources", "reading"],
+    event: ANALYTICS_EVENTS.VIEW_BOOKMARKS,
+  },
 ];
 
 const PORTFOLIO_LINKS: CommandLinkItem[] = [
