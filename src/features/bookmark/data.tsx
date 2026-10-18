@@ -168,22 +168,15 @@ export const BOOKMARKS: Bookmark[] = [
     bookmarkedAt: "2026-07-25",
   },
   {
-    title: "Copper",
-    url: "https://shadcn.com/copper",
-    author: "shadcn",
+    title: "Raycast",
+    url: "https://www.raycast.com",
     category: BookmarkCategory.SOFTWARE,
     bookmarkedAt: "2026-07-30",
   },
   {
-    title: "React Bits Pro",
-    url: "https://pro.reactbits.dev",
+    title: "Tailark Pro",
+    url: "https://pro.tailark.com",
     category: BookmarkCategory.UI_LIBRARY,
-    bookmarkedAt: "2026-09-03",
-  },
-  {
-    title: "shadcncraft",
-    url: "https://shadcncraft.com",
-    category: BookmarkCategory.UI_LIBRARY,
-    bookmarkedAt: "2026-09-03",
+    bookmarkedAt: "2025-03-03",
   },
 ];
