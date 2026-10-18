@@ -11,25 +11,11 @@ export const BOOKMARKS: Bookmark[] = [
     bookmarkedAt: "2025-12-01",
   },
   {
-    title: "Developing Taste",
-    url: "https://emilkowal.ski/ui/developing-taste",
-    author: "Emil Kowalski",
-    category: BookmarkCategory.ARTICLE,
-    bookmarkedAt: "2025-12-01",
-  },
-  {
     title: "Web Interface Guidelines",
     url: "https://vercel.com/design/guidelines",
     author: "Vercel",
     icon: <VercelIcon />,
     category: BookmarkCategory.REFERENCE,
-    bookmarkedAt: "2025-12-01",
-  },
-  {
-    title: "7 Practical Animation Tips",
-    url: "https://emilkowal.ski/ui/7-practical-animation-tips",
-    author: "Emil Kowalski",
-    category: BookmarkCategory.ARTICLE,
     bookmarkedAt: "2025-12-01",
   },
   {
@@ -55,20 +41,6 @@ export const BOOKMARKS: Bookmark[] = [
     bookmarkedAt: "2025-12-11",
   },
   {
-    title: "7 Principles of Rich Web Applications",
-    url: "https://rauchg.com/2014/7-principles-of-rich-web-applications",
-    author: "Guillermo Rauch",
-    category: BookmarkCategory.ARTICLE,
-    bookmarkedAt: "2025-12-16",
-  },
-  {
-    title: "How we think about design",
-    url: "https://resend.com/handbook/design/how-we-think-about-design",
-    author: "Resend",
-    category: BookmarkCategory.REFERENCE,
-    bookmarkedAt: "2025-12-20",
-  },
-  {
     title: "Philosophy",
     url: "https://resend.com/philosophy",
     author: "Resend",
@@ -76,25 +48,11 @@ export const BOOKMARKS: Bookmark[] = [
     bookmarkedAt: "2025-12-20",
   },
   {
-    title: "Train Your Judgement",
-    url: "https://emilkowal.ski/ui/train-your-judgement",
-    author: "Emil Kowalski",
-    category: BookmarkCategory.ARTICLE,
-    bookmarkedAt: "2026-04-09",
-  },
-  {
     title: "Devouring Details",
     url: "https://devouringdetails.com",
     author: "Rauno",
     category: BookmarkCategory.COURSE,
-    bookmarkedAt: "2026-04-14",
-  },
-  {
-    title: "React handbook",
-    url: "https://devouringdetails.com/resources/react-handbook",
-    author: "Rauno",
-    category: BookmarkCategory.REFERENCE,
-    bookmarkedAt: "2026-04-14",
+    bookmarkedAt: "2026-09-14",
   },
   {
     title: "Agents with Taste",
@@ -102,13 +60,6 @@ export const BOOKMARKS: Bookmark[] = [
     author: "Emil Kowalski",
     category: BookmarkCategory.ARTICLE,
     bookmarkedAt: "2026-04-21",
-  },
-  {
-    title: "Component Architecture for React Server Components",
-    url: "https://aurorascharff.no/posts/component-architecture-for-react-server-components",
-    author: "Aurora Scharff",
-    category: BookmarkCategory.ARTICLE,
-    bookmarkedAt: "2026-05-30",
   },
   {
     title: "Details that make interfaces feel better",
@@ -129,7 +80,7 @@ export const BOOKMARKS: Bookmark[] = [
     url: "https://www.makingsoftware.com",
     author: "Dan Hollick",
     category: BookmarkCategory.BOOK,
-    bookmarkedAt: "2026-06-08",
+    bookmarkedAt: "2026-09-08",
   },
   {
     title: "Interface Craft",
@@ -143,7 +94,7 @@ export const BOOKMARKS: Bookmark[] = [
     url: "http://interfaces.dev",
     author: "Jakub Krehel",
     category: BookmarkCategory.COURSE,
-    bookmarkedAt: "2026-06-20",
+    bookmarkedAt: "2026-09-01",
   },
   {
     title: "Design Engineer Principles",
@@ -171,7 +122,7 @@ export const BOOKMARKS: Bookmark[] = [
     title: "Raycast",
     url: "https://www.raycast.com",
     category: BookmarkCategory.SOFTWARE,
-    bookmarkedAt: "2026-07-30",
+    bookmarkedAt: "2026-06-30",
   },
   {
     title: "Tailark Pro",
