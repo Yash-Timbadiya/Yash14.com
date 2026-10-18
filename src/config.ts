@@ -13,6 +13,14 @@ export const config = {
     contributionsApiUrl: process.env.GITHUB_CONTRIBUTIONS_API_URL,
   },
 
+  analytics: {
+    /**
+     * Whether PostHog runs during `next dev`. Off keeps local clicks out of
+     * production insights; turn it on to debug events end to end.
+     */
+    trackInDevelopment: false,
+  },
+
   dmca: {
     url: process.env.NEXT_PUBLIC_DMCA_URL,
   },

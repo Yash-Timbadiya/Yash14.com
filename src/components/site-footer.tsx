@@ -156,25 +156,48 @@ export function SiteFooter() {
 
             <Field label="Typeface">Geist</Field>
 
-            <Field label="Analytics">
+            <Field className="col-span-2" label="Stack">
               <ul className="flex flex-col gap-0.5">
-                <li className="w-fit transition-transform duration-200 hover:translate-x-0.5">
-                  <a
-                    className="link-underline"
-                    href={addQueryParams(POSTHOG_URL, UTM_PARAMS)}
-                    target="_blank"
-                    rel="noopener"
-                    onClick={() =>
-                      trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_POSTHOG, {
-                        section: ANALYTICS_SECTIONS.FOOTER,
-                        url: POSTHOG_URL,
-                      })
-                    }
+                {stack.map((item) => (
+                  <li
+                    key={item.name}
+                    className="w-fit transition-transform duration-200 hover:translate-x-0.5"
                   >
-                    PostHog
-                  </a>
-                </li>
+                    <a
+                      className="link-underline"
+                      href={addQueryParams(item.href, UTM_PARAMS)}
+                      target="_blank"
+                      rel="noopener"
+                      onClick={() =>
+                        trackEvent(ANALYTICS_EVENTS.TECH_STACK_CLICK, {
+                          section: ANALYTICS_SECTIONS.FOOTER,
+                          source: ANALYTICS_SOURCES.STACK,
+                          tech: item.name,
+                          version: item.version,
+                          url: item.href,
+                        })
+                      }
+                    >
+                      {item.name}@{item.version}
+                    </a>
+                  </li>
+                ))}
               </ul>
+            </Field>
+
+            <Field label="Analytics">
+              <LinkPreview
+                url={POSTHOG_URL}
+                className="link-underline"
+                onClick={() =>
+                  trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_POSTHOG, {
+                    section: ANALYTICS_SECTIONS.FOOTER,
+                    url: POSTHOG_URL,
+                  })
+                }
+              >
+                PostHog
+              </LinkPreview>
             </Field>
 
             <Field label="For agents">
@@ -211,35 +234,6 @@ export function SiteFooter() {
                     index.md
                   </a>
                 </li>
-              </ul>
-            </Field>
-
-            <Field className="col-span-2" label="Stack">
-              <ul className="flex flex-col gap-0.5">
-                {stack.map((item) => (
-                  <li
-                    key={item.name}
-                    className="w-fit transition-transform duration-200 hover:translate-x-0.5"
-                  >
-                    <a
-                      className="link-underline"
-                      href={addQueryParams(item.href, UTM_PARAMS)}
-                      target="_blank"
-                      rel="noopener"
-                      onClick={() =>
-                        trackEvent(ANALYTICS_EVENTS.TECH_STACK_CLICK, {
-                          section: ANALYTICS_SECTIONS.FOOTER,
-                          source: ANALYTICS_SOURCES.STACK,
-                          tech: item.name,
-                          version: item.version,
-                          url: item.href,
-                        })
-                      }
-                    >
-                      {item.name}@{item.version}
-                    </a>
-                  </li>
-                ))}
               </ul>
             </Field>
 
