@@ -145,6 +145,7 @@ export const ANALYTICS_SOURCES = {
   TOC: "toc",
   HEADING: "heading",
   CRAFTED_BY: "crafted_by",
+  INSPIRED_BY: "inspired_by",
   BUILD_COMMIT: "build_commit",
   SOURCE_CODE: "source_code",
   STACK: "stack",

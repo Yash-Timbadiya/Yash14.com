@@ -20,6 +20,7 @@ import {
 } from "@/lib/analytics-events";
 
 const POSTHOG_URL = "https://posthog.com";
+const INSPIRED_BY_X_URL = "https://x.com/iamncdai";
 
 const INSPIRED_BY = [
   "Tailwind CSS",
@@ -72,6 +73,22 @@ export function SiteFooter() {
                   {xLink.handle}
                 </LinkPreview>
               ) : null}
+            </Field>
+
+            <Field label="Inspired by">
+              <LinkPreview
+                url={addQueryParams(INSPIRED_BY_X_URL, UTM_PARAMS)}
+                className="link-underline"
+                onClick={() =>
+                  trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_X, {
+                    section: ANALYTICS_SECTIONS.FOOTER,
+                    source: ANALYTICS_SOURCES.INSPIRED_BY,
+                    url: INSPIRED_BY_X_URL,
+                  })
+                }
+              >
+                @iamncdai
+              </LinkPreview>
             </Field>
 
             <Field label="Build">
@@ -160,36 +177,7 @@ export function SiteFooter() {
               </ul>
             </Field>
 
-            <Field className="col-span-2" label="Stack">
-              <ul className="flex flex-col gap-0.5">
-                {stack.map((item) => (
-                  <li
-                    key={item.name}
-                    className="w-fit transition-transform duration-200 hover:translate-x-0.5"
-                  >
-                    <a
-                      className="link-underline"
-                      href={addQueryParams(item.href, UTM_PARAMS)}
-                      target="_blank"
-                      rel="noopener"
-                      onClick={() =>
-                        trackEvent(ANALYTICS_EVENTS.TECH_STACK_CLICK, {
-                          section: ANALYTICS_SECTIONS.FOOTER,
-                          source: ANALYTICS_SOURCES.STACK,
-                          tech: item.name,
-                          version: item.version,
-                          url: item.href,
-                        })
-                      }
-                    >
-                      {item.name}@{item.version}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </Field>
-
-            <Field className="col-span-2" label="For agents">
+            <Field label="For agents">
               <ul className="flex flex-col gap-0.5">
                 <li className="w-fit transition-transform duration-200 hover:translate-x-0.5">
                   <a
@@ -226,7 +214,39 @@ export function SiteFooter() {
               </ul>
             </Field>
 
-            <Field className="col-span-2 md:col-span-4" label="Inspired by">
+            <Field className="col-span-2" label="Stack">
+              <ul className="flex flex-col gap-0.5">
+                {stack.map((item) => (
+                  <li
+                    key={item.name}
+                    className="w-fit transition-transform duration-200 hover:translate-x-0.5"
+                  >
+                    <a
+                      className="link-underline"
+                      href={addQueryParams(item.href, UTM_PARAMS)}
+                      target="_blank"
+                      rel="noopener"
+                      onClick={() =>
+                        trackEvent(ANALYTICS_EVENTS.TECH_STACK_CLICK, {
+                          section: ANALYTICS_SECTIONS.FOOTER,
+                          source: ANALYTICS_SOURCES.STACK,
+                          tech: item.name,
+                          version: item.version,
+                          url: item.href,
+                        })
+                      }
+                    >
+                      {item.name}@{item.version}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </Field>
+
+            <Field
+              className="col-span-2 md:col-span-4"
+              label="Also inspired by"
+            >
               <ol className="-mx-4 grid grid-cols-2 gap-x-px gap-y-0.5 font-sans md:grid-cols-4">
                 {INSPIRED_BY.map((name, index) => (
                   <li
