@@ -1,4 +1,5 @@
 import posthog from "posthog-js";
+import { POSTHOG_PROXY_PATH, POSTHOG_UI_HOST } from "@/config/posthog";
 
 const projectToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
 const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
@@ -16,11 +17,14 @@ if (!projectToken) {
     );
   }
 } else {
-  // Web analytics only: pageviews and pageleaves. Every other product is
-  // disabled here so that turning one on in the PostHog project settings
-  // cannot start collecting data from this site.
+  // Pageviews, pageleaves and the site's own named events only. Every other
+  // product is disabled here so that turning one on in the PostHog project
+  // settings cannot start collecting data from this site.
   posthog.init(projectToken, {
-    api_host: host,
+    // Sent through this site's own domain (see next.config.ts) so ad
+    // blockers do not drop the requests.
+    api_host: POSTHOG_PROXY_PATH,
+    ui_host: POSTHOG_UI_HOST,
     defaults: "2026-01-30",
     capture_pageview: "history_change",
     capture_pageleave: true,
