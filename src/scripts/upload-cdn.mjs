@@ -19,6 +19,28 @@ const MANIFEST_KEY = ".cdn-manifest.json";
 const WRANGLER =
   "pnpm dlx --allow-build=esbuild --allow-build=workerd wrangler";
 
+// Wrangler stores SVGs with an empty or application/xml type, which browsers
+// refuse to render in <img>, so common types are set explicitly.
+const CONTENT_TYPES = {
+  svg: "image/svg+xml",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+  avif: "image/avif",
+  gif: "image/gif",
+  ico: "image/x-icon",
+  mp3: "audio/mpeg",
+  zip: "application/zip",
+  pdf: "application/pdf",
+  json: "application/json",
+};
+
+function contentTypeFlag(key) {
+  const type = CONTENT_TYPES[key.split(".").pop()?.toLowerCase()];
+  return type ? ` --content-type "${type}"` : "";
+}
+
 function wrangler(args, options = {}) {
   return execSync(`${WRANGLER} ${args}`, {
     stdio: ["inherit", "pipe", "inherit"],
@@ -84,7 +106,7 @@ try {
   for (const key of toUpload) {
     console.log(`${key in remote ? "~ update" : "+ upload"}  ${key}`);
     wrangler(
-      `r2 object put "${BUCKET}/${key}" --file "${DIR}/${key}" --cache-control "public, max-age=31536000, immutable" --remote`,
+      `r2 object put "${BUCKET}/${key}" --file "${DIR}/${key}" --cache-control "public, max-age=31536000, immutable"${contentTypeFlag(key)} --remote`,
     );
     manifest[key] = local[key];
   }
@@ -94,7 +116,9 @@ try {
     for (const key of toDelete) console.log(`- ${key}`);
 
     let confirmed = process.argv.includes("--yes");
-    if (!confirmed) {
+    // Without a TTY the prompt never settles and Node exits before `finally`
+    // writes the manifest, so treat non-interactive runs as "no".
+    if (!confirmed && process.stdin.isTTY) {
       const rl = createInterface({
         input: process.stdin,
         output: process.stdout,

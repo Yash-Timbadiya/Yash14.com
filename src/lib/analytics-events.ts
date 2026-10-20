@@ -99,6 +99,7 @@ export const ANALYTICS_EVENTS = {
 
   // Tech stack
   TECH_STACK_CLICK: "tech_stack_click",
+  BRAND_COLORS_TOGGLED: "brand_colors_toggled",
 
   // Bookmarks
   VIEW_BOOKMARKS: "view_bookmarks",
@@ -122,6 +123,7 @@ export const ANALYTICS_SECTIONS = {
   COMMAND_MENU: "command_menu",
   PROFILE_HEADER: "profile_header",
   BRAND_GUIDELINES: "brand_guidelines",
+  HELLO: "hello",
   OVERVIEW: "overview",
   SOCIAL_LINKS: "social_links",
   TECH_STACK: "tech_stack",

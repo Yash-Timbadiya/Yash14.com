@@ -46,6 +46,7 @@ Next.js site on Vercel
 | `logo/crosseven.png` | `EXPERIENCES` (`src/features/portfolio/data/experiences.tsx`) |
 | `logo/enacton.png` | `EXPERIENCES` |
 | `assets/yash14-brand.zip` | `BRAND_ASSETS.url` (`src/config/site.ts`) — brand kit download |
+| `tech-stack-icons/*.svg`, `tech-stack-icons/*.png` | `TECH_STACK_BRAND_ICONS` (`src/features/portfolio/data/tech-stack-brand-icons.ts`) — original-colour logos for the Stack section's brand-colours toggle. `*-dark.*` files are the dark-mode variants. |
 
 ### What must stay in `public/`
 

@@ -20,7 +20,7 @@ import {
   ContributionGraphFooter,
   ContributionGraphLegend,
   ContributionGraphTotalCount,
-  THEME,
+  GITHUB_THEME,
 } from "@/features/portfolio/components/contribution-graph";
 
 export function GitHubContributionGraph({
@@ -71,6 +71,7 @@ export function GitHubContributionGraph({
                     activity={activity}
                     dayIndex={dayIndex}
                     weekIndex={weekIndex}
+                    theme={GITHUB_THEME}
                     className={cn(
                       "origin-center transform-fill transition-opacity motion-safe:animate-contribution-in",
                       selectedLevel !== null &&
@@ -136,7 +137,7 @@ export function GitHubContributionGraph({
                   width={12}
                 >
                   <rect
-                    className={THEME}
+                    className={GITHUB_THEME}
                     data-level={level}
                     height={12}
                     width={12}

@@ -6,6 +6,8 @@ import { TECH_STACK } from "../data/tech-stack";
 import { PanelTitleCopy } from "./panel-title-copy";
 import { TrackedLink } from "@/components/tracked-link";
 import { Panel, PanelHeader, PanelTitle } from "./panel";
+import { TechStackItemIcon } from "./tech-stack-brand-icons";
+import { TECH_STACK_BRAND_ICONS } from "../data/tech-stack-brand-icons";
 import {
   ANALYTICS_EVENTS,
   ANALYTICS_SECTIONS,
@@ -83,7 +85,10 @@ export function TechStack() {
                           }}
                           className="flex h-(--badge-height) items-center justify-center gap-1.25 rounded-full bg-zinc-50/80 px-2 font-mono text-xs text-foreground inset-ring-1 inset-ring-border dark:bg-zinc-900/80 [&_svg]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0 [&_svg]:text-muted-foreground/80"
                         >
-                          {item.icon}
+                          <TechStackItemIcon
+                            icon={item.icon}
+                            brandIcon={TECH_STACK_BRAND_ICONS[item.key]}
+                          />
                           {item.title}
                         </TrackedLink>
                       </li>

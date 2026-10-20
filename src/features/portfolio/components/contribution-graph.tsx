@@ -82,6 +82,16 @@ export const THEME = cn(
   'data-[level="4"]:fill-muted-foreground/80',
 );
 
+// Level colors come from `.contribution-levels` in globals.css: GitHub's palette, or greys when brand colors are off.
+export const GITHUB_THEME = cn(
+  "contribution-levels",
+  'data-[level="0"]:fill-(--level-0)',
+  'data-[level="1"]:fill-(--level-1)',
+  'data-[level="2"]:fill-(--level-2)',
+  'data-[level="3"]:fill-(--level-3)',
+  'data-[level="4"]:fill-(--level-4)',
+);
+
 type ContributionGraphContextType = {
   data: Activity[];
   weeks: Week[];
@@ -318,12 +328,14 @@ export type ContributionGraphBlockProps = HTMLAttributes<SVGRectElement> & {
   activity: Activity;
   dayIndex: number;
   weekIndex: number;
+  theme?: string;
 };
 
 export const ContributionGraphBlock = ({
   activity,
   dayIndex,
   weekIndex,
+  theme = THEME,
   className,
   ...props
 }: ContributionGraphBlockProps) => {
@@ -338,7 +350,7 @@ export const ContributionGraphBlock = ({
 
   return (
     <rect
-      className={cn(THEME, className)}
+      className={cn(theme, className)}
       data-count={activity.count}
       data-date={activity.date}
       data-level={activity.level}
