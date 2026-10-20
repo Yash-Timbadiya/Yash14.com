@@ -7,6 +7,7 @@ import { XIcon } from "@/components/icons";
 import { UTM_PARAMS } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
+import { LinkPreview } from "@/components/link-preview";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
@@ -36,11 +37,10 @@ export function HelloInspiration({ className }: { className?: string }) {
   return (
     <li ref={ref} className={className}>
       Design inspired by{" "}
-      <a
-        href={addQueryParams(INSPIRATION.href, UTM_PARAMS)}
-        target="_blank"
-        rel="noopener"
-        className="group/handle inline-flex items-baseline gap-1 font-medium whitespace-nowrap text-foreground link-underline"
+      <LinkPreview
+        url={addQueryParams(INSPIRATION.href, UTM_PARAMS)}
+        className="group/handle inline-flex items-baseline gap-1 font-medium whitespace-nowrap link-underline"
+        side="top"
         onClick={() =>
           trackEvent(ANALYTICS_EVENTS.DESCRIPTION_LINK_CLICK, {
             section: ANALYTICS_SECTIONS.HELLO,
@@ -50,7 +50,7 @@ export function HelloInspiration({ className }: { className?: string }) {
       >
         <XIcon className="size-[0.8em] self-center transition-transform duration-500 ease-out group-hover/handle:rotate-360 motion-reduce:transition-none" />
         {INSPIRATION.handle}
-      </a>
+      </LinkPreview>
       ,{" "}
       <span className="relative inline-block">
         <motion.del
