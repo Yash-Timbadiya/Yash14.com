@@ -82,6 +82,17 @@ export const THEME = cn(
   'data-[level="4"]:fill-muted-foreground/80',
 );
 
+// GitHub's own contribution palette, light and dark.
+export const GITHUB_THEME = cn(
+  "[--level-0:#ebedf0] [--level-1:#9be9a8] [--level-2:#40c463] [--level-3:#30a14e] [--level-4:#216e39]",
+  "dark:[--level-0:#151b23] dark:[--level-1:#033a16] dark:[--level-2:#196c2e] dark:[--level-3:#2ea043] dark:[--level-4:#56d364]",
+  'data-[level="0"]:fill-(--level-0)',
+  'data-[level="1"]:fill-(--level-1)',
+  'data-[level="2"]:fill-(--level-2)',
+  'data-[level="3"]:fill-(--level-3)',
+  'data-[level="4"]:fill-(--level-4)',
+);
+
 type ContributionGraphContextType = {
   data: Activity[];
   weeks: Week[];
@@ -318,12 +329,14 @@ export type ContributionGraphBlockProps = HTMLAttributes<SVGRectElement> & {
   activity: Activity;
   dayIndex: number;
   weekIndex: number;
+  theme?: string;
 };
 
 export const ContributionGraphBlock = ({
   activity,
   dayIndex,
   weekIndex,
+  theme = THEME,
   className,
   ...props
 }: ContributionGraphBlockProps) => {
@@ -338,7 +351,7 @@ export const ContributionGraphBlock = ({
 
   return (
     <rect
-      className={cn(THEME, className)}
+      className={cn(theme, className)}
       data-count={activity.count}
       data-date={activity.date}
       data-level={activity.level}

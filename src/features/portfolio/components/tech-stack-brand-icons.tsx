@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { PaletteIcon } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
-import { createContext, use, useState } from "react";
+import { useBrandColors } from "@/hooks/use-brand-colors";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   Tooltip,
@@ -14,49 +14,34 @@ import {
   TooltipTrigger,
 } from "@/components/base/ui/tooltip";
 
-type BrandIconsContextValue = {
-  enabled: boolean;
-  toggle: () => void;
-};
-
-const BrandIconsContext = createContext<BrandIconsContextValue | null>(null);
-
 /**
- * Exposes the brand-icons state as `data-brand-icons` on a `group/stack`
+ * Exposes the brand-colors setting as `data-brand-icons` on a `group/stack`
  * wrapper so badges can swap icons with CSS alone and stay server-rendered.
  */
 export function TechStackBrandIconsScope({
   children,
 }: React.PropsWithChildren) {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled] = useBrandColors();
+
+  return (
+    <div data-brand-icons={enabled} className="group/stack">
+      {children}
+    </div>
+  );
+}
+
+/** Toggles brand colors site-wide: stack logos, social links and the contribution graph. */
+export function TechStackBrandIconsToggle() {
+  const [enabled, setEnabled] = useBrandColors();
+  const label = enabled ? "Show monochrome icons" : "Show brand colors";
 
   const toggle = () => {
-    trackEvent(ANALYTICS_EVENTS.TECH_STACK_BRAND_ICONS_TOGGLED, {
+    trackEvent(ANALYTICS_EVENTS.BRAND_COLORS_TOGGLED, {
       section: ANALYTICS_SECTIONS.TECH_STACK,
       enabled: !enabled,
     });
     setEnabled(!enabled);
   };
-
-  return (
-    <BrandIconsContext value={{ enabled, toggle }}>
-      <div data-brand-icons={enabled} className="group/stack">
-        {children}
-      </div>
-    </BrandIconsContext>
-  );
-}
-
-export function TechStackBrandIconsToggle() {
-  const context = use(BrandIconsContext);
-  if (!context) {
-    throw new Error(
-      "TechStackBrandIconsToggle must be used within TechStackBrandIconsScope",
-    );
-  }
-
-  const { enabled, toggle } = context;
-  const label = enabled ? "Show monochrome icons" : "Show brand colors";
 
   return (
     <Tooltip>
