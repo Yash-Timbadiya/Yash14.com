@@ -99,6 +99,7 @@ export const ANALYTICS_EVENTS = {
 
   // Tech stack
   TECH_STACK_CLICK: "tech_stack_click",
+  TECH_STACK_BRAND_ICONS_TOGGLED: "tech_stack_brand_icons_toggled",
 
   // Bookmarks
   VIEW_BOOKMARKS: "view_bookmarks",
