@@ -123,6 +123,7 @@ export const ANALYTICS_SECTIONS = {
   COMMAND_MENU: "command_menu",
   PROFILE_HEADER: "profile_header",
   BRAND_GUIDELINES: "brand_guidelines",
+  HELLO: "hello",
   OVERVIEW: "overview",
   SOCIAL_LINKS: "social_links",
   TECH_STACK: "tech_stack",

@@ -1,30 +1,11 @@
-"use client";
-
 import type { TechStackBrandIcon } from "../types/tech-stack";
 
 import { cn } from "@/lib/utils";
-import { useBrandColors } from "@/hooks/use-brand-colors";
-
-/**
- * Exposes the brand-colors setting as `data-brand-icons` on a `group/stack`
- * wrapper so badges can swap icons with CSS alone and stay server-rendered.
- */
-export function TechStackBrandIconsScope({
-  children,
-}: React.PropsWithChildren) {
-  const [enabled] = useBrandColors();
-
-  return (
-    <div data-brand-icons={enabled} className="group/stack">
-      {children}
-    </div>
-  );
-}
 
 const IMG_CLASS =
   "pointer-events-none hidden size-3.5 shrink-0 object-contain select-none";
 
-/** Renders both icon sets; visibility is driven by the nearest `group/stack`. */
+/** Renders both icon sets; visibility is driven by the nearest `BrandColorsScope`. */
 export function TechStackItemIcon({
   icon,
   brandIcon,
@@ -36,15 +17,15 @@ export function TechStackItemIcon({
 
   return (
     <>
-      <span className="contents group-data-[brand-icons=true]/stack:hidden">
+      <span className="contents group-data-[brand-colors=true]/brand:hidden">
         {icon}
       </span>
       <img
         className={cn(
           IMG_CLASS,
           brandIcon.dark
-            ? "group-data-[brand-icons=true]/stack:not-dark:block"
-            : "group-data-[brand-icons=true]/stack:block",
+            ? "group-data-[brand-colors=true]/brand:not-dark:block"
+            : "group-data-[brand-colors=true]/brand:block",
         )}
         src={brandIcon.light}
         alt=""
@@ -56,7 +37,7 @@ export function TechStackItemIcon({
         <img
           className={cn(
             IMG_CLASS,
-            "group-data-[brand-icons=true]/stack:dark:block",
+            "group-data-[brand-colors=true]/brand:dark:block",
           )}
           src={brandIcon.dark}
           alt=""

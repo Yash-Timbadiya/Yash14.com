@@ -6,11 +6,9 @@ import { TECH_STACK } from "../data/tech-stack";
 import { PanelTitleCopy } from "./panel-title-copy";
 import { TrackedLink } from "@/components/tracked-link";
 import { Panel, PanelHeader, PanelTitle } from "./panel";
+import { TechStackItemIcon } from "./tech-stack-brand-icons";
+import { BrandColorsScope } from "@/components/brand-colors-scope";
 import { TECH_STACK_BRAND_ICONS } from "../data/tech-stack-brand-icons";
-import {
-  TechStackBrandIconsScope,
-  TechStackItemIcon,
-} from "./tech-stack-brand-icons";
 import {
   ANALYTICS_EVENTS,
   ANALYTICS_SECTIONS,
@@ -22,7 +20,7 @@ const ID = "stack";
 export function TechStack() {
   return (
     <Panel id={ID}>
-      <TechStackBrandIconsScope>
+      <BrandColorsScope>
         <PanelHeader>
           <PanelTitle>
             <TrackedLink
@@ -107,7 +105,7 @@ export function TechStack() {
             },
           )}
         </div>
-      </TechStackBrandIconsScope>
+      </BrandColorsScope>
     </Panel>
   );
 }
