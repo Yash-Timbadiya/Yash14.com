@@ -11,6 +11,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Brand colors mode, toggled via `data-brand-colors` on <html> (see use-brand-colors.ts). */
+@custom-variant brand (&:where(:root:not([data-brand-colors="false"]) *));
+@custom-variant mono (&:where([data-brand-colors="false"] *));
+
 @custom-variant supports-timeline-scroll {
   @supports (animation-timeline: scroll()) {
     @slot;
@@ -655,4 +659,30 @@
   --typeset-flow: 1em;
 
   font-size: var(--typeset-size);
+}
+
+/* GitHub contribution levels: GitHub's palette, or muted greys when brand colors are off. */
+.contribution-levels {
+  --level-0: #ebedf0;
+  --level-1: #9be9a8;
+  --level-2: #40c463;
+  --level-3: #30a14e;
+  --level-4: #216e39;
+}
+
+.dark .contribution-levels {
+  --level-0: #111112;
+  --level-1: #033a16;
+  --level-2: #196c2e;
+  --level-3: #2ea043;
+  --level-4: #56d364;
+}
+
+/* Declared last so it wins over `.dark` at equal specificity. */
+[data-brand-colors="false"] .contribution-levels {
+  --level-0: color-mix(in oklab, var(--color-muted-foreground) 5%, transparent);
+  --level-1: color-mix(in oklab, var(--color-muted-foreground) 20%, transparent);
+  --level-2: color-mix(in oklab, var(--color-muted-foreground) 40%, transparent);
+  --level-3: color-mix(in oklab, var(--color-muted-foreground) 60%, transparent);
+  --level-4: color-mix(in oklab, var(--color-muted-foreground) 80%, transparent);
 }

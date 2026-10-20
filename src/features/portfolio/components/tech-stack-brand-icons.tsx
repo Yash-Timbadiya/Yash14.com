@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const IMG_CLASS =
   "pointer-events-none hidden size-3.5 shrink-0 object-contain select-none";
 
-/** Renders both icon sets; visibility is driven by the nearest `BrandColorsScope`. */
+/** Renders both icon sets; visibility follows the `brand:` / `mono:` variants. */
 export function TechStackItemIcon({
   icon,
   brandIcon,
@@ -17,15 +17,11 @@ export function TechStackItemIcon({
 
   return (
     <>
-      <span className="contents group-data-[brand-colors=true]/brand:hidden">
-        {icon}
-      </span>
+      <span className="hidden mono:contents">{icon}</span>
       <img
         className={cn(
           IMG_CLASS,
-          brandIcon.dark
-            ? "group-data-[brand-colors=true]/brand:not-dark:block"
-            : "group-data-[brand-colors=true]/brand:block",
+          brandIcon.dark ? "brand:not-dark:block" : "brand:block",
         )}
         src={brandIcon.light}
         alt=""
@@ -35,10 +31,7 @@ export function TechStackItemIcon({
       />
       {brandIcon.dark && (
         <img
-          className={cn(
-            IMG_CLASS,
-            "group-data-[brand-colors=true]/brand:dark:block",
-          )}
+          className={cn(IMG_CLASS, "brand:dark:block")}
           src={brandIcon.dark}
           alt=""
           loading="lazy"

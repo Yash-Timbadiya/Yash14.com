@@ -28,7 +28,7 @@ export function ExperienceItem({ experience }: { experience: Experience }) {
               width={experience.largeLogo ? 40 : 24}
               height={experience.largeLogo ? 24 : 24}
               className={cn(
-                "grayscale transition-[filter] duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] group-hover/experience:grayscale-0 group-data-[brand-colors=true]/brand:grayscale-0",
+                "grayscale transition-[filter] duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] group-hover/experience:grayscale-0 brand:grayscale-0",
                 experience.largeLogo
                   ? "max-h-6 max-w-10 object-contain"
                   : "size-6 rounded-full object-cover",

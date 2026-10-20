@@ -1,11 +1,52 @@
 "use client";
 
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { useCallback, useSyncExternalStore } from "react";
 
-// Shared by every section that can show original brand colours; on by default.
-const brandColorsAtom = atomWithStorage("brand-colors", true);
+/**
+ * Brand colors are on by default. When off, `<html data-brand-colors="false">`
+ * is set (before paint by the inline script in the root layout), and sections
+ * restyle with the `mono:` / `brand:` CSS variants, so server and client
+ * markup always match.
+ */
+export const BRAND_COLORS_STORAGE_KEY = "brand-colors";
+
+const CHANGE_EVENT = "brand-colors-change";
+
+function subscribe(onChange: () => void) {
+  window.addEventListener(CHANGE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
+function getSnapshot() {
+  return document.documentElement.dataset.brandColors !== "false";
+}
+
+function getServerSnapshot() {
+  return true;
+}
 
 export function useBrandColors() {
-  return useAtom(brandColorsAtom);
+  const enabled = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+
+  const setEnabled = useCallback((value: boolean) => {
+    if (value) {
+      delete document.documentElement.dataset.brandColors;
+    } else {
+      document.documentElement.dataset.brandColors = "false";
+    }
+    try {
+      localStorage.setItem(BRAND_COLORS_STORAGE_KEY, String(value));
+    } catch {}
+    window.dispatchEvent(new Event(CHANGE_EVENT));
+  }, []);
+
+  return [enabled, setEnabled] as const;
 }

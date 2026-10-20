@@ -33,6 +33,12 @@ const darkModeScript = `
   } catch (_) {}
 
   try {
+    if (localStorage.getItem('brand-colors') === 'false') {
+      document.documentElement.dataset.brandColors = 'false'
+    }
+  } catch (_) {}
+
+  try {
     if (/(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
       document.documentElement.classList.add('os-macos')
     }

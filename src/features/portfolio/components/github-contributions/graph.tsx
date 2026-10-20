@@ -7,7 +7,6 @@ import { format } from "date-fns";
 import { LoaderIcon } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { use, useEffect, useRef, useState } from "react";
-import { useBrandColors } from "@/hooks/use-brand-colors";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   Tooltip,
@@ -22,7 +21,6 @@ import {
   ContributionGraphLegend,
   ContributionGraphTotalCount,
   GITHUB_THEME,
-  THEME,
 } from "@/features/portfolio/components/contribution-graph";
 
 export function GitHubContributionGraph({
@@ -31,8 +29,6 @@ export function GitHubContributionGraph({
   contributions: Promise<Activity[]>;
 }) {
   const data = use(contributions);
-  const [brandColors] = useBrandColors();
-  const theme = brandColors ? GITHUB_THEME : THEME;
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const legendRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +71,7 @@ export function GitHubContributionGraph({
                     activity={activity}
                     dayIndex={dayIndex}
                     weekIndex={weekIndex}
-                    theme={theme}
+                    theme={GITHUB_THEME}
                     className={cn(
                       "origin-center transform-fill transition-opacity motion-safe:animate-contribution-in",
                       selectedLevel !== null &&
@@ -141,7 +137,7 @@ export function GitHubContributionGraph({
                   width={12}
                 >
                   <rect
-                    className={theme}
+                    className={GITHUB_THEME}
                     data-level={level}
                     height={12}
                     width={12}

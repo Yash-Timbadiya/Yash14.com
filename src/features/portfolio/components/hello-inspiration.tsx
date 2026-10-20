@@ -90,7 +90,13 @@ export function HelloInspiration({ className }: { className?: string }) {
             : undefined
         }
         whileHover={
-          shouldReduceMotion ? undefined : { rotate: [-4, 3, -6, -4] }
+          shouldReduceMotion
+            ? undefined
+            : {
+                rotate: [-4, 3, -6, -4],
+                // Springs only support two keyframes, so the wiggle uses its own tween.
+                transition: { duration: 0.5, ease: "easeInOut" },
+              }
         }
         transition={
           shouldReduceMotion
