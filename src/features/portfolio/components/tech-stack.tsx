@@ -8,15 +8,14 @@ import { TrackedLink } from "@/components/tracked-link";
 import { Panel, PanelHeader, PanelTitle } from "./panel";
 import { TECH_STACK_BRAND_ICONS } from "../data/tech-stack-brand-icons";
 import {
+  TechStackBrandIconsScope,
+  TechStackItemIcon,
+} from "./tech-stack-brand-icons";
+import {
   ANALYTICS_EVENTS,
   ANALYTICS_SECTIONS,
   ANALYTICS_SOURCES,
 } from "@/lib/analytics-events";
-import {
-  TechStackBrandIconsScope,
-  TechStackBrandIconsToggle,
-  TechStackItemIcon,
-} from "./tech-stack-brand-icons";
 
 const ID = "stack";
 
@@ -24,7 +23,7 @@ export function TechStack() {
   return (
     <Panel id={ID}>
       <TechStackBrandIconsScope>
-        <PanelHeader className="flex items-center justify-between gap-4">
+        <PanelHeader>
           <PanelTitle>
             <TrackedLink
               href={`#${ID}`}
@@ -39,7 +38,6 @@ export function TechStack() {
             </TrackedLink>
             <PanelTitleCopy id={ID} section={ANALYTICS_SECTIONS.TECH_STACK} />
           </PanelTitle>
-          <TechStackBrandIconsToggle />
         </PanelHeader>
 
         <div className="relative [--badge-height:--spacing(6)] [--col-left-width:--spacing(48)]">

@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { NavItemGitHub } from "@/components/nav-item-github";
 import { SiteHeaderLogo } from "@/components/site-header-logo";
+import { BrandColorsToggle } from "@/components/brand-colors-toggle";
 
 const BrandContextMenu = dynamic(
   () => import("@/components/brand-context-menu"),
@@ -40,6 +41,7 @@ export function SiteHeader() {
             orientation="vertical"
             className="mx-2 data-vertical:h-5 data-vertical:self-center"
           />
+          <BrandColorsToggle section={ANALYTICS_SECTIONS.HEADER} />
           <ThemeToggle />
         </div>
       </div>

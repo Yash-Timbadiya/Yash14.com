@@ -85,7 +85,7 @@ export const THEME = cn(
 // GitHub's own contribution palette, light and dark.
 export const GITHUB_THEME = cn(
   "[--level-0:#ebedf0] [--level-1:#9be9a8] [--level-2:#40c463] [--level-3:#30a14e] [--level-4:#216e39]",
-  "dark:[--level-0:#151b23] dark:[--level-1:#033a16] dark:[--level-2:#196c2e] dark:[--level-3:#2ea043] dark:[--level-4:#56d364]",
+  "dark:[--level-0:#111112] dark:[--level-1:#033a16] dark:[--level-2:#196c2e] dark:[--level-3:#2ea043] dark:[--level-4:#56d364]",
   'data-[level="0"]:fill-(--level-0)',
   'data-[level="1"]:fill-(--level-1)',
   'data-[level="2"]:fill-(--level-2)',
