@@ -67,10 +67,15 @@ export function LinkPreview({
 
   const [isOpen, setOpen] = React.useState(false);
 
-  React.useEffect(() => {
+  // Warm the screenshot on intent (hover/focus) rather than on mount, so a page
+  // with many previews doesn't fetch every screenshot up front.
+  const preloaded = React.useRef(false);
+  const preload = () => {
+    if (preloaded.current || !src) return;
+    preloaded.current = true;
     const image = new Image();
     image.src = src;
-  }, [src]);
+  };
 
   const springConfig = { stiffness: 100, damping: 15 };
   const x = useMotionValue(0);
@@ -91,6 +96,8 @@ export function LinkPreview({
           target={target}
           rel={rel}
           onMouseMove={handleMouseMove}
+          onPointerEnter={preload}
+          onFocus={preload}
           onClick={onClick}
           className={cn("text-foreground", className)}
         >

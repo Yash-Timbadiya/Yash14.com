@@ -450,7 +450,7 @@ export const TECH_STACK: TechStack[] = [
   {
     key: "ps",
     title: "Photoshop",
-    href: "https://www.adobe.com/vn_en/products/photoshop.html",
+    href: "https://www.adobe.com/products/photoshop.html",
     icon: <PhotoshopIcon />,
     categories: ["Design"],
   },

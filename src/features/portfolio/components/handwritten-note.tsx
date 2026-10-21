@@ -50,7 +50,6 @@ function HandwrittenArrow({
       aria-hidden="true"
       {...props}
     >
-      <title>Decorative pointer arrow</title>
       <defs>
         <mask id={maskId}>
           <motion.path

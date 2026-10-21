@@ -82,16 +82,6 @@ export const THEME = cn(
   'data-[level="4"]:fill-muted-foreground/80',
 );
 
-// Level colors come from `.contribution-levels` in globals.css: GitHub's palette, or greys when brand colors are off.
-export const GITHUB_THEME = cn(
-  "contribution-levels",
-  'data-[level="0"]:fill-(--level-0)',
-  'data-[level="1"]:fill-(--level-1)',
-  'data-[level="2"]:fill-(--level-2)',
-  'data-[level="3"]:fill-(--level-3)',
-  'data-[level="4"]:fill-(--level-4)',
-);
-
 type ContributionGraphContextType = {
   data: Activity[];
   weeks: Week[];
@@ -379,7 +369,7 @@ export type ContributionGraphCalendarProps = Omit<
 };
 
 export const ContributionGraphCalendar = ({
-  title = "Contribution Graph",
+  title,
   hideMonthLabels = false,
   className,
   children,
@@ -401,13 +391,15 @@ export const ContributionGraphCalendar = ({
       )}
       {...props}
     >
+      {/* biome-ignore lint/a11y/noSvgWithoutTitle: the title is optional; without one the svg is aria-hidden, and an extra <title> reads as a duplicate page title to SEO crawlers */}
       <svg
         className="block overflow-visible"
         height={height}
         viewBox={`0 0 ${width} ${height}`}
         width={width}
+        aria-hidden={title ? undefined : true}
       >
-        <title>{title}</title>
+        {title && <title>{title}</title>}
         {!hideMonthLabels && (
           <g
             data-slot="month-labels"
@@ -424,19 +416,26 @@ export const ContributionGraphCalendar = ({
             ))}
           </g>
         )}
-        {weeks.map((week, weekIndex) =>
-          week.map((activity, dayIndex) => {
-            if (!activity) {
-              return null;
-            }
+        {weeks.map((week, weekIndex) => (
+          // One group per week exposes `--week` for CSS (e.g. staggered animation) without a style on every block.
+          <g
+            // biome-ignore lint/suspicious/noArrayIndexKey: weeks are positional and never reorder
+            key={weekIndex}
+            style={{ "--week": weekIndex } as CSSProperties}
+          >
+            {week.map((activity, dayIndex) => {
+              if (!activity) {
+                return null;
+              }
 
-            return (
-              <Fragment key={activity.date}>
-                {children({ activity, dayIndex, weekIndex })}
-              </Fragment>
-            );
-          }),
-        )}
+              return (
+                <Fragment key={activity.date}>
+                  {children({ activity, dayIndex, weekIndex })}
+                </Fragment>
+              );
+            })}
+          </g>
+        ))}
       </svg>
     </div>
   );

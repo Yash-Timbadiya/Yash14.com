@@ -118,16 +118,6 @@
       opacity: 0.15;
     }
   }
-
-  --animate-contribution-in: contribution-in
-    var(--tw-animation-duration, var(--tw-duration, 0.4s)) ease-out backwards;
-
-  @keyframes contribution-in {
-    from {
-      opacity: 0;
-      scale: 0.3;
-    }
-  }
 }
 
 @utility link {
@@ -661,7 +651,11 @@
   font-size: var(--typeset-size);
 }
 
-/* GitHub contribution levels: GitHub's palette, or muted greys when brand colors are off. */
+/*
+ * GitHub contribution graph. Styled from the wrapper instead of per block, so
+ * the ~365 blocks carry no classes or inline styles of their own.
+ * Colors: GitHub's palette, or muted greys when brand colors are off.
+ */
 .contribution-levels {
   --level-0: #ebedf0;
   --level-1: #9be9a8;
@@ -685,4 +679,68 @@
   --level-2: color-mix(in oklab, var(--color-muted-foreground) 40%, transparent);
   --level-3: color-mix(in oklab, var(--color-muted-foreground) 60%, transparent);
   --level-4: color-mix(in oklab, var(--color-muted-foreground) 80%, transparent);
+}
+
+.contribution-levels [data-level] {
+  transform-origin: center;
+  transform-box: fill-box;
+  transition: opacity 150ms ease;
+}
+
+.contribution-levels [data-level="0"] {
+  fill: var(--level-0);
+}
+.contribution-levels [data-level="1"] {
+  fill: var(--level-1);
+}
+.contribution-levels [data-level="2"] {
+  fill: var(--level-2);
+}
+.contribution-levels [data-level="3"] {
+  fill: var(--level-3);
+}
+.contribution-levels [data-level="4"] {
+  fill: var(--level-4);
+}
+
+/* Diagonal pop-in wave: `--week` is set per week group, the day comes from its position. */
+@media (prefers-reduced-motion: no-preference) {
+  .contribution-levels g > [data-level] {
+    animation: contribution-in 0.4s ease-out backwards;
+    animation-delay: calc((var(--week, 0) + var(--day, 0)) * 20ms);
+  }
+}
+.contribution-levels g > :nth-child(2) {
+  --day: 1;
+}
+.contribution-levels g > :nth-child(3) {
+  --day: 2;
+}
+.contribution-levels g > :nth-child(4) {
+  --day: 3;
+}
+.contribution-levels g > :nth-child(5) {
+  --day: 4;
+}
+.contribution-levels g > :nth-child(6) {
+  --day: 5;
+}
+.contribution-levels g > :nth-child(7) {
+  --day: 6;
+}
+
+@keyframes contribution-in {
+  from {
+    opacity: 0;
+    scale: 0.3;
+  }
+}
+
+/* Legend highlight: dim every block outside the selected level. */
+.contribution-levels[data-selected-level="0"] g > :not([data-level="0"]),
+.contribution-levels[data-selected-level="1"] g > :not([data-level="1"]),
+.contribution-levels[data-selected-level="2"] g > :not([data-level="2"]),
+.contribution-levels[data-selected-level="3"] g > :not([data-level="3"]),
+.contribution-levels[data-selected-level="4"] g > :not([data-level="4"]) {
+  opacity: 0.15;
 }

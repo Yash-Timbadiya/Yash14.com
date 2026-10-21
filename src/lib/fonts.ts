@@ -9,12 +9,15 @@ const fontMono = GeistMono;
 const fontSerif = IBM_Plex_Serif({
   weight: ["400"],
   display: "swap",
+  // Decorative only; not preloading keeps bandwidth free for the LCP avatar.
+  preload: false,
   variable: "--font-serif",
 });
 
 const fontHandwritten = Caveat({
   weight: ["400", "500"],
   display: "swap",
+  preload: false,
   variable: "--font-handwritten",
 });
 

@@ -80,8 +80,10 @@ export function ProfileHeader() {
             <div className="pointer-events-none relative size-30 rounded-full min-[24rem]:size-32 sm:size-40">
               <img
                 className="size-full rounded-full object-cover select-none"
-                src={USER.avatar}
+                src={USER.avatarThumb}
                 alt={USER.displayName}
+                width={320}
+                height={320}
                 fetchPriority="high"
               />
               <div
