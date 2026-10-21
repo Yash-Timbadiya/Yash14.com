@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+import { withSentryConfig } from "@sentry/nextjs/config";
 import {
   POSTHOG_ASSETS_HOST,
   POSTHOG_INGEST_HOST,
@@ -52,4 +53,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: "yash14",
+  project: "portfolio",
+  // Source maps are only uploaded when this is set, so local builds still work without it.
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  widenClientFileUpload: true,
+  // A random path per build, so ad blockers cannot match it like they would `/monitoring`.
+  tunnelRoute: true,
+  silent: !process.env.CI,
+});
