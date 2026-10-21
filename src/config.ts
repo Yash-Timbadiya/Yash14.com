@@ -26,6 +26,11 @@ export const config = {
   },
 
   sentry: {
+    /**
+     * Whether Sentry sends events during `next dev`. Off keeps local errors
+     * out of the issue stream; turn it on to debug the setup end to end.
+     */
+    trackInDevelopment: false,
     org: "yash14",
     project: "portfolio",
     /**
