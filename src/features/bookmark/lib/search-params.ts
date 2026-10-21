@@ -10,6 +10,7 @@ export const BOOKMARK_CATEGORY_PARAMS = [
   "reference",
   "ui-library",
   "software",
+  "other",
 ] as const;
 
 export type BookmarkCategoryParam = (typeof BOOKMARK_CATEGORY_PARAMS)[number];

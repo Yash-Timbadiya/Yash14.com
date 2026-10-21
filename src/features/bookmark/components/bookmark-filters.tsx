@@ -16,6 +16,7 @@ const CATEGORY_LABELS: Record<BookmarkCategoryParam, string> = {
   reference: "Reference",
   "ui-library": "UI Library",
   software: "Software",
+  other: "Other",
 };
 
 export function BookmarkFilters({

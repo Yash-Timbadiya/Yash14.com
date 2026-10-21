@@ -130,4 +130,17 @@ export const BOOKMARKS: Bookmark[] = [
     category: BookmarkCategory.UI_LIBRARY,
     bookmarkedAt: "2025-03-03",
   },
+  {
+    title: "Torph",
+    url: "https://torph.lochie.me",
+    author: "Lochie",
+    category: BookmarkCategory.OTHER,
+    bookmarkedAt: "2026-10-21",
+  },
+  {
+    title: "Vibrant Design",
+    url: "https://vibrant.design",
+    category: BookmarkCategory.OTHER,
+    bookmarkedAt: "2026-10-21",
+  },
 ];

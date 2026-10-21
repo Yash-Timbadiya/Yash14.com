@@ -14,6 +14,7 @@ import {
   ArrowUpRightIcon,
   BookOpenIcon,
   ComponentIcon,
+  EllipsisIcon,
   FileTextIcon,
   GraduationCapIcon,
   LayoutGridIcon,
@@ -127,4 +128,5 @@ const CATEGORY_ICONS: Record<BookmarkCategory, React.ReactNode> = {
   [BookmarkCategory.REFERENCE]: <FileTextIcon strokeWidth={1.5} />,
   [BookmarkCategory.UI_LIBRARY]: <ComponentIcon strokeWidth={1.5} />,
   [BookmarkCategory.SOFTWARE]: <LayoutGridIcon strokeWidth={1.5} />,
+  [BookmarkCategory.OTHER]: <EllipsisIcon strokeWidth={1.5} />,
 };
