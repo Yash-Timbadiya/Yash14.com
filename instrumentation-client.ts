@@ -1,11 +1,22 @@
 import posthog from "posthog-js";
 import { config } from "@/config";
+import * as Sentry from "@sentry/nextjs";
 import { POSTHOG_PROXY_PATH, POSTHOG_UI_HOST } from "@/config/posthog";
+
+const isDevelopment = process.env.NODE_ENV === "development";
+
+// Initialized before PostHog so errors thrown below are reported too.
+Sentry.init({
+  enabled: !isDevelopment || config.sentry.trackInDevelopment,
+  dsn: config.sentry.dsn,
+  environment: config.sentry.environment,
+  tracesSampleRate: config.sentry.tracesSampleRate,
+});
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
 
 const projectToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
 const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
-
-const isDevelopment = process.env.NODE_ENV === "development";
 
 if (isDevelopment && !config.analytics.trackInDevelopment) {
   // Left uninitialized, so trackEvent is a no-op and no pageviews are sent.
