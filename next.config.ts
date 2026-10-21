@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { config } from "./src/config";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import {
   POSTHOG_ASSETS_HOST,
   POSTHOG_INGEST_HOST,
@@ -52,4 +54,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: config.sentry.org,
+  project: config.sentry.project,
+  authToken: config.sentry.authToken,
+  widenClientFileUpload: true,
+  // A random path per build, so ad blockers cannot match it like they would `/monitoring`.
+  tunnelRoute: true,
+  silent: !process.env.CI,
+});
