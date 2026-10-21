@@ -2,17 +2,12 @@ import posthog from "posthog-js";
 import { config } from "@/config";
 import * as Sentry from "@sentry/nextjs";
 import { POSTHOG_PROXY_PATH, POSTHOG_UI_HOST } from "@/config/posthog";
-import {
-  SENTRY_DSN,
-  SENTRY_ENVIRONMENT,
-  SENTRY_TRACES_SAMPLE_RATE,
-} from "@/config/sentry";
 
 // Initialized before PostHog so errors thrown below are reported too.
 Sentry.init({
-  dsn: SENTRY_DSN,
-  environment: SENTRY_ENVIRONMENT,
-  tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE,
+  dsn: config.sentry.dsn,
+  environment: config.sentry.environment,
+  tracesSampleRate: config.sentry.tracesSampleRate,
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
