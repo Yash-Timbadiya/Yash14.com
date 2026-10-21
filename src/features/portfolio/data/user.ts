@@ -34,6 +34,7 @@ export const USER: User = {
 - Focused on transforming complex ideas into seamless, production-ready digital solutions. I deliver polished, thoughtfully crafted projects that prioritize clean code, performance, and user experience.
 `,
   avatar: cdn("/assets/yash.webp"),
+  avatarThumb: cdn("/assets/yash-320.webp"),
   ogImage: cdn("/screenshots/screenshot-og-image-dark.png"),
   namePronunciationUrl: cdn("/audio/yashtimbadiya.mp3"),
   timeZone: "Asia/Kolkata",

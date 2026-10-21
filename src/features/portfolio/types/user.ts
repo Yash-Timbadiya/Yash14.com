@@ -32,6 +32,8 @@ export type User = {
   about: string;
   /** Public URL to avatar image */
   avatar: string;
+  /** 320px avatar for on-page display; the full-size `avatar` stays for JSON-LD and vCard */
+  avatarThumb: string;
   /** Open Graph image URL for social sharing */
   ogImage: string;
   /** Audio URL for name pronunciation */

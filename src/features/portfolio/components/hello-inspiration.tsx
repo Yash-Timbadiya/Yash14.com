@@ -68,7 +68,6 @@ export function HelloInspiration({ className }: { className?: string }) {
           fill="none"
           aria-hidden="true"
         >
-          <title>Hand-drawn strikethrough</title>
           <motion.path
             d="M2 11C14 7 26 9 36 7S56 5 62 4"
             stroke="currentColor"
@@ -116,7 +115,6 @@ export function HelloInspiration({ className }: { className?: string }) {
           fill="none"
           aria-hidden="true"
         >
-          <title>Hand-drawn squiggle underline</title>
           <motion.path
             d="M1 5C9 1 15 7 23 4S37 1 45 4 59 7 67 4 81 1 89 4 97 6 99 4"
             stroke="currentColor"

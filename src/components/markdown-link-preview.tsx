@@ -1,20 +1,17 @@
-"use client";
-
 import type { Components } from "react-markdown";
 import type { AnalyticsProperties } from "@/lib/analytics";
 
-import { useMemo } from "react";
-import { cn } from "@/lib/utils";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import Markdown from "react-markdown";
 import { UTM_PARAMS } from "@/config/site";
-import { trackEvent } from "@/lib/analytics";
-import { LinkPreview } from "@/components/link-preview";
 import rehypeExternalLinks from "rehype-external-links";
-import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
+import { MarkdownLink } from "@/components/markdown-link";
 import { rehypeAddQueryParams } from "@/lib/rehype-add-query-params";
 
+// A server component: the markdown is parsed at render time on the server, so
+// react-markdown and its unified plugins never ship to the browser. Only the
+// links hydrate, through the `MarkdownLink` client component.
 function createMarkdownComponents(
   eventProperties?: AnalyticsProperties,
 ): Components {
@@ -25,24 +22,15 @@ function createMarkdownComponents(
       }
 
       return (
-        <LinkPreview
-          url={href}
-          className={cn("link-underline", className)}
+        <MarkdownLink
+          href={href}
+          className={className}
           rel={typeof rel === "string" ? rel : undefined}
           target={typeof target === "string" ? target : undefined}
-          side="top"
-          onClick={
-            eventProperties
-              ? () =>
-                  trackEvent(ANALYTICS_EVENTS.DESCRIPTION_LINK_CLICK, {
-                    ...eventProperties,
-                    url: href,
-                  })
-              : undefined
-          }
+          eventProperties={eventProperties}
         >
           {children}
-        </LinkPreview>
+        </MarkdownLink>
       );
     },
   };
@@ -56,14 +44,9 @@ export function MarkdownLinkPreview({
   /** Sent with `description_link_click` when a link in the text is clicked. */
   eventProperties?: AnalyticsProperties;
 }) {
-  const markdownComponents = useMemo(
-    () => createMarkdownComponents(eventProperties),
-    [eventProperties],
-  );
-
   return (
     <Markdown
-      components={markdownComponents}
+      components={createMarkdownComponents(eventProperties)}
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[
         rehypeRaw,
