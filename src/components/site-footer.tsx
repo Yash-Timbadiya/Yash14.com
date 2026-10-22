@@ -3,6 +3,7 @@
 import type { BuildInfo } from "@/lib/build-info";
 
 import { cn } from "@/lib/utils";
+import { config } from "@/config";
 import packageJson from "../../package.json";
 import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
@@ -19,20 +20,9 @@ import {
   ANALYTICS_SOURCES,
 } from "@/lib/analytics-events";
 
-const ANALYTICS_TOOLS = [
-  {
-    name: "PostHog",
-    url: "https://posthog.com",
-    event: ANALYTICS_EVENTS.REDIRECT_TO_POSTHOG,
-  },
-  {
-    name: "Google Analytics",
-    url: "https://marketingplatform.google.com/about/analytics/",
-    event: ANALYTICS_EVENTS.REDIRECT_TO_GOOGLE_ANALYTICS,
-  },
-] as const;
+const POSTHOG_URL = "https://posthog.com";
 
-const INSPIRED_BY_X_URL = "https://x.com/iamncdai";
+const DMCA_URL = config.dmca.url;
 
 const INSPIRED_BY = [
   "Tailwind CSS",
@@ -87,20 +77,21 @@ export function SiteFooter() {
               ) : null}
             </Field>
 
-            <Field label="Inspired by">
-              <LinkPreview
-                url={addQueryParams(INSPIRED_BY_X_URL, UTM_PARAMS)}
-                className="link-underline"
-                onClick={() =>
-                  trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_X, {
-                    section: ANALYTICS_SECTIONS.FOOTER,
-                    source: ANALYTICS_SOURCES.INSPIRED_BY,
-                    url: INSPIRED_BY_X_URL,
-                  })
-                }
-              >
-                @iamncdai
-              </LinkPreview>
+            <Field label="Protected by">
+              {DMCA_URL ? (
+                <LinkPreview
+                  url={DMCA_URL}
+                  className="link-underline"
+                  onClick={() =>
+                    trackEvent(ANALYTICS_EVENTS.VIEW_DMCA, {
+                      section: ANALYTICS_SECTIONS.FOOTER,
+                      url: DMCA_URL,
+                    })
+                  }
+                >
+                  DMCA
+                </LinkPreview>
+              ) : null}
             </Field>
 
             <Field label="Build">
@@ -199,25 +190,21 @@ export function SiteFooter() {
 
             <Field label="Analytics">
               <ul className="flex flex-col gap-0.5">
-                {ANALYTICS_TOOLS.map((tool) => (
-                  <li
-                    key={tool.name}
-                    className="w-fit transition-transform duration-200 hover:translate-x-0.5"
+                <li className="w-fit transition-transform duration-200 hover:translate-x-0.5">
+                  <LinkPreview
+                    url={POSTHOG_URL}
+                    className="link-underline"
+                    onClick={() =>
+                      trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_POSTHOG, {
+                        section: ANALYTICS_SECTIONS.FOOTER,
+                        url: POSTHOG_URL,
+                      })
+                    }
                   >
-                    <LinkPreview
-                      url={tool.url}
-                      className="link-underline"
-                      onClick={() =>
-                        trackEvent(tool.event, {
-                          section: ANALYTICS_SECTIONS.FOOTER,
-                          url: tool.url,
-                        })
-                      }
-                    >
-                      {tool.name}
-                    </LinkPreview>
-                  </li>
-                ))}
+                    PostHog
+                  </LinkPreview>
+                </li>
+                <li>Google Search Console</li>
               </ul>
             </Field>
 

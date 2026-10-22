@@ -74,7 +74,6 @@ export const ANALYTICS_EVENTS = {
   REDIRECT_TO_COMPANY: "redirect_to_company",
   REDIRECT_TO_WEBSITE: "redirect_to_website",
   REDIRECT_TO_POSTHOG: "redirect_to_posthog",
-  REDIRECT_TO_GOOGLE_ANALYTICS: "redirect_to_google_analytics",
   REDIRECT_TO_CREATIVE_PORTFOLIO: "redirect_to_creative_portfolio",
   VIEW_LOCATION_MAP: "view_location_map",
 
