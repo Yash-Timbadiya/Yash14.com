@@ -13,6 +13,8 @@ export enum BookmarkCategory {
   UI_LIBRARY = "UI Library",
   /** Tools and utilities that aid development or design. */
   SOFTWARE = "Software",
+  /** Anything that does not fit the categories above. */
+  OTHER = "Other",
 }
 
 export type Bookmark = {
@@ -37,6 +39,7 @@ export const BOOKMARK_CATEGORY_TO_PARAM: Record<
   [BookmarkCategory.REFERENCE]: "reference",
   [BookmarkCategory.UI_LIBRARY]: "ui-library",
   [BookmarkCategory.SOFTWARE]: "software",
+  [BookmarkCategory.OTHER]: "other",
 };
 
 /**

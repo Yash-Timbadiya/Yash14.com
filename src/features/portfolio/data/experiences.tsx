@@ -64,7 +64,6 @@ Products I've built and maintain:
           "GoHighLevel",
           "Klaviyo",
         ],
-        isExpanded: true,
       },
     ],
     isCurrentEmployer: true,
