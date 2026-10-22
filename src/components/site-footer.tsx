@@ -19,7 +19,19 @@ import {
   ANALYTICS_SOURCES,
 } from "@/lib/analytics-events";
 
-const POSTHOG_URL = "https://posthog.com";
+const ANALYTICS_TOOLS = [
+  {
+    name: "PostHog",
+    url: "https://posthog.com",
+    event: ANALYTICS_EVENTS.REDIRECT_TO_POSTHOG,
+  },
+  {
+    name: "Google Analytics",
+    url: "https://marketingplatform.google.com/about/analytics/",
+    event: ANALYTICS_EVENTS.REDIRECT_TO_GOOGLE_ANALYTICS,
+  },
+] as const;
+
 const INSPIRED_BY_X_URL = "https://x.com/iamncdai";
 
 const INSPIRED_BY = [
@@ -186,18 +198,27 @@ export function SiteFooter() {
             </Field>
 
             <Field label="Analytics">
-              <LinkPreview
-                url={POSTHOG_URL}
-                className="link-underline"
-                onClick={() =>
-                  trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_POSTHOG, {
-                    section: ANALYTICS_SECTIONS.FOOTER,
-                    url: POSTHOG_URL,
-                  })
-                }
-              >
-                PostHog
-              </LinkPreview>
+              <ul className="flex flex-col gap-0.5">
+                {ANALYTICS_TOOLS.map((tool) => (
+                  <li
+                    key={tool.name}
+                    className="w-fit transition-transform duration-200 hover:translate-x-0.5"
+                  >
+                    <LinkPreview
+                      url={tool.url}
+                      className="link-underline"
+                      onClick={() =>
+                        trackEvent(tool.event, {
+                          section: ANALYTICS_SECTIONS.FOOTER,
+                          url: tool.url,
+                        })
+                      }
+                    >
+                      {tool.name}
+                    </LinkPreview>
+                  </li>
+                ))}
+              </ul>
             </Field>
 
             <Field label="For agents">
