@@ -3,6 +3,11 @@
 import { encode } from "qss";
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { cdn } from "@/utils/cdn";
+import {
+  getLinkPreviewSlug,
+  LINK_PREVIEW_DIR,
+} from "@/utils/link-preview-slug.mjs";
 import {
   AnimatePresence,
   motion,
@@ -16,6 +21,15 @@ import {
 } from "@/components/ui/hover-card";
 
 const DESKTOP_VIEWPORT_WIDTH = 1280;
+
+/**
+ * How long Microlink gets before the CDN screenshot is shown instead. Uncached
+ * Microlink renders take 3-30s, and its free tier stops after 25 a day per IP.
+ */
+const LIVE_SCREENSHOT_TIMEOUT_MS = 3500;
+
+/** `live` is Microlink (or `imageSrc`), `fallback` the CDN screenshot, `none` neither loaded. */
+type PreviewSource = "live" | "fallback" | "none";
 
 function getHostname(url: string) {
   try {
@@ -78,10 +92,21 @@ export function LinkPreview({
   }
 
   const hostname = getHostname(url);
+  const slug = isStatic ? null : getLinkPreviewSlug(url);
+  const fallbackSrc = slug ? cdn(`/${LINK_PREVIEW_DIR}/${slug}.webp`) : null;
 
   const [isOpen, setOpen] = React.useState(false);
-  // Microlink times out on some heavy sites; keep the window instead of a broken image.
-  const [hasImageError, setImageError] = React.useState(false);
+  const [source, setSource] = React.useState<PreviewSource>("live");
+
+  const showFallback = React.useCallback(() => {
+    setSource((current) =>
+      current === "live" ? (fallbackSrc ? "fallback" : "none") : current,
+    );
+  }, [fallbackSrc]);
+
+  const liveLoaded = React.useRef(false);
+  const fallbackTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+  React.useEffect(() => () => clearTimeout(fallbackTimer.current), []);
 
   // Warm the screenshot on intent (hover/focus) rather than on mount, so a page
   // with many previews doesn't fetch every screenshot up front.
@@ -90,7 +115,16 @@ export function LinkPreview({
     if (preloaded.current || !src) return;
     preloaded.current = true;
     const image = new Image();
+    image.onload = () => {
+      liveLoaded.current = true;
+    };
+    // A rate-limited Microlink request fails fast, so switch without waiting.
+    image.onerror = showFallback;
     image.src = src;
+    if (isStatic) return;
+    fallbackTimer.current = setTimeout(() => {
+      if (!liveLoaded.current) showFallback();
+    }, LIVE_SCREENSHOT_TIMEOUT_MS);
   };
 
   const springConfig = { stiffness: 100, damping: 15 };
@@ -116,6 +150,7 @@ export function LinkPreview({
           onFocus={preload}
           onClick={onClick}
           className={cn("text-foreground", className)}
+          data-link-preview=""
         >
           {children}
         </a>
@@ -167,7 +202,7 @@ export function LinkPreview({
                     </span>
                   ) : null}
                 </div>
-                {hasImageError ? (
+                {source === "none" ? (
                   <div
                     style={{ width, height }}
                     className="flex items-center justify-center bg-background font-mono text-xs text-muted-foreground"
@@ -176,12 +211,20 @@ export function LinkPreview({
                   </div>
                 ) : (
                   <img
-                    src={isStatic ? imageSrc : src}
+                    key={source}
+                    src={
+                      source === "fallback" && fallbackSrc ? fallbackSrc : src
+                    }
                     width={width}
                     height={height}
-                    className="block bg-background"
+                    className="block bg-background object-cover object-top"
                     alt=""
-                    onError={() => setImageError(true)}
+                    onLoad={() => {
+                      if (source === "live") liveLoaded.current = true;
+                    }}
+                    onError={() =>
+                      source === "live" ? showFallback() : setSource("none")
+                    }
                   />
                 )}
               </a>
