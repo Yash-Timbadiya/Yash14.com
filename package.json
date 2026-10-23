@@ -30,6 +30,7 @@
     "prepare": "husky",
     "cdn:login": "pnpm dlx --allow-build=esbuild --allow-build=workerd wrangler login",
     "cdn:upload": "node ./src/scripts/upload-cdn.mjs",
+    "cdn:previews": "node ./src/scripts/capture-link-previews.mjs",
     "indexnow": "node ./src/scripts/indexnow.mjs"
   },
   "dependencies": {
@@ -84,6 +85,7 @@
     "eslint": "^10.9.1",
     "eslint-plugin-perfectionist": "^5.10.1",
     "husky": "^9.1.7",
+    "playwright": "^1.64.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^5",
     "typescript-eslint": "^8.68.0"
