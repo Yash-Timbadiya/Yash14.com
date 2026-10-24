@@ -87,10 +87,10 @@ export function LighthouseGauges({
     <dl className={cn("grid grid-cols-2 gap-x-4 gap-y-3", className)}>
       {items.map(([label, value]) => (
         <div key={label} className="flex flex-col-reverse items-center">
-          <dt className="mt-1 font-mono text-[11px] text-muted-foreground">
+          <dt className="mt-1 font-mono text-[11px] leading-4 text-muted-foreground">
             {label}
           </dt>
-          <dd className="w-full max-w-24">
+          <dd className="h-13 w-full max-w-24">
             <Gauge
               value={value}
               initialValue={0}
@@ -102,7 +102,8 @@ export function LighthouseGauges({
               role="img"
               aria-label={`Lighthouse ${label} ${value} out of 100`}
               // Colour lives in the progress; the number stays neutral.
-              className={ACCENT}
+              // Fixed box height keeps the row on whole pixels; the dial scales to fit.
+              className={cn(ACCENT, "h-full")}
             >
               <GaugeTrack width={34} opacity={TINT.rest} cap="butt" />
               <GaugeArc width={34} cap="butt" />

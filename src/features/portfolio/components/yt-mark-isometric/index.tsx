@@ -490,7 +490,9 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
       <ContextMenuTrigger asChild>
         <motion.svg
           ref={svgRef}
-          className="relative isolate h-auto w-full touch-manipulation overflow-visible cursor-pointer transition-all duration-300 [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]"
+          // Height rounded to a whole pixel (the viewBox is 617 x 315), so the
+          // hairlines in every section below stay on the pixel grid.
+          className="relative isolate h-auto w-full touch-manipulation overflow-visible cursor-pointer transition-all duration-300 supports-[height:round(1px,1px)]:h-[round(down,calc(100cqw*315/617),1px)] [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]"
           viewBox="-31 -20 617 315"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

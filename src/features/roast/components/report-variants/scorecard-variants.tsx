@@ -218,7 +218,7 @@ export function ScorecardSplitReport(props: ReportVariantProps) {
           </h2>
         </div>
         <ScoreSummary result={result} />
-        <Separator className="screen-line-bottom" />
+        <Separator className="screen-line-bottom border-x-0" />
       </div>
 
       <div className="screen-line-bottom grid md:grid-cols-[18rem_1fr]">

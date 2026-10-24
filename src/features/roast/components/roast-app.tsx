@@ -245,7 +245,7 @@ function RoastReport({
       exit={{ opacity: 0, transition: { duration: 0.15 } }}
       transition={{ duration: 0.45, ease: EASE_OUT, delay: 0.1 }}
     >
-      <Separator className="screen-line-bottom" />
+      <Separator className="screen-line-bottom border-x-0" />
 
       <div className="screen-line-bottom p-3">
         <h2
@@ -261,11 +261,11 @@ function RoastReport({
 
       <ScoreSummary result={result} />
 
-      <Separator className="screen-line-bottom" />
+      <Separator className="screen-line-bottom border-x-0" />
 
       <CategoryList
         categories={result.categories}
-        className="screen-line-top screen-line-bottom"
+        className="screen-line-bottom"
         onFixesOpened={(category) =>
           trackEvent(ANALYTICS_EVENTS.ROAST_FIXES_OPENED, {
             section: SECTION,

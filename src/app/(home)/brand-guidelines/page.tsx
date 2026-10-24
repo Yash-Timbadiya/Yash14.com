@@ -139,7 +139,7 @@ export default function BrandPage() {
 
         <div className="mx-auto w-full md:max-w-4xl">
           {/* Intro */}
-          <Panel>
+          <Panel className="screen-line-top-none">
             <PanelDescription className="px-4">
               {PAGE_DESCRIPTION} Right-click any logo on this page to copy it as
               SVG or download the full brand assets pack.
@@ -147,7 +147,7 @@ export default function BrandPage() {
           </Panel>
 
           {/* Mark */}
-          <Panel>
+          <Panel className="screen-line-top-none">
             <PanelHeader>
               <AnchorHeading id="mark">Mark</AnchorHeading>
             </PanelHeader>
@@ -179,7 +179,7 @@ export default function BrandPage() {
           </Panel>
 
           {/* Logotype */}
-          <Panel>
+          <Panel className="screen-line-top-none">
             <PanelHeader>
               <AnchorHeading id="logotype">Logotype</AnchorHeading>
             </PanelHeader>
@@ -211,7 +211,7 @@ export default function BrandPage() {
           </Panel>
 
           {/* Clear Space */}
-          <Panel>
+          <Panel className="screen-line-top-none">
             <PanelHeader>
               <AnchorHeading id="clear-space">Clear Space</AnchorHeading>
             </PanelHeader>
@@ -222,14 +222,16 @@ export default function BrandPage() {
               clearly recognizable and legible.
             </PanelDescription>
 
-            <PanelContent className="screen-line-top flex flex-col items-center justify-center gap-8 px-4 py-16">
-              <YTMarkClearSpace className="h-auto w-1/2 text-foreground sm:w-1/3" />
-              <YTWordmarkClearSpace className="h-auto w-full text-foreground" />
+            {/* Heights rounded to whole pixels (from each viewBox) so the
+                hairlines below stay on the pixel grid. */}
+            <PanelContent className="@container screen-line-top flex flex-col items-center justify-center gap-8 px-4 py-16">
+              <YTMarkClearSpace className="h-auto w-1/2 text-foreground supports-[height:round(1px,1px)]:h-[round(down,calc(50cqw*530/660),1px)] sm:w-1/3 sm:supports-[height:round(1px,1px)]:h-[round(down,calc(33.3333cqw*530/660),1px)]" />
+              <YTWordmarkClearSpace className="h-auto w-full text-foreground supports-[height:round(1px,1px)]:h-[round(down,calc(100cqw*1050/5875),1px)]" />
             </PanelContent>
           </Panel>
 
           {/* Color */}
-          <Panel>
+          <Panel className="screen-line-top-none">
             <PanelHeader>
               <AnchorHeading id="color">Color</AnchorHeading>
             </PanelHeader>
@@ -246,7 +248,7 @@ export default function BrandPage() {
           </Panel>
 
           {/* Download all */}
-          <Panel>
+          <Panel className="screen-line-top-none">
             <PanelContent className="flex flex-col items-center gap-4 py-10 text-center">
               <p className="text-balance text-muted-foreground">
                 Download the complete brand assets pack including the mark,
