@@ -11,15 +11,15 @@ import { useId, useRef, useState, useEffect } from "react";
 import { useRoast } from "@/features/roast/hooks/use-roast";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
-import {
-  ArrowRightIcon,
-  RotateCcwIcon,
-  ChevronDownIcon,
-  FlameIcon,
-} from "lucide-react";
+import { ArrowRightIcon, RotateCcwIcon, ChevronDownIcon } from "lucide-react";
+import { AnimatedFlameIcon } from "@/features/roast/components/animated-flame-icon";
 
 const SECTION = ANALYTICS_SECTIONS.ROAST_PAGE;
 const URL_PARAM = "url";
+// Brand mode gets the flame orange; monochrome keeps the theme's own primary
+// (black in light mode, white in dark mode).
+const ROAST_BUTTON_CLASS =
+  "brand:bg-[#fa5d19] brand:text-white brand:hover:bg-[#e14d0e] brand:focus-visible:ring-[#fa5d19]/40";
 
 export function RoastApp() {
   const inputId = useId();
@@ -85,7 +85,7 @@ export function RoastApp() {
           htmlFor={inputId}
           className="font-mono text-xs tracking-wide text-muted-foreground uppercase"
         >
-          Drop a URL
+          Drop The URL
         </label>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
@@ -104,16 +104,15 @@ export function RoastApp() {
           <Button
             type="submit"
             size="lg"
+            className={ROAST_BUTTON_CLASS}
             disabled={phase === "scanning" || !input.trim()}
           >
-            <FlameIcon />
+            <AnimatedFlameIcon className="size-4.5" />
             {phase === "scanning" ? "Roasting..." : "Roast it"}
           </Button>
         </div>
         <p className="text-sm text-balance text-muted-foreground">
-          Real checks on your homepage: HTML, SEO, social tags and Google
-          Lighthouse. Takes up to 45 seconds. The jokes are brutal. The fixes
-          are real.
+          Takes 45 seconds. Brutal roasts ahead. Can you take it?
         </p>
       </form>
 
@@ -272,7 +271,7 @@ function RoastReport({
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button asChild size="lg">
+          <Button asChild size="lg" className={ROAST_BUTTON_CLASS}>
             <a
               href={mailto}
               onClick={() =>
