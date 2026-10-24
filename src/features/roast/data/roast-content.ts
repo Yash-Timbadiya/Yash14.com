@@ -274,7 +274,7 @@ export const SCAN_QUIPS = {
   fetching: "> fetching the homepage ... judging silently",
   fetched: "> got {kb} KB in {ms} ms ... {mood}",
   checks: "> counting headings, tags, links and life choices ...",
-  pagespeed: "> asking Google Lighthouse for a second opinion (up to 45 s) ...",
+  pagespeed: "> asking Google Lighthouse for a second opinion (up to 80 s) ...",
   pagespeedDone: "> Lighthouse is back ... it has notes too",
   pagespeedSkipped:
     "> Lighthouse couldn't test it ... roasting from the HTML alone",

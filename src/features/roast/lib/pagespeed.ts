@@ -7,7 +7,8 @@ import { check } from "@/features/roast/lib/page-checks";
 
 const PAGESPEED_ENDPOINT =
   "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
-const PAGESPEED_TIMEOUT_MS = 45_000;
+// Heavy sites (ads, many scripts) take Lighthouse 50 to 70 s.
+const PAGESPEED_TIMEOUT_MS = 80_000;
 
 type LighthouseAudit = { numericValue?: number };
 type PageSpeedResponse = {

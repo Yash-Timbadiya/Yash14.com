@@ -7,9 +7,11 @@ import { trackEvent } from "@/lib/analytics";
 import { decodeEmail } from "@/utils/string";
 import { Button } from "@/components/ui/button";
 import { USER } from "@/features/portfolio/data/user";
+import { Separator } from "@/components/section-separator";
 import { useId, useRef, useState, useEffect } from "react";
 import { DissolveInput } from "@/components/dissolve-input";
 import { useRoast } from "@/features/roast/hooks/use-roast";
+import { ScoreSummary } from "@/features/roast/components/score-summary";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { ArrowRightIcon, RotateCcwIcon, ChevronDownIcon } from "lucide-react";
@@ -26,13 +28,17 @@ export function RoastApp() {
   const inputId = useId();
   const [input, setInput] = useState("");
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
+  const roastRequest = useRef(0);
   const { phase, logs, result, error, start, reset } = useRoast();
 
   async function roast(url: string) {
     const trimmed = url.trim();
     if (!trimmed) return;
 
-    setInput(trimmed);
+    const request = ++roastRequest.current;
+    // The domain moves into the result heading, so the box empties (with the
+    // dissolve) and is ready for the next URL.
+    setInput("");
     syncUrlParam(trimmed);
     trackEvent(ANALYTICS_EVENTS.ROAST_SUBMITTED, {
       section: SECTION,
@@ -55,6 +61,9 @@ export function RoastApp() {
         section: SECTION,
         url: trimmed,
       });
+      // Give the URL back so it can be fixed or retried, unless a newer roast
+      // or "Roast another" has taken over since.
+      if (request === roastRequest.current) setInput(trimmed);
     }
   }
 
@@ -67,6 +76,7 @@ export function RoastApp() {
   }, []);
 
   function roastAnother() {
+    roastRequest.current++;
     trackEvent(ANALYTICS_EVENTS.ROAST_ANOTHER, { section: SECTION });
     reset();
     setInput("");
@@ -117,9 +127,12 @@ export function RoastApp() {
         </p>
       </form>
 
-      {phase !== "idle" && (
-        <ScanLog logs={logs} scanning={phase === "scanning"} />
-      )}
+      {/* The log is only the wait; once the roast lands it gets out of the way. */}
+      <AnimatePresence initial={false}>
+        {(phase === "scanning" || phase === "error") && (
+          <ScanLog key="scan-log" logs={logs} scanning={phase === "scanning"} />
+        )}
+      </AnimatePresence>
 
       {phase === "error" && (
         <div className="screen-line-bottom flex items-center justify-between gap-4 p-4">
@@ -133,40 +146,75 @@ export function RoastApp() {
         </div>
       )}
 
-      {phase === "done" && result && (
-        <RoastReport
-          result={result}
-          headingRef={resultHeadingRef}
-          onRoastAnother={roastAnother}
-        />
-      )}
+      <AnimatePresence initial={false}>
+        {phase === "done" && result && (
+          <RoastReport
+            key="roast-report"
+            result={result}
+            headingRef={resultHeadingRef}
+            onRoastAnother={roastAnother}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+
 function ScanLog({ logs, scanning }: { logs: string[]; scanning: boolean }) {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div className="screen-line-bottom p-4">
-      <div
-        role="log"
-        aria-live="polite"
-        aria-busy={scanning}
-        className="min-h-24 rounded-lg border border-line bg-muted/40 p-3 font-mono text-xs leading-relaxed text-muted-foreground sm:text-sm"
-      >
-        {logs.map((line, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: lines are append-only and never reorder
-          <div key={i} className="whitespace-pre-wrap">
-            {line}
-          </div>
-        ))}
-        {scanning && (
-          <span
-            aria-hidden
-            className="inline-block h-4 w-2 animate-pulse bg-foreground align-middle motion-reduce:animate-none"
-          />
-        )}
+    <motion.div
+      className="screen-line-bottom overflow-hidden"
+      initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+      animate={{ height: "auto", opacity: 1 }}
+      exit={
+        reduceMotion
+          ? { opacity: 0, transition: { duration: 0 } }
+          : { height: 0, opacity: 0 }
+      }
+      transition={{ duration: 0.35, ease: EASE_OUT }}
+    >
+      <div className="p-4">
+        <div
+          role="log"
+          aria-live="polite"
+          aria-busy={scanning}
+          className="min-h-24 rounded-lg border border-line bg-muted/40 p-3 font-mono text-xs leading-relaxed text-muted-foreground sm:text-sm"
+        >
+          {logs.map((line, i) => (
+            <motion.div
+              // biome-ignore lint/suspicious/noArrayIndexKey: lines are append-only and never reorder
+              key={i}
+              className="whitespace-pre-wrap"
+              initial={
+                reduceMotion ? false : { opacity: 0, y: 6, filter: "blur(3px)" }
+              }
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.4, ease: EASE_OUT }}
+            >
+              {line}
+            </motion.div>
+          ))}
+          {scanning && (
+            <motion.span
+              aria-hidden
+              className="inline-block h-4 w-2 bg-foreground align-middle"
+              // A steady terminal blink instead of a pulsing fade.
+              animate={reduceMotion ? undefined : { opacity: [1, 1, 0, 0] }}
+              transition={{
+                duration: 1,
+                times: [0, 0.5, 0.5, 1],
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "linear",
+              }}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -179,6 +227,7 @@ function RoastReport({
   headingRef: React.RefObject<HTMLHeadingElement | null>;
   onRoastAnother: () => void;
 }) {
+  const reduceMotion = useReducedMotion();
   const email = decodeEmail(USER.emailB64);
   const mailto = `mailto:${email}?${new URLSearchParams({
     subject: `Fix my site: you roasted ${result.domain}`,
@@ -188,38 +237,29 @@ function RoastReport({
     .replaceAll("+", "%20")}`;
 
   return (
-    <section aria-labelledby="roast-result-heading">
+    <motion.section
+      aria-labelledby="roast-result-heading"
+      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, transition: { duration: 0.15 } }}
+      transition={{ duration: 0.45, ease: EASE_OUT, delay: 0.1 }}
+    >
+      <Separator className="screen-line-bottom" />
+
       <div className="screen-line-bottom p-4">
         <h2
           id="roast-result-heading"
           ref={headingRef}
           tabIndex={-1}
-          className="text-2xl font-medium tracking-tight text-balance outline-none sm:text-3xl"
+          className="font-serif text-2xl tracking-tight break-all italic outline-none brand:text-blue-600 sm:text-3xl brand:dark:text-blue-400"
         >
-          We looked at{" "}
-          <span className="font-mono underline decoration-line decoration-2 underline-offset-4">
-            {result.domain}
-          </span>
-          . We have notes.
+          {result.domain}
         </h2>
       </div>
 
-      <div className="screen-line-bottom grid sm:grid-cols-[auto_1fr]">
-        <div className="flex items-baseline gap-1 border-line p-4 sm:border-r">
-          <span className="font-mono text-6xl font-semibold tracking-tighter tabular-nums">
-            {result.score}
-          </span>
-          <span className="font-mono text-sm text-muted-foreground">/100</span>
-        </div>
-        <div className="flex flex-col justify-center gap-1 border-t border-line p-4 sm:border-t-0">
-          <p className="text-xl font-medium">{result.grade}</p>
-          <p className="text-sm text-muted-foreground">{result.gradeNote}</p>
-        </div>
-      </div>
+      <ScoreSummary result={result} />
 
-      {result.lighthouse && <LighthouseRow lighthouse={result.lighthouse} />}
-
-      <div className="stripe-divider h-4 w-full" />
+      <Separator className="screen-line-bottom" />
 
       <div className="screen-line-top screen-line-bottom grid sm:grid-cols-2">
         {result.categories.map((category, i) => (
@@ -298,48 +338,7 @@ function RoastReport({
           content rendered by JavaScript may be missed.
         </p>
       </div>
-    </section>
-  );
-}
-
-function LighthouseRow({
-  lighthouse,
-}: {
-  lighthouse: NonNullable<RoastResult["lighthouse"]>;
-}) {
-  const items = [
-    ["Performance", lighthouse.performance],
-    ["Accessibility", lighthouse.accessibility],
-    ["Best practices", lighthouse.bestPractices],
-    ["SEO", lighthouse.seo],
-  ] as const;
-
-  return (
-    <dl className="screen-line-bottom grid grid-cols-2 sm:grid-cols-4">
-      {items.map(([label, value], i) => (
-        <div
-          key={label}
-          className={cn(
-            "border-line p-4",
-            i % 2 === 1 && "border-l",
-            i >= 2 && "border-t sm:border-t-0",
-            i === 2 && "sm:border-l",
-          )}
-        >
-          <dt className="font-mono text-xs text-muted-foreground">
-            Lighthouse {label}
-          </dt>
-          <dd
-            className={cn(
-              "mt-1 font-mono text-2xl font-semibold tabular-nums",
-              value < 50 && "text-destructive",
-            )}
-          >
-            {value}
-          </dd>
-        </div>
-      ))}
-    </dl>
+    </motion.section>
   );
 }
 

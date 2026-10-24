@@ -92,6 +92,25 @@
       }
     },
     {
+      "includes": ["src/components/gauge/**"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noSvgWithoutTitle": "off"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "off"
+          },
+          "performance": {
+            "noAccumulatingSpread": "off"
+          },
+          "correctness": {
+            "useExhaustiveDependencies": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["src/components/ui/**"],
       "linter": {
         "rules": {

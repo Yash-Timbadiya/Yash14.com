@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import type { ProfilePage, WithContext } from "schema-dts";
 
+import { absoluteUrl } from "@/lib/utils";
 import { JsonLdScript } from "@/lib/json-ld";
-import { absoluteUrl, cn } from "@/lib/utils";
 import { personJsonLd } from "@/config/json-ld";
 import { USER } from "@/features/portfolio/data/user";
+import { Separator } from "@/components/section-separator";
 import { Hello } from "@/features/portfolio/components/hello";
 import { Overview } from "@/features/portfolio/components/overview";
 import { Bookmarks } from "@/features/portfolio/components/bookmarks";
@@ -70,15 +71,4 @@ function getProfilePageJsonLd(): WithContext<ProfilePage> {
     // to a node not on the page fails with "Invalid object type".
     mainEntity: personJsonLd,
   };
-}
-
-function Separator({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "stripe-divider h-(--separator-height) w-full border-x border-line",
-        className,
-      )}
-    ></div>
-  );
 }

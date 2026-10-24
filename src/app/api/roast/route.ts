@@ -19,8 +19,8 @@ import {
   setCachedRoast,
 } from "@/features/roast/lib/roast-store";
 
-// Lighthouse alone can take 40 s.
-export const maxDuration = 60;
+// Lighthouse alone can take up to 80 s on heavy sites.
+export const maxDuration = 90;
 
 const bodySchema = z.object({ url: z.string().trim().min(1).max(2048) });
 

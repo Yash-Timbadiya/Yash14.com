@@ -298,7 +298,7 @@ function streakLayers(wrap: HTMLElement, center: number, segmentWidth: number) {
     Number.parseFloat(styles.getPropertyValue("--glow-height")) || 1;
   const width = wrap.clientWidth || 280;
   const rgb = glowColor();
-  const halfWidth = Math.max(segmentWidth * 0.45, 8) * spread;
+  const halfWidth = Math.max(segmentWidth * 0.45, 12) * spread;
 
   return [
     [0, 0.8, 7, 0.22],
@@ -307,8 +307,10 @@ function streakLayers(wrap: HTMLElement, center: number, segmentWidth: number) {
     [halfWidth * 0.15, 0.9, 5, 0.14],
   ].map(([dx, widthScale, height, alpha]) => {
     const left = (((center + dx) / width) * 100).toFixed(2);
-    const radius = Math.max(halfWidth * widthScale, 2).toFixed(1);
-    return `radial-gradient(ellipse ${radius}px ${(height * heightScale).toFixed(1)}px at ${left}% 100%, rgba(${rgb},${alpha}), transparent)`;
+    const radiusY = height * heightScale;
+    // Always wider than tall, so a single character glows as a dome, not a pillar.
+    const radiusX = Math.max(halfWidth * widthScale, radiusY * 1.8);
+    return `radial-gradient(ellipse ${radiusX.toFixed(1)}px ${radiusY.toFixed(1)}px at ${left}% 100%, rgba(${rgb},${alpha}), rgba(${rgb},${(alpha * 0.45).toFixed(3)}) 45%, transparent)`;
   });
 }
 

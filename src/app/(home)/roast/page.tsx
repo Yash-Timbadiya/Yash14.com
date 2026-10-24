@@ -96,7 +96,8 @@ export default function RoastPage() {
 
         <div className="h-4" />
 
-        <div className="screen-line-top">
+        {/* Keeps the footer off the input while the page is just the form. */}
+        <div className="screen-line-top screen-line-bottom min-h-[50svh]">
           <RoastApp />
         </div>
 
