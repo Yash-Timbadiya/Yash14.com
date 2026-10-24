@@ -35,6 +35,9 @@ export const metadata: Metadata = {
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: "/bookmarks",
+    types: {
+      "application/rss+xml": [{ url: "/rss", title: "Bookmarks RSS" }],
+    },
   },
   openGraph: {
     siteName: SITE_INFO.name,

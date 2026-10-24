@@ -1,7 +1,10 @@
 import { format } from "date-fns";
 import { BOOKMARKS } from "@/features/bookmark/data";
+import { USER } from "@/features/portfolio/data/user";
+import { BRAND_ASSETS, SITE_INFO } from "@/config/site";
 import { BookmarkCategory } from "@/features/bookmark/types";
 import { EDUCATION } from "@/features/portfolio/data/education";
+import { TECH_STACK } from "@/features/portfolio/data/tech-stack";
 import { EXPERIENCES } from "@/features/portfolio/data/experiences";
 import { sortBookmarksNewestFirst } from "@/features/bookmark/lib/sort";
 
@@ -124,4 +127,66 @@ ${items
   .join("\n")}`,
     )
     .join("\n\n");
+}
+
+// Insertion order matches the Stack section, which groups the same way.
+function groupTechStackByCategory() {
+  const grouped = new Map<string, typeof TECH_STACK>();
+
+  for (const item of TECH_STACK) {
+    for (const category of item.categories) {
+      grouped.set(category, [...(grouped.get(category) ?? []), item]);
+    }
+  }
+
+  return [...grouped];
+}
+
+export function getTechStackMarkdown(level = 2) {
+  return groupTechStackByCategory()
+    .map(
+      ([category, items]) =>
+        `${heading(level, category)}
+
+${items.map((item) => `- [${item.title}](${item.href})`).join("\n")}`,
+    )
+    .join("\n\n");
+}
+
+/** One line per category, for llms.txt; the links live in about.md. */
+export function getTechStackSummary() {
+  return groupTechStackByCategory()
+    .map(
+      ([category, items]) =>
+        `- ${category}: ${items.map((item) => item.title).join(", ")}`,
+    )
+    .join("\n");
+}
+
+// Mirrors the copy on /brand-guidelines; keep the two in sync.
+export function getBrandMarkdown(level = 2) {
+  return `> Key elements of the ${USER.displayName} visual identity, including the mark, logotype, clear space, and color.
+
+${heading(level, "Mark")}
+
+- SVG: ${SITE_INFO.url}/assets/yash14-brand/yash14-mark.svg
+
+${heading(level, "Logotype")}
+
+- SVG: ${SITE_INFO.url}/assets/yash14-brand/yash14-logotype.svg
+
+${heading(level, "Clear Space")}
+
+Maintain a clear space of 1/2 the height of the Mark on all sides of the logo, except in limited cases where the logo remains clearly recognizable and legible.
+
+${heading(level, "Color")}
+
+The identity is monochrome. Use Ink on light surfaces and Paper on dark surfaces to keep the mark legible.
+
+- Ink: #09090B
+- Paper: #FFFFFF
+
+${heading(level, "Downloads")}
+
+- Brand assets pack (mark, logotype, and icon in SVG): ${BRAND_ASSETS.url}`;
 }

@@ -18,6 +18,9 @@ import { GitHubContributions } from "@/features/portfolio/components/github-cont
 export const metadata: Metadata = {
   alternates: {
     canonical: "/",
+    types: {
+      "application/rss+xml": [{ url: "/rss", title: "Bookmarks RSS" }],
+    },
   },
 };
 

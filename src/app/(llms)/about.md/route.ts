@@ -1,3 +1,4 @@
+import { getTechStackMarkdown } from "@/lib/llms";
 import { USER } from "@/features/portfolio/data/user";
 import { SOCIAL_LINKS } from "@/features/portfolio/data/social-links";
 
@@ -18,6 +19,10 @@ ${USER.about.trim()}
 ${USER.jobs
   .map((job) => `- ${job.title} at [${job.company}](${job.website})`)
   .join("\n")}
+
+## Stack
+
+${getTechStackMarkdown(3)}
 
 ## Social Links
 
