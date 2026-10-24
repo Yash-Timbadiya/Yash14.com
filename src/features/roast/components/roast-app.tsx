@@ -1,6 +1,6 @@
 "use client";
 
-import type { RoastCategory, RoastResult } from "@/features/roast/types";
+import type { RoastResult } from "@/features/roast/types";
 
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
@@ -11,6 +11,7 @@ import { Separator } from "@/components/section-separator";
 import { useId, useRef, useState, useEffect } from "react";
 import { DissolveInput } from "@/components/dissolve-input";
 import { useRoast } from "@/features/roast/hooks/use-roast";
+import { CategoryList } from "@/features/roast/components/category-list";
 import { ScoreSummary } from "@/features/roast/components/score-summary";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
@@ -246,14 +247,15 @@ function RoastReport({
     >
       <Separator className="screen-line-bottom" />
 
-      <div className="screen-line-bottom p-4">
+      <div className="screen-line-bottom p-3">
         <h2
           id="roast-result-heading"
           ref={headingRef}
           tabIndex={-1}
-          className="font-serif text-2xl tracking-tight break-all italic outline-none brand:text-blue-600 sm:text-3xl brand:dark:text-blue-400"
+          className="flex items-center gap-2 font-handwritten text-4xl leading-none font-medium tracking-normal text-foreground outline-none"
         >
-          {result.domain}
+          <AnimatedFlameIcon className="size-[0.8em] shrink-0 text-foreground brand:text-[#ff4d00]" />
+          <span className="min-w-0 break-all">{result.domain}</span>
         </h2>
       </div>
 
@@ -261,21 +263,16 @@ function RoastReport({
 
       <Separator className="screen-line-bottom" />
 
-      <div className="screen-line-top screen-line-bottom grid sm:grid-cols-2">
-        {result.categories.map((category, i) => (
-          <CategoryCard
-            key={category.key}
-            category={category}
-            dead={result.dead !== null}
-            className={cn(
-              "border-line",
-              i > 0 && "border-t",
-              i === 1 && "sm:border-t-0",
-              i % 2 === 0 && "sm:border-r",
-            )}
-          />
-        ))}
-      </div>
+      <CategoryList
+        categories={result.categories}
+        className="screen-line-top screen-line-bottom"
+        onFixesOpened={(category) =>
+          trackEvent(ANALYTICS_EVENTS.ROAST_FIXES_OPENED, {
+            section: SECTION,
+            category: category.key,
+          })
+        }
+      />
 
       {result.dead && (
         <div className="screen-line-bottom p-4">
@@ -339,86 +336,6 @@ function RoastReport({
         </p>
       </div>
     </motion.section>
-  );
-}
-
-function CategoryCard({
-  category,
-  dead,
-  className,
-}: {
-  category: RoastCategory;
-  dead: boolean;
-  className?: string;
-}) {
-  const { label, score, line, issues, passedCount } = category;
-
-  return (
-    <div className={cn("flex flex-col gap-3 p-4", className)}>
-      <div className="flex items-baseline justify-between gap-4">
-        <h3 className="font-mono text-xs tracking-wide uppercase">{label}</h3>
-        <span className="font-mono text-lg font-semibold tabular-nums">
-          {score}
-        </span>
-      </div>
-      {/* Decorative: the score is already printed above as text. */}
-      <div
-        aria-hidden
-        className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
-      >
-        <div
-          className={cn(
-            "h-full rounded-full",
-            score < 50 ? "bg-destructive" : "bg-foreground",
-          )}
-          style={{ width: `${score}%` }}
-        />
-      </div>
-      <p className="font-serif text-base text-pretty italic">{line}</p>
-
-      {!dead && issues.length > 0 && (
-        <FixesToggle
-          label={`Show ${issues.length} fix${issues.length === 1 ? "" : "es"}`}
-          eventProperties={{ section: SECTION, category: category.key }}
-        >
-          <ul className="space-y-3">
-            {issues.map((issue) => (
-              <li key={issue.id} className="text-sm">
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="font-medium">{issue.label}</span>
-                  <span
-                    className={cn(
-                      "shrink-0 font-mono text-xs",
-                      issue.status === "fail"
-                        ? "text-destructive"
-                        : "text-muted-foreground",
-                    )}
-                  >
-                    {issue.status === "fail" ? "FAIL" : "WARN"} · {issue.value}
-                  </span>
-                </div>
-                <ul className="mt-1 list-disc space-y-0.5 pl-5 text-muted-foreground">
-                  {issue.fixes.map((fix) => (
-                    <li key={fix}>{fix}</li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-          {passedCount > 0 && (
-            <p className="mt-3 font-mono text-xs text-muted-foreground">
-              {passedCount} other check{passedCount === 1 ? "" : "s"} passed.
-            </p>
-          )}
-        </FixesToggle>
-      )}
-
-      {!dead && issues.length === 0 && passedCount > 0 && (
-        <p className="font-mono text-xs text-muted-foreground">
-          All {passedCount} checks passed.
-        </p>
-      )}
-    </div>
   );
 }
 

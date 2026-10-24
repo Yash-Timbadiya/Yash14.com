@@ -7,6 +7,14 @@ import { cn } from "@/lib/utils";
 import { useId, useState } from "react";
 import { ChevronDownIcon } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import { Separator } from "@/components/section-separator";
+import { CategoryList } from "@/features/roast/components/category-list";
+import { AnimatedFlameIcon } from "@/features/roast/components/animated-flame-icon";
+import {
+  ScoreDial,
+  ScoreSummary,
+  LighthouseGauges,
+} from "@/features/roast/components/score-summary";
 import {
   Reveal,
   EASE_OUT,
@@ -201,73 +209,45 @@ export function ScorecardSplitReport(props: ReportVariantProps) {
 
   return (
     <section>
-      <div className="screen-line-bottom grid md:grid-cols-[17rem_1fr]">
-        <aside className="border-line p-4 md:border-r">
-          <div className="space-y-4 md:sticky md:top-20">
-            <Ring value={result.score} size={160} stroke={7}>
-              <span className="font-mono text-5xl font-semibold tracking-tighter tabular-nums">
-                {result.score}
-              </span>
-              <span className="font-mono text-[10px] text-muted-foreground">
-                /100
-              </span>
-            </Ring>
+      {/* Phone: exactly the live /roast header and score block. */}
+      <div className="md:hidden">
+        <div className="screen-line-bottom p-4">
+          <h2 className="flex items-center gap-2 font-handwritten text-3xl leading-none font-medium tracking-normal text-foreground">
+            <AnimatedFlameIcon className="size-[0.8em] shrink-0 text-foreground brand:text-[#ff4d00]" />
+            <span className="min-w-0 break-all">{result.domain}</span>
+          </h2>
+        </div>
+        <ScoreSummary result={result} />
+        <Separator className="screen-line-bottom" />
+      </div>
+
+      <div className="screen-line-bottom grid md:grid-cols-[18rem_1fr]">
+        {/* Desktop: the same dial and Lighthouse gauges, in a column that stays in view. */}
+        <aside className="hidden border-r border-line p-4 md:block">
+          <div className="sticky top-20 space-y-5">
+            <h2 className="flex items-center gap-2 font-handwritten text-3xl leading-none font-medium tracking-normal text-foreground">
+              <AnimatedFlameIcon className="size-[0.8em] shrink-0 text-foreground brand:text-[#ff4d00]" />
+              <span className="min-w-0 break-all">{result.domain}</span>
+            </h2>
+            <div className="flex justify-center">
+              <ScoreDial result={result} className="sm:size-56" />
+            </div>
             <div className="space-y-1">
-              <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
-                {result.domain}
-              </p>
-              <h2 className="text-2xl font-medium tracking-tight">
+              <p className="text-2xl font-medium tracking-tight">
                 {result.grade}
-              </h2>
+              </p>
               <p className="text-sm text-muted-foreground">
                 {result.gradeNote}
               </p>
             </div>
-            {result.lighthouse && (
-              <dl className="space-y-1.5 border-t border-line pt-4 font-mono text-xs">
-                {(
-                  [
-                    ["Performance", result.lighthouse.performance],
-                    ["Accessibility", result.lighthouse.accessibility],
-                    ["Best practices", result.lighthouse.bestPractices],
-                    ["SEO", result.lighthouse.seo],
-                  ] as const
-                ).map(([label, value]) => (
-                  <div key={label} className="flex items-center gap-3">
-                    <dt className="w-28 text-muted-foreground">{label}</dt>
-                    <ScoreBar score={value} className="flex-1" />
-                    <dd
-                      className={cn(
-                        "w-7 text-right tabular-nums",
-                        TONE_TEXT[toneFor(value)],
-                      )}
-                    >
-                      {value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            )}
+            <LighthouseGauges
+              result={result}
+              className="border-t border-line pt-4"
+            />
           </div>
         </aside>
 
-        <ul className="divide-y divide-line border-t border-line md:border-t-0">
-          {result.categories.map((category) => (
-            <ExpandableRow
-              key={category.key}
-              category={category}
-              trailing={
-                <div className="flex items-center gap-3">
-                  <ScoreBar
-                    score={category.score}
-                    className="hidden w-20 sm:block"
-                  />
-                  <Score score={category.score} />
-                </div>
-              }
-            />
-          ))}
-        </ul>
+        <CategoryList categories={result.categories} />
       </div>
       <Footer {...props} />
     </section>

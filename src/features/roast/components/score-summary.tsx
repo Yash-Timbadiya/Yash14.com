@@ -21,17 +21,15 @@ const ACCENT = "text-foreground brand:text-[#ff4d00]";
 // Lighthouse counts 90 and above as good; each half gauge marks that line.
 const LIGHTHOUSE_GOOD = 90;
 
+// A speedometer: ticks and labels inside the band. The band is three tints of
+// the primary colour (orange in brand mode, ink in monochrome): full strength
+// for the first 80% of the score, a lighter tint for its last 20%, and the
+// lightest tint for the rest of the way to 100.
+const LEAD_SHARE = 0.2;
+const TINT = { main: 1, lead: 0.5, rest: 0.16 } as const;
+
 /** Overall score dial, grade, and the four Lighthouse scores as half gauges. */
 export function ScoreSummary({ result }: { result: RoastResult }) {
-  const lighthouse = result.lighthouse
-    ? ([
-        ["Performance", result.lighthouse.performance],
-        ["Accessibility", result.lighthouse.accessibility],
-        ["Best practices", result.lighthouse.bestPractices],
-        ["SEO", result.lighthouse.seo],
-      ] as const)
-    : null;
-
   return (
     <div className="screen-line-bottom grid sm:grid-cols-[auto_1fr]">
       <div className="flex items-center justify-center border-line p-4 sm:border-r sm:px-6">
@@ -44,68 +42,98 @@ export function ScoreSummary({ result }: { result: RoastResult }) {
           <p className="text-sm text-muted-foreground">{result.gradeNote}</p>
         </div>
 
-        {lighthouse && (
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-line pt-4 sm:grid-cols-4">
-            {lighthouse.map(([label, value]) => (
-              <div key={label} className="flex flex-col-reverse items-center">
-                <dt className="mt-1 font-mono text-[11px] text-muted-foreground">
-                  {label}
-                </dt>
-                <dd className="w-full max-w-24">
-                  <Gauge
-                    value={value}
-                    initialValue={0}
-                    transition
-                    startAngle={90}
-                    endAngle={270}
-                    fit="content"
-                    padding={22}
-                    role="img"
-                    aria-label={`Lighthouse ${label} ${value} out of 100`}
-                    // Colour lives in the progress; the number stays neutral.
-                    className={ACCENT}
-                  >
-                    <GaugeTrack width={34} opacity={TINT.rest} cap="butt" />
-                    <GaugeArc width={34} cap="butt" />
-                    <GaugeMarks
-                      values={[LIGHTHOUSE_GOOD]}
-                      length={30}
-                      width={6}
-                      color="var(--muted-foreground)"
-                    />
-                    <GaugeValue
-                      y={-12}
-                      fontSize={84}
-                      font="mono"
-                      color="var(--foreground)"
-                      format={(v) => `${Math.round(v)}%`}
-                    />
-                  </Gauge>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
-
-        {!lighthouse && !result.dead && (
-          <p className="border-t border-line pt-4 font-mono text-xs text-balance text-muted-foreground">
-            Google Lighthouse couldn't finish testing this site in time, so
-            speed is judged from the raw page alone.
-          </p>
-        )}
+        <LighthouseGauges
+          result={result}
+          className="border-t border-line pt-4 sm:grid-cols-4"
+        />
       </div>
     </div>
   );
 }
 
-// A speedometer: ticks and labels inside the band. The band is three tints of
-// the primary colour (orange in brand mode, ink in monochrome): full strength
-// for the first 80% of the score, a lighter tint for its last 20%, and the
-// lightest tint for the rest of the way to 100.
-const LEAD_SHARE = 0.2;
-const TINT = { main: 1, lead: 0.5, rest: 0.16 } as const;
+/**
+ * The four Lighthouse scores as half gauges in a 2-column grid; pass grid
+ * classes to widen it. Shows a short note instead when Lighthouse timed out.
+ */
+export function LighthouseGauges({
+  result,
+  className,
+}: {
+  result: RoastResult;
+  className?: string;
+}) {
+  if (!result.lighthouse) {
+    return result.dead ? null : (
+      <p
+        className={cn(
+          "font-mono text-xs text-balance text-muted-foreground",
+          className,
+        )}
+      >
+        Google Lighthouse couldn't finish testing this site in time, so speed is
+        judged from the raw page alone.
+      </p>
+    );
+  }
 
-function ScoreDial({ result }: { result: RoastResult }) {
+  const items = [
+    ["Performance", result.lighthouse.performance],
+    ["Accessibility", result.lighthouse.accessibility],
+    ["Best practices", result.lighthouse.bestPractices],
+    ["SEO", result.lighthouse.seo],
+  ] as const;
+
+  return (
+    <dl className={cn("grid grid-cols-2 gap-x-4 gap-y-3", className)}>
+      {items.map(([label, value]) => (
+        <div key={label} className="flex flex-col-reverse items-center">
+          <dt className="mt-1 font-mono text-[11px] text-muted-foreground">
+            {label}
+          </dt>
+          <dd className="w-full max-w-24">
+            <Gauge
+              value={value}
+              initialValue={0}
+              transition
+              startAngle={90}
+              endAngle={270}
+              fit="content"
+              padding={22}
+              role="img"
+              aria-label={`Lighthouse ${label} ${value} out of 100`}
+              // Colour lives in the progress; the number stays neutral.
+              className={ACCENT}
+            >
+              <GaugeTrack width={34} opacity={TINT.rest} cap="butt" />
+              <GaugeArc width={34} cap="butt" />
+              <GaugeMarks
+                values={[LIGHTHOUSE_GOOD]}
+                length={30}
+                width={6}
+                color="var(--muted-foreground)"
+              />
+              <GaugeValue
+                y={-12}
+                fontSize={84}
+                font="mono"
+                color="var(--foreground)"
+                format={(v) => `${Math.round(v)}%`}
+              />
+            </Gauge>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export function ScoreDial({
+  result,
+  className,
+}: {
+  result: RoastResult;
+  className?: string;
+}) {
   return (
     <Gauge
       value={result.score}
@@ -114,7 +142,7 @@ function ScoreDial({ result }: { result: RoastResult }) {
       padding={30}
       role="img"
       aria-label={`Roast score ${result.score} out of 100`}
-      className={cn("size-44 sm:size-52", ACCENT)}
+      className={cn("size-44 sm:size-52", ACCENT, className)}
     >
       <GaugeTrack width={30} opacity={TINT.rest} cap="butt" />
       <GaugeStack
