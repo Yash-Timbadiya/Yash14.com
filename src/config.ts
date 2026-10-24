@@ -21,6 +21,15 @@ export const config = {
     trackInDevelopment: false,
   },
 
+  roast: {
+    /** Google PageSpeed Insights key. Without one, Google's shared quota runs dry fast. */
+    pagespeedApiKey: process.env.PAGESPEED_API_KEY,
+    /** Upstash Redis for the rate limit and result cache. The Vercel integration sets the KV_ names. */
+    redisUrl: process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL,
+    redisToken:
+      process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN,
+  },
+
   dmca: {
     url: process.env.NEXT_PUBLIC_DMCA_URL,
   },
