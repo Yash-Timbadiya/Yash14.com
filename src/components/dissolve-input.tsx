@@ -6,6 +6,7 @@ import { useReducedMotion } from "motion/react";
 import { useRef, useState, useLayoutEffect } from "react";
 
 type Ghost = { id: number; text: string; x: number };
+type Spark = { id: number; background: string };
 
 type DissolveInputProps = Omit<
   React.ComponentProps<"input">,
@@ -19,8 +20,9 @@ type DissolveInputProps = Omit<
 };
 
 /**
- * Text input whose deleted characters lift away, and whose text dissolves
- * with a per-word streak when cleared (transitions.dev
+ * Text input that lights a soft streak under every typed or deleted
+ * character, lifts deleted characters away, and dissolves with a per-word
+ * streak when cleared (transitions.dev
  * "Input clear with dissolve"). The real <input> keeps the caret, selection
  * and accessibility; a mirror layer draws the text.
  */
@@ -44,6 +46,7 @@ export function DissolveInput({
   const previousValue = useRef(value);
 
   const [ghosts, setGhosts] = useState<Ghost[]>([]);
+  const [sparks, setSparks] = useState<Spark[]>([]);
   const [clearingText, setClearingText] = useState<string | null>(null);
 
   function syncScroll() {
@@ -68,7 +71,7 @@ export function DissolveInput({
     // Typing again mid-dissolve cancels it (its effect cleanup resets the layers).
     setClearingText(null);
 
-    const { start, removed } = diff(previous, value);
+    const { start, removed, inserted } = diff(previous, value);
 
     const input = inputRef.current;
     if (removed && input && !reduceMotion) {
@@ -83,7 +86,25 @@ export function DissolveInput({
     }
 
     syncScroll();
-    requestAnimationFrame(syncScroll);
+    requestAnimationFrame(() => {
+      syncScroll();
+      // Measured after the caret scroll settles, so the streak sits under the change.
+      const wrap = wrapRef.current;
+      const changed = inserted || removed;
+      if (!wrap || !input || !changed.trim() || reduceMotion) return;
+      const left =
+        Number.parseFloat(getComputedStyle(input).paddingLeft) +
+        measureText(input, value.slice(0, start)) -
+        input.scrollLeft;
+      const width = measureText(input, changed);
+      setSparks((current) => [
+        ...current,
+        {
+          id: nextId.current++,
+          background: streakLayers(wrap, left + width / 2, width).join(", "),
+        },
+      ]);
+    });
   }, [value, reduceMotion]);
 
   useLayoutEffect(() => {
@@ -170,6 +191,18 @@ export function DissolveInput({
 
       <div ref={glowRef} className="t-clear-glow" aria-hidden />
 
+      {sparks.map((spark) => (
+        <div
+          key={spark.id}
+          className="t-clear-spark"
+          style={{ background: spark.background }}
+          aria-hidden
+          onAnimationEnd={() =>
+            setSparks((current) => current.filter((s) => s.id !== spark.id))
+          }
+        />
+      ))}
+
       {hasValue && !disabled && (
         <button
           type="button"
@@ -208,7 +241,11 @@ function diff(previous: string, next: string) {
   ) {
     endOffset++;
   }
-  return { start, removed: previous.slice(start, previous.length - endOffset) };
+  return {
+    start,
+    removed: previous.slice(start, previous.length - endOffset),
+    inserted: next.slice(start, next.length - endOffset),
+  };
 }
 
 let measureContext: CanvasRenderingContext2D | null = null;
@@ -252,35 +289,40 @@ function glowColor() {
   return root.classList.contains("dark") ? "255,255,255" : "0,0,0";
 }
 
-function buildGlow(wrap: HTMLElement, input: HTMLInputElement, text: string) {
+/** The recipe's four-ellipse streak under one word, as gradient layers. */
+function streakLayers(wrap: HTMLElement, center: number, segmentWidth: number) {
   const styles = getComputedStyle(wrap);
   const spread =
     Number.parseFloat(styles.getPropertyValue("--glow-spread")) || 1.5;
   const heightScale =
     Number.parseFloat(styles.getPropertyValue("--glow-height")) || 1;
   const width = wrap.clientWidth || 280;
-  const padLeft = Number.parseFloat(getComputedStyle(input).paddingLeft) || 12;
   const rgb = glowColor();
+  const halfWidth = Math.max(segmentWidth * 0.45, 8) * spread;
+
+  return [
+    [0, 0.8, 7, 0.22],
+    [halfWidth * 0.45, 0.55, 8, 0.18],
+    [-halfWidth * 0.4, 0.65, 6, 0.16],
+    [halfWidth * 0.15, 0.9, 5, 0.14],
+  ].map(([dx, widthScale, height, alpha]) => {
+    const left = (((center + dx) / width) * 100).toFixed(2);
+    const radius = Math.max(halfWidth * widthScale, 2).toFixed(1);
+    return `radial-gradient(ellipse ${radius}px ${(height * heightScale).toFixed(1)}px at ${left}% 100%, rgba(${rgb},${alpha}), transparent)`;
+  });
+}
+
+function buildGlow(wrap: HTMLElement, input: HTMLInputElement, text: string) {
+  const padLeft = Number.parseFloat(getComputedStyle(input).paddingLeft) || 12;
   const layers: string[] = [];
   let x = -input.scrollLeft;
 
   for (const segment of text.split(/(\s+)/)) {
     const segmentWidth = measureText(input, segment);
     if (segment.trim()) {
-      const center = padLeft + x + segmentWidth / 2;
-      const halfWidth = Math.max(segmentWidth * 0.45, 8) * spread;
-      for (const [dx, widthScale, height, alpha] of [
-        [0, 0.8, 7, 0.22],
-        [halfWidth * 0.45, 0.55, 8, 0.18],
-        [-halfWidth * 0.4, 0.65, 6, 0.16],
-        [halfWidth * 0.15, 0.9, 5, 0.14],
-      ]) {
-        const left = (((center + dx) / width) * 100).toFixed(2);
-        const radius = Math.max(halfWidth * widthScale, 2).toFixed(1);
-        layers.push(
-          `radial-gradient(ellipse ${radius}px ${(height * heightScale).toFixed(1)}px at ${left}% 100%, rgba(${rgb},${alpha}), transparent)`,
-        );
-      }
+      layers.push(
+        ...streakLayers(wrap, padLeft + x + segmentWidth / 2, segmentWidth),
+      );
     }
     x += segmentWidth;
   }

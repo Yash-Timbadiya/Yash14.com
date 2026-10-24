@@ -65,6 +65,33 @@
   mix-blend-mode: screen;
 }
 
+/* Typing and deleting: a short streak under the characters that changed. */
+.t-clear-spark {
+  --spark-opacity: var(--glow-opacity);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  mix-blend-mode: multiply;
+  animation: t-spark 700ms linear forwards;
+}
+.dark .t-clear-spark {
+  --spark-opacity: min(1, calc(var(--glow-opacity) * 1.6));
+  mix-blend-mode: screen;
+}
+@keyframes t-spark {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: var(--spark-opacity);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* Deleting: the removed characters lift and blur away where they stood. */
 .t-glyph-out {
   position: absolute;
@@ -83,7 +110,8 @@
     /* biome-ignore lint/complexity/noImportantStyles: must beat the inline opacity the dissolve writes each frame */
     opacity: 0 !important;
   }
-  .t-glyph-out {
+  .t-glyph-out,
+  .t-clear-spark {
     display: none;
   }
 }
