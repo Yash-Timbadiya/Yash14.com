@@ -6,6 +6,7 @@
 @import "./scroll-fade-effect.css";
 @import "./gradient-border-plugin.css";
 @import "./screen-line-color.css";
+@import "./dissolve-input.css";
 
 @plugin "@tailwindcss/typography";
 

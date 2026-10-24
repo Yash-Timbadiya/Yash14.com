@@ -55,6 +55,7 @@ export function AnimatedFlameIcon({
   const flicker = animate && !reduceMotion;
 
   return (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: decorative and aria-hidden; the button text is the label
     <svg
       viewBox="90 20 420 570"
       fill="currentColor"

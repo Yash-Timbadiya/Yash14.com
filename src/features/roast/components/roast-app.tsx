@@ -8,6 +8,7 @@ import { decodeEmail } from "@/utils/string";
 import { Button } from "@/components/ui/button";
 import { USER } from "@/features/portfolio/data/user";
 import { useId, useRef, useState, useEffect } from "react";
+import { DissolveInput } from "@/components/dissolve-input";
 import { useRoast } from "@/features/roast/hooks/use-roast";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
@@ -19,7 +20,7 @@ const URL_PARAM = "url";
 // Brand mode gets the flame orange; monochrome keeps the theme's own primary
 // (black in light mode, white in dark mode).
 const ROAST_BUTTON_CLASS =
-  "brand:bg-[#fa5d19] brand:text-white brand:hover:bg-[#e14d0e] brand:focus-visible:ring-[#fa5d19]/40";
+  "brand:bg-[#ff4d00] brand:text-white brand:hover:bg-[#e64500] brand:focus-visible:ring-[#ff4d00]/40";
 
 export function RoastApp() {
   const inputId = useId();
@@ -88,18 +89,18 @@ export function RoastApp() {
           Drop The URL
         </label>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <input
+          <DissolveInput
             id={inputId}
             value={input}
-            onChange={(event) => setInput(event.target.value)}
+            onValueChange={setInput}
             placeholder="competitor-i-dont-like.com"
+            clearLabel="Clear URL"
             autoComplete="off"
             autoCapitalize="none"
             spellCheck={false}
             inputMode="url"
             maxLength={2048}
             disabled={phase === "scanning"}
-            className="h-10 w-full min-w-0 rounded-lg border border-input bg-background px-3 font-mono text-sm outline-none placeholder:text-muted-foreground/60 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60"
           />
           <Button
             type="submit"

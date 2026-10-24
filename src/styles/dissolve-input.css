@@ -1,0 +1,89 @@
+/*
+ * Input clear with dissolve, adapted from transitions.dev (input-clear-dissolve).
+ * Motion tokens live on the wrapper; dissolve-input.tsx reads them per clear.
+ */
+.t-clear {
+  --clear-dur: 1300ms;
+  --clear-out-dur: 400ms;
+  --clear-in-dur: 400ms;
+  --clear-out-fly: 12px;
+  --clear-in-fly: 12px;
+  --clear-out-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --clear-in-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --clear-blur: 2px;
+  --glow-delay: 50ms;
+  --glow-peak-at: 0.2;
+  --glow-opacity: 0.75;
+  --glow-spread: 1.9;
+  /* Multiplies the streak heights from the recipe (5-8px) so it reads on a 40px field. */
+  --glow-height: 2.6;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.t-clear-mirror,
+.t-clear-placeholder,
+.t-clear-ghosts {
+  position: absolute;
+  inset-block: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  white-space: pre;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.t-clear-mirror {
+  opacity: 0;
+}
+.t-clear.has-value .t-clear-mirror,
+.t-clear.is-clearing .t-clear-mirror {
+  opacity: 1;
+}
+
+/* The mirror draws the glyphs so they can animate; the real input keeps the caret and selection. */
+.t-clear.has-value > input,
+.t-clear.is-clearing > input {
+  -webkit-text-fill-color: transparent;
+}
+
+.t-clear.has-value .t-clear-placeholder {
+  opacity: 0;
+}
+
+.t-clear-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+  mix-blend-mode: multiply;
+}
+.dark .t-clear-glow {
+  mix-blend-mode: screen;
+}
+
+/* Deleting: the removed characters lift and blur away where they stood. */
+.t-glyph-out {
+  position: absolute;
+  animation: t-glyph-out 240ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes t-glyph-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+    filter: blur(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-clear-glow {
+    /* biome-ignore lint/complexity/noImportantStyles: must beat the inline opacity the dissolve writes each frame */
+    opacity: 0 !important;
+  }
+  .t-glyph-out {
+    display: none;
+  }
+}
