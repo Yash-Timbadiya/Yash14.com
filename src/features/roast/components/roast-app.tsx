@@ -15,6 +15,7 @@ import { FixCta } from "@/features/roast/components/fix-cta";
 import { RotateCcwIcon, ChevronDownIcon } from "lucide-react";
 import { ExportMenu } from "@/features/roast/components/export-menu";
 import { CategoryList } from "@/features/roast/components/category-list";
+import { FinalVerdict } from "@/features/roast/components/final-verdict";
 import { ScoreSummary } from "@/features/roast/components/score-summary";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
@@ -309,13 +310,8 @@ function RoastReport({
         </div>
       )}
 
-      <div className="screen-line-bottom p-4">
-        <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
-          Final verdict
-        </p>
-        <p className="mt-2 font-serif text-xl text-balance italic sm:text-2xl">
-          {result.verdict}
-        </p>
+      <div className="screen-line-bottom">
+        <FinalVerdict result={result} />
       </div>
 
       <Separator className="screen-line-bottom border-x-0" />
