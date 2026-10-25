@@ -11,11 +11,13 @@ import { Separator } from "@/components/section-separator";
 import { useId, useRef, useState, useEffect } from "react";
 import { DissolveInput } from "@/components/dissolve-input";
 import { useRoast } from "@/features/roast/hooks/use-roast";
+import { FixCta } from "@/features/roast/components/fix-cta";
+import { RotateCcwIcon, ChevronDownIcon } from "lucide-react";
+import { ExportMenu } from "@/features/roast/components/export-menu";
 import { CategoryList } from "@/features/roast/components/category-list";
 import { ScoreSummary } from "@/features/roast/components/score-summary";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
-import { ArrowRightIcon, RotateCcwIcon, ChevronDownIcon } from "lucide-react";
 import { AnimatedFlameIcon } from "@/features/roast/components/animated-flame-icon";
 
 const SECTION = ANALYTICS_SECTIONS.ROAST_PAGE;
@@ -82,6 +84,14 @@ export function RoastApp() {
     reset();
     setInput("");
     syncUrlParam(null);
+    // The button sits at the end of a long report; the input is back at the top.
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+    document.getElementById(inputId)?.focus({ preventScroll: true });
   }
 
   return (
@@ -247,7 +257,7 @@ function RoastReport({
     >
       <Separator className="screen-line-bottom border-x-0" />
 
-      <div className="screen-line-bottom p-3">
+      <div className="screen-line-bottom flex items-center justify-between gap-3 p-3">
         <h2
           id="roast-result-heading"
           ref={headingRef}
@@ -257,6 +267,16 @@ function RoastReport({
           <AnimatedFlameIcon className="size-[0.8em] shrink-0 text-foreground brand:text-[#ff4d00]" />
           <span className="min-w-0 break-all">{result.domain}</span>
         </h2>
+        <ExportMenu
+          result={result}
+          onExport={(format) =>
+            trackEvent(ANALYTICS_EVENTS.ROAST_EXPORT, {
+              section: SECTION,
+              domain: result.domain,
+              format,
+            })
+          }
+        />
       </div>
 
       <ScoreSummary result={result} />
@@ -298,42 +318,20 @@ function RoastReport({
         </p>
       </div>
 
-      <div className="stripe-divider h-4 w-full" />
+      <Separator className="screen-line-bottom border-x-0" />
 
-      <div className="screen-line-top screen-line-bottom space-y-4 p-4">
-        <div>
-          <p className="text-lg font-medium">Brutal? Yes. Fixable? Also yes.</p>
-          <p className="mt-1 text-sm text-balance text-muted-foreground">
-            Roasts are free. Fixes aren't, but a site people trust pays for
-            itself. I build fast, accessible websites that don't need a roast.
-          </p>
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button asChild size="lg" className={ROAST_BUTTON_CLASS}>
-            <a
-              href={mailto}
-              onClick={() =>
-                trackEvent(ANALYTICS_EVENTS.ROAST_FIX_CLICK, {
-                  section: SECTION,
-                  domain: result.domain,
-                  score: result.score,
-                })
-              }
-            >
-              Get it fixed
-              <ArrowRightIcon />
-            </a>
-          </Button>
-          <Button variant="outline" size="lg" onClick={onRoastAnother}>
-            <RotateCcwIcon />
-            Roast another
-          </Button>
-        </div>
-        <p className="font-mono text-xs text-muted-foreground">
-          {result.cached ? "Served from a recent roast. " : ""}
-          Scanned {new Date(result.scannedAt).toLocaleString()}. Homepage only;
-          content rendered by JavaScript may be missed.
-        </p>
+      <div className="screen-line-bottom">
+        <FixCta
+          mailto={mailto}
+          onRoastAnother={onRoastAnother}
+          onFixClick={() =>
+            trackEvent(ANALYTICS_EVENTS.ROAST_FIX_CLICK, {
+              section: SECTION,
+              domain: result.domain,
+              score: result.score,
+            })
+          }
+        />
       </div>
     </motion.section>
   );

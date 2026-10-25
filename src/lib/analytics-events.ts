@@ -120,6 +120,7 @@ export const ANALYTICS_EVENTS = {
   ROAST_FIXES_OPENED: "roast_fixes_opened",
   ROAST_FIX_CLICK: "roast_fix_click",
   ROAST_ANOTHER: "roast_another",
+  ROAST_EXPORT: "roast_export",
 } as const;
 
 export type AnalyticsEvent =
