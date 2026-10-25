@@ -23,7 +23,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "speed",
       label: "Load speed",
       score: 47,
-      line: "Your HTML alone weighs 596 KB. The CSS hasn't even entered the chat.",
+      line: "Even turtles use your site as a benchmark for taking things slow.",
       passedCount: 2,
       issues: [
         {
@@ -85,7 +85,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "seo",
       label: "SEO",
       score: 100,
-      line: "SEO is clean. Annoying, I had jokes ready.",
+      line: "Google loves you. Now give the humans it sends a reason to stay.",
       passedCount: 9,
       issues: [],
     },
@@ -93,7 +93,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "copy",
       label: "Copywriting",
       score: 100,
-      line: "The copy actually says something. Rare. Unsettling.",
+      line: "Clear words, perfect score. Clear isn't the same as convincing, though.",
       passedCount: 4,
       issues: [],
     },
@@ -101,7 +101,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "social",
       label: "Social previews",
       score: 100,
-      line: "Link previews look great. You must share your own link a lot.",
+      line: "Perfect previews. Pretty wrapping only works if the gift inside is worth opening.",
       passedCount: 5,
       issues: [],
     },
@@ -109,7 +109,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "trust",
       label: "Trust",
       score: 100,
-      line: "Secure, tidy, no broken links. Boring in the best way.",
+      line: "Nothing broken, nothing scary. Safe is the floor, not the finish line.",
       passedCount: 5,
       issues: [],
     },
@@ -117,7 +117,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "mobile",
       label: "Mobile & a11y",
       score: 87,
-      line: "Alt text on 4% of 82 images. Screen reader users get a guided tour of 'image, image, image'.",
+      line: "Almost phone-friendly. Thumbs still find every rough edge you missed.",
       passedCount: 5,
       issues: [
         {

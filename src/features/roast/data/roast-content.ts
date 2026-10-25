@@ -1,7 +1,7 @@
 import type { DeadSiteReason, RoastCategoryKey } from "@/features/roast/types";
 
 /** Bump when lines or their order change, so cached roasts are rebuilt. */
-export const ROAST_CONTENT_VERSION = 1;
+export const ROAST_CONTENT_VERSION = 3;
 
 export const ROAST_CATEGORIES: { key: RoastCategoryKey; label: string }[] = [
   { key: "speed", label: "Load speed" },
@@ -12,124 +12,153 @@ export const ROAST_CATEGORIES: { key: RoastCategoryKey; label: string }[] = [
   { key: "mobile", label: "Mobile & a11y" },
 ];
 
+export type RoastTier = "brutal" | "harsh" | "mild";
+
+/** Below 50 is brutal, below 80 harsh, anything short of perfect mild. */
+export function roastTierFor(score: number): RoastTier {
+  if (score < 50) return "brutal";
+  return score < 80 ? "harsh" : "mild";
+}
+
 /**
- * One roast per failing check. `{value}` is replaced with what was measured.
- * The worst issue in a category picks the line.
+ * Category lines by how badly it scored. Every tier is a roast: a high score
+ * that still missed gets mocked for being so close. Jokes only, since the
+ * measured numbers already live in the issue list under each category.
  */
-export const ISSUE_ROASTS: Record<string, string[]> = {
-  response_time: [
-    "Your server took {value} to say hello. I've had faster replies from government offices.",
-    "{value} before the first byte. Somewhere a hamster is pedalling your backend.",
-  ],
-  html_weight: [
-    "{value} of HTML. That's not a homepage, that's a novella.",
-    "Your HTML alone weighs {value}. The CSS hasn't even entered the chat.",
-  ],
-  performance_score: [
-    "Lighthouse gave you {value}. Lighthouse is being polite.",
-    "Performance {value}. Visitors are leaving before the spinner finishes spinning.",
-  ],
-  lcp: [
-    "Main content shows up after {value}. Most visitors have already bounced to a competitor.",
-    "Largest Contentful Paint: {value}. Largest, yes. Contentful, eventually.",
-  ],
-  fcp: [
-    "{value} of white screen before anything appears. Very minimalist. Very empty.",
-    "First paint at {value}. Your site makes a strong first impression of nothing.",
-  ],
-  tbt: [
-    "The main thread is blocked for {value}. Your JavaScript is holding the page hostage.",
-    "{value} of blocking time. Every tap feels like pressing an elevator button twice.",
-  ],
-  cls: [
-    "Layout shift {value}. I went to click a link and ended up somewhere else entirely.",
-    "CLS of {value}. The page moves more than my landlord's deadlines.",
-  ],
-  title_tag: [
-    "Your title tag: {value}. Google is guessing what you do. So am I.",
-    "Title says {value}. Search results deserve better, and so do you.",
-  ],
-  heading_hierarchy: [
-    "Heading order: {value}. That's not a structure, that's a ransom note.",
-  ],
-  canonical: [
-    "No canonical tag. Google has to guess which copy of you is the real one.",
-  ],
-  noindex: [
-    "Your page literally tells Google not to index it. Mission accomplished, I guess.",
-  ],
-  robots_txt: ["No robots.txt. Crawlers knock, nobody answers."],
-  sitemap_xml: ["No sitemap. You're making Google find your pages by vibes."],
-  structured_data: [
-    "Zero structured data. To search engines you're just a wall of text with a logo.",
-  ],
-  duplicate_meta: [
-    "Duplicate title or description tags ({value}). Pick a personality.",
-  ],
-  lighthouse_seo: ["Lighthouse SEO {value}. Even the robot is disappointed."],
-  h1: [
-    "H1 situation: {value}. Either you have nothing to say or you're saying it all at once.",
-    "{value}. Your page has no clear headline. Neither do your visitors.",
-  ],
-  meta_description: [
-    "Meta description: {value}. Google is writing your sales pitch for you. Badly.",
-    "Meta description length: {value}. That's your one shot in the search results and you fumbled it.",
-  ],
-  word_count: [
-    "{value} on the whole homepage. I've seen longer error messages.",
-    "Only {value}. Visitors still don't know what you sell, and neither does Google.",
-  ],
-  internal_links: [
-    "{value} from the homepage. It's a dead end with a logo on it.",
-  ],
-  og_title: [
-    "No og:title. Share your link on WhatsApp and it shows up as a shrug.",
-  ],
-  og_description: [
-    "No og:description. Your link previews have nothing to say. Fitting.",
-  ],
-  og_image: [
-    "No og:image. Every share of your site is a sad grey rectangle.",
-    "Missing og:image. Your link previews look like a placeholder someone forgot to replace.",
-  ],
-  twitter_card: [
-    "No twitter:card. On X your link is just a blue string of regret.",
-  ],
-  twitter_text: ["X preview text: {value}. Nobody is clicking that."],
-  https: ["No HTTPS. Browsers are literally warning people about you. In red."],
-  favicon: ["No favicon. In a row of tabs you're the blank one nobody trusts."],
-  broken_links: [
-    "{value} links are broken. Your site is giving people directions to places that don't exist.",
-  ],
-  charset: ["No charset declared. One emoji away from mojibake."],
-  best_practices_score: [
-    "Best practices {value}. Lighthouse found habits your future self will hate.",
-  ],
-  viewport: [
-    "No viewport tag. On a phone your site is a desktop page viewed through a keyhole.",
-  ],
-  html_lang: [
-    "No lang attribute. Screen readers are guessing your language. Rudely.",
-  ],
-  image_alt: [
-    "Alt text on {value}. Screen reader users get a guided tour of 'image, image, image'.",
-  ],
-  inline_styles: [
-    "{value} use inline styles. Your CSS lives in the HTML like an unwanted roommate.",
-  ],
-  accessibility_score: [
-    "Accessibility {value}. A chunk of your visitors can't actually use this.",
-  ],
+export const CATEGORY_ROASTS: Record<
+  RoastCategoryKey,
+  Record<RoastTier, string[]>
+> = {
+  speed: {
+    brutal: [
+      "Even turtles use your site as a benchmark for taking things slow.",
+      "A snail taking a power nap still has a faster response time than your server.",
+      "Your server isn't hosting a website, it's staging a public cry for help.",
+      "Visitors don't bounce off this page. They age, retire, and pass the tab down to their kids.",
+    ],
+    harsh: [
+      "Your page loads like it's reading the terms and conditions first.",
+      "Visitors could brew a coffee while this loads. Most go to a competitor to drink it.",
+      "Your loading spinner gets more screen time than your actual content.",
+    ],
+    mild: [
+      "So close to fast, and still the slowest part of your visitor's day.",
+      "Almost quick. Like a sprinter who stops mid-race to tie a shoelace and check email.",
+      "Fast enough to pass. Slow enough that a competitor already closed the sale.",
+    ],
+  },
+  seo: {
+    brutal: [
+      "Google's web crawler doesn't rank your site; it files a missing person report.",
+      "Your site is so hidden, page two of Google would be a promotion.",
+      "Search engines walk past this site like it owes them money.",
+    ],
+    harsh: [
+      "Google knows you exist. It just has no idea why anyone should care.",
+      "You're findable the way a sock behind the dryer is findable: by accident.",
+      "Search engines see you and politely pretend they don't.",
+    ],
+    mild: [
+      "Almost optimised. Google still treats you like a plus-one nobody invited.",
+      "Nearly clean SEO, which is like nearly locking the front door.",
+    ],
+  },
+  copy: {
+    brutal: [
+      "Your writing is so bland, even a parrot reading it out loud would sound monotone.",
+      "A toddler babbling for juice has a higher conversion rate than your hero section.",
+      "Your content doesn't persuade; it aggressively begs visitors to leave.",
+      "I read the whole homepage and still can't tell what you sell. I suspect you can't either.",
+    ],
+    harsh: [
+      "The copy is there. So is wallpaper. Both are equally persuasive.",
+      "Your headline whispers when it should be shouting, and nobody is leaning in.",
+      "Visitors skim this and leave with exactly the opinion they arrived with: none.",
+    ],
+    mild: [
+      "Decent words, zero spine. Your copy apologises for existing.",
+      "The pitch almost lands, then trips over its own adjectives.",
+    ],
+  },
+  social: {
+    brutal: [
+      "Your link previews have the charisma of a blank parking ticket.",
+      "Every time someone shares your site, a group chat goes quiet out of pity.",
+      "Your link shows up on social looking like it crawled out of a spam folder.",
+    ],
+    harsh: [
+      "Your previews show up. That's the nicest thing anyone will say about them.",
+      "Half dressed for the party. The other half is still in the dryer.",
+      "People will click your link, but only to find out what went wrong.",
+    ],
+    mild: [
+      "Nearly share-ready, which on social media means invisible.",
+      "Your previews look fine. Fine is exactly what people scroll past.",
+    ],
+  },
+  trust: {
+    brutal: [
+      "Browsers see your site and quietly reach for the pepper spray.",
+      "Visitors would rather hand their card details to a fortune cookie.",
+      "This site has the trust signals of a free-gift popup from 2009.",
+    ],
+    harsh: [
+      "It doesn't look dangerous. It just looks like nobody has been home since 2019.",
+      "Trustworthy the way gas station sushi is technically food.",
+      "Visitors notice the loose wires long before they notice you.",
+    ],
+    mild: [
+      "Mostly trustworthy, which is exactly what a con artist would say too.",
+      "Your handshake is limp. Visitors can feel it through the screen.",
+    ],
+  },
+  mobile: {
+    brutal: [
+      "On a phone, your site is a desktop page viewed through a keyhole.",
+      "Screen readers don't read your site, they file a complaint.",
+      "Using this on a phone feels like doing taxes on a calculator watch.",
+    ],
+    harsh: [
+      "Works on mobile the way a folding chair works as a bed.",
+      "Accessible to some. Everyone else gets a puzzle with no instructions.",
+      "Phones load it. Thumbs file a complaint.",
+    ],
+    mild: [
+      "Almost phone-friendly. Thumbs still find every rough edge you missed.",
+      "Nearly inclusive, which is a polite way of saying someone is still locked out.",
+    ],
+  },
 };
 
-/** For a category with nothing wrong: a backhanded compliment. */
-export const CLEAN_CATEGORY_ROASTS: Record<RoastCategoryKey, string> = {
-  speed: "Fast. Suspiciously fast. Who did you hire?",
-  seo: "SEO is clean. Annoying, I had jokes ready.",
-  copy: "The copy actually says something. Rare. Unsettling.",
-  social: "Link previews look great. You must share your own link a lot.",
-  trust: "Secure, tidy, no broken links. Boring in the best way.",
-  mobile: "Works on a phone. The bar is low, but you cleared it.",
+/**
+ * For a perfect category: a light jab, then the next thing to push on, since
+ * a clean score is the floor, not the finish line.
+ */
+export const CLEAN_CATEGORY_ROASTS: Record<RoastCategoryKey, string[]> = {
+  speed: [
+    "Fast. Suspiciously fast. Now make all that speed actually sell something.",
+    "Top marks on speed. A fast page with nothing to say just loses people quicker, so make the content earn it.",
+  ],
+  seo: [
+    "SEO is clean. Annoying, I had jokes ready. Ranking is step one; getting the click is step two.",
+    "Google loves you. Now give the humans it sends a reason to stay.",
+  ],
+  copy: [
+    "The copy actually says something. Rare. Unsettling. Next, make it say something people remember.",
+    "Clear words, perfect score. Clear isn't the same as convincing, though.",
+  ],
+  social: [
+    "Link previews look great. You must share your own link a lot. Now make the page live up to the preview.",
+    "Perfect previews. Pretty wrapping only works if the gift inside is worth opening.",
+  ],
+  trust: [
+    "Secure, tidy, no broken links. Boring in the best way. Trust gets them in; a reason to buy keeps them.",
+    "Nothing broken, nothing scary. Safe is the floor, not the finish line.",
+  ],
+  mobile: [
+    "Works on a phone. The bar is low, but you cleared it. Next, clear it with some style.",
+    "Perfect on mobile. Now make it feel built for thumbs, not just tolerated by them.",
+  ],
 };
 
 export const ROAST_GRADES = [
@@ -157,6 +186,7 @@ export const ROAST_VERDICTS: string[][] = [
   [
     "This isn't a website, it's a cry for help with a domain name attached.",
     "Every visitor this site loses is someone your competitor says thank you to.",
+    "If this site were a restaurant, the health inspector would just leave a sympathy card.",
   ],
   [
     "The bones are there. The skin is on fire. Good news: fire is fixable.",

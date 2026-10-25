@@ -7,8 +7,9 @@ import type {
 } from "@/features/roast/types";
 
 import {
-  ISSUE_ROASTS,
+  roastTierFor,
   ROAST_GRADES,
+  CATEGORY_ROASTS,
   ROAST_VERDICTS,
   DEAD_SITE_ROASTS,
   ROAST_CATEGORIES,
@@ -82,12 +83,10 @@ export function buildRoast({
         )
       : 0;
 
-    const worst = issues[0];
-    const lines = worst ? ISSUE_ROASTS[worst.id] : undefined;
     const line =
-      worst && lines
-        ? pickFrom(lines, random).replaceAll("{value}", worst.value)
-        : CLEAN_CATEGORY_ROASTS[key];
+      issues.length > 0
+        ? pickFrom(CATEGORY_ROASTS[key][roastTierFor(score)], random)
+        : pickFrom(CLEAN_CATEGORY_ROASTS[key], random);
 
     return {
       key,
