@@ -41,6 +41,21 @@ export const TONE_BAR: Record<Tone, string> = {
   good: "bg-foreground",
 };
 
+/**
+ * One scale spanning the whole track, so a fill reveals only the part of the
+ * gradient its score reaches: low scores stay deep orange, full scores end in a light orange.
+ */
+export const SCORE_GRADIENT =
+  "bg-linear-to-r from-foreground/25 to-foreground brand:from-[#b32d00] brand:via-[#ff4d00] brand:to-[#ff9a5c]";
+
+export function scoreGradientStyle(score: number) {
+  const width = Math.max(score, 1);
+  return {
+    width: `${width}%`,
+    backgroundSize: `${10000 / width}% 100%`,
+  };
+}
+
 export function letterGrade(score: number) {
   if (score >= 90) return "A";
   if (score >= 80) return "B";

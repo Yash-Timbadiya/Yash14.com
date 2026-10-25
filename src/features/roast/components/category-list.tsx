@@ -7,10 +7,10 @@ import { useId, useState } from "react";
 import { ChevronDownIcon } from "lucide-react";
 import {
   Reveal,
-  toneFor,
-  TONE_BAR,
-  TONE_TEXT,
   IssueFixes,
+  ACCENT_TEXT,
+  SCORE_GRADIENT,
+  scoreGradientStyle,
 } from "@/features/roast/components/report-variants/shared";
 
 /**
@@ -48,7 +48,6 @@ function CategoryRow({
 }) {
   const contentId = useId();
   const [open, setOpen] = useState(false);
-  const tone = toneFor(category.score);
   const hasIssues = category.issues.length > 0;
 
   return (
@@ -62,7 +61,10 @@ function CategoryRow({
           if (!open) onOpen();
           setOpen(!open);
         }}
-        className="flex w-full items-center gap-4 p-4 text-left hover:bg-muted/40 disabled:hover:bg-transparent"
+        className={cn(
+          "flex w-full items-center gap-4 border-b-2 border-dashed border-transparent p-4 text-left hover:bg-muted/40 disabled:hover:bg-transparent",
+          open && "border-line",
+        )}
       >
         <div className="min-w-0 flex-1 space-y-1">
           <p className="font-mono text-xs tracking-wide uppercase">
@@ -78,14 +80,14 @@ function CategoryRow({
             className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-muted sm:block"
           >
             <div
-              className={cn("h-full rounded-full", TONE_BAR[tone])}
-              style={{ width: `${category.score}%` }}
+              className={cn("h-full rounded-full", SCORE_GRADIENT)}
+              style={scoreGradientStyle(category.score)}
             />
           </div>
           <span
             className={cn(
               "w-9 text-right font-mono text-lg font-semibold tabular-nums",
-              TONE_TEXT[tone],
+              ACCENT_TEXT,
             )}
           >
             {category.score}
@@ -101,7 +103,7 @@ function CategoryRow({
       </button>
       {hasIssues && (
         <Reveal open={open} id={contentId}>
-          <div className="px-4 pb-4">
+          <div className="p-4">
             <IssueFixes issues={category.issues} />
             {category.passedCount > 0 && (
               <p className="pt-3 font-mono text-xs text-muted-foreground">
