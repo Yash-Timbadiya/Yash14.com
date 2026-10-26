@@ -28,6 +28,20 @@ export const config = {
     redisUrl: process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL,
     redisToken:
       process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN,
+    /**
+     * Writes the personal roast lines. Models are tried in order; without a
+     * key, or when all of them fail, the prewritten lines are used.
+     */
+    openrouter: {
+      apiKey: process.env.OPENROUTER_API_KEY,
+      models: (
+        process.env.OPENROUTER_MODELS ||
+        "nvidia/nemotron-3.5-super-vl:free,nvidia/nemotron-3.5-lightning:free"
+      )
+        .split(",")
+        .map((model) => model.trim())
+        .filter(Boolean),
+    },
   },
 
   dmca: {

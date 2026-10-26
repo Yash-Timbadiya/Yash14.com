@@ -5,6 +5,8 @@ import type { RoastResult } from "@/features/roast/types";
 import { runPageSpeed } from "@/features/roast/lib/pagespeed";
 import { SCAN_QUIPS } from "@/features/roast/data/roast-content";
 import { runPageChecks } from "@/features/roast/lib/page-checks";
+import { extractPageCopy } from "@/features/roast/lib/page-copy";
+import { applyAiRoast, generateAiRoast } from "@/features/roast/lib/ai-roast";
 import { buildRoast, buildDeadRoast } from "@/features/roast/lib/build-roast";
 import {
   fetchPage,
@@ -29,7 +31,7 @@ export function displayDomain(url: URL) {
 
 /**
  * Fetches the page, runs the HTML checks and Lighthouse in parallel, and
- * turns the results into a roast. `log` receives terminal lines as it goes.
+ * turns the results into a roast, written by AI when a provider answers. `log` receives terminal lines as it goes.
  */
 export async function runRoast(
   url: URL,
@@ -73,13 +75,23 @@ export async function runRoast(
     const pageSpeed = await pageSpeedPromise;
     log(pageSpeed ? SCAN_QUIPS.pagespeedDone : SCAN_QUIPS.pagespeedSkipped);
 
-    log(SCAN_QUIPS.compiling);
-    return buildRoast({
+    const allChecks = [...checks, ...(pageSpeed?.checks ?? [])];
+    const roast = buildRoast({
       url: href,
       domain,
-      checks: [...checks, ...(pageSpeed?.checks ?? [])],
+      checks: allChecks,
       lighthouse: pageSpeed?.lighthouse ?? null,
     });
+
+    log(SCAN_QUIPS.aiRoasting);
+    const aiRoast = await generateAiRoast(
+      { roast, checks: allChecks, copy: extractPageCopy(page.html) },
+      signal,
+    );
+    log(aiRoast ? SCAN_QUIPS.aiDone : SCAN_QUIPS.aiSkipped);
+
+    log(SCAN_QUIPS.compiling);
+    return aiRoast ? applyAiRoast(roast, aiRoast) : roast;
   } catch (error) {
     if (!(error instanceof DeadSiteError)) throw error;
 

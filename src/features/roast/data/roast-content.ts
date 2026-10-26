@@ -1,7 +1,7 @@
 import type { DeadSiteReason, RoastCategoryKey } from "@/features/roast/types";
 
 /** Bump when lines or their order change, so cached roasts are rebuilt. */
-export const ROAST_CONTENT_VERSION = 3;
+export const ROAST_CONTENT_VERSION = 4;
 
 export const ROAST_CATEGORIES: { key: RoastCategoryKey; label: string }[] = [
   { key: "speed", label: "Load speed" },
@@ -304,10 +304,13 @@ export const SCAN_QUIPS = {
   fetching: "> fetching the homepage ... judging silently",
   fetched: "> got {kb} KB in {ms} ms ... {mood}",
   checks: "> counting headings, tags, links and life choices ...",
-  pagespeed: "> asking Google Lighthouse for a second opinion (up to 80 s) ...",
+  pagespeed: "> asking Google Lighthouse for a second opinion ...",
   pagespeedDone: "> Lighthouse is back ... it has notes too",
   pagespeedSkipped:
     "> Lighthouse couldn't test it ... roasting from the HTML alone",
+  aiRoasting: "> handing the evidence to an AI with no filter ...",
+  aiDone: "> the AI read every word ... it has questions",
+  aiSkipped: "> the AI refused to look ... using the house roasts",
   compiling: "> compiling roast ...",
   cached: "> roasted {domain} recently ... serving the leftovers",
 };

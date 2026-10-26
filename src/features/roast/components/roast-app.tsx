@@ -135,7 +135,7 @@ export function RoastApp() {
           </Button>
         </div>
         <p className="text-sm text-balance text-muted-foreground">
-          Takes 45 seconds. Brutal roasts ahead. Can you take it?
+          Brutal roasts ahead. Can you take it?
         </p>
       </form>
 
