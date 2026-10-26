@@ -105,6 +105,7 @@ export function FixCta({
         className="pointer-events-none relative z-1 flex-1 max-sm:hidden"
       >
         <svg
+          aria-hidden="true"
           viewBox={`0 0 ${COLS} ${ROW_REACH.length}`}
           preserveAspectRatio="xMinYMid meet"
           overflow="visible"
