@@ -17,7 +17,9 @@ const MODEL_TIMEOUT_MS = 25_000;
 
 const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
-const roastLine = z.string().trim().min(10).max(320);
+// Loose on purpose: long lines are trimmed to whole sentences later.
+const roastLine = z.string().trim().min(10).max(1000);
+const MAX_LINE_CHARS = 240;
 
 /** One line per category, keyed like ROAST_CATEGORIES, plus the closing verdict. */
 const aiRoastSchema = z.object({
@@ -159,9 +161,21 @@ export async function generateAiRoast(
   return null;
 }
 
-// Models ignore the no-em-dash rule often enough to enforce it here.
+/**
+ * Models ignore the no-em-dash and length rules often enough to enforce them
+ * here. Keeps whole sentences up to the limit, and always at least the first.
+ */
 function tidy(line: string) {
-  return line.replace(/\s*[—–]\s*/g, ", ");
+  const sentences = line
+    .replace(/\s+[-—–]\s+|\s*[—–]\s*/g, ", ")
+    .split(/(?<=[.!?])\s+/);
+
+  let result = sentences[0];
+  for (const sentence of sentences.slice(1)) {
+    if (result.length + sentence.length + 1 > MAX_LINE_CHARS) break;
+    result = `${result} ${sentence}`;
+  }
+  return result;
 }
 
 export function applyAiRoast(roast: RoastResult, ai: AiRoast): RoastResult {
