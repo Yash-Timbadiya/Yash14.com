@@ -6,7 +6,7 @@ import { buildDeadRoast } from "@/features/roast/lib/build-roast";
 import {
   runRoast,
   displayDomain,
-  normalizeRoastUrl,
+  roastCacheKey,
 } from "@/features/roast/lib/run-roast";
 import {
   DeadSiteError,
@@ -62,8 +62,8 @@ export async function POST(request: Request) {
     throw error;
   }
 
-  const href = normalizeRoastUrl(url);
-  const cached = await getCachedRoast(href);
+  const key = roastCacheKey(url);
+  const cached = await getCachedRoast(key);
   if (cached) {
     return stream(async (send) => {
       send({
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
   if (!allowed) {
     return Response.json(
       {
-        error: `Easy, I can only roast so much. Try again in ${Math.ceil(retryAfterSeconds / 60)} min.`,
+        error: `Easy, I can only roast so much. Try again in ${formatWait(retryAfterSeconds)}.`,
       },
       { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } },
     );
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       (message) => send({ type: "log", message }),
       request.signal,
     );
-    await setCachedRoast(href, result);
+    await setCachedRoast(key, result);
     send({ type: "result", result });
   });
 }
@@ -140,6 +140,13 @@ function stream(
       "X-Accel-Buffering": "no",
     },
   });
+}
+
+function formatWait(seconds: number) {
+  const minutes = Math.ceil(seconds / 60);
+  if (minutes < 90) return `${minutes} min`;
+  const hours = Math.round(minutes / 60);
+  return `${hours} hour${hours === 1 ? "" : "s"}`;
 }
 
 function clientIp(request: Request) {

@@ -55,6 +55,8 @@ export type RoastResult = {
   } | null;
   scannedAt: string;
   cached: boolean;
+  /** True when the lines and verdict came from the AI, not the prewritten set. */
+  aiWritten?: boolean;
 };
 
 export type RoastStreamEvent =

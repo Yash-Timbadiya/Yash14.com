@@ -1,7 +1,7 @@
 import type { DeadSiteReason, RoastCategoryKey } from "@/features/roast/types";
 
 /** Bump when lines or their order change, so cached roasts are rebuilt. */
-export const ROAST_CONTENT_VERSION = 4;
+export const ROAST_CONTENT_VERSION = 5;
 
 export const ROAST_CATEGORIES: { key: RoastCategoryKey; label: string }[] = [
   { key: "speed", label: "Load speed" },
