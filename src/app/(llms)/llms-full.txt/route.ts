@@ -3,8 +3,10 @@ import { USER } from "@/features/portfolio/data/user";
 import { SOCIAL_LINKS } from "@/features/portfolio/data/social-links";
 import {
   getBookmarksMarkdown,
+  getBrandMarkdown,
   getEducationMarkdown,
   getExperienceMarkdown,
+  getTechStackMarkdown,
 } from "@/lib/llms";
 
 const aboutText = `## About
@@ -29,6 +31,10 @@ ${USER.jobs
 
 ${SOCIAL_LINKS.map((item) => `- [${item.title}](${item.href})`).join("\n")}
 
+## Stack
+
+${getTechStackMarkdown(3)}
+
 ## Experience
 
 ${getExperienceMarkdown(3)}
@@ -40,9 +46,13 @@ ${getEducationMarkdown(3)}
 ## Bookmarks
 
 ${getBookmarksMarkdown(3)}
+
+## Brand
+
+${getBrandMarkdown(3)}
 `;
 
-const content = `<SYSTEM>This document contains comprehensive information about ${USER.displayName}'s portfolio published on ${SITE_INFO.url}. It includes personal details, work experience, education, bookmarks, and social links. This data is formatted for consumption by Large Language Models (LLMs) to provide accurate and up-to-date information about ${USER.displayName}'s work as a ${USER.jobTitle}.</SYSTEM>
+const content = `<SYSTEM>This document contains comprehensive information about ${USER.displayName}'s portfolio published on ${SITE_INFO.url}. It includes personal details, tech stack, work experience, education, bookmarks, brand guidelines, and social links. This data is formatted for consumption by Large Language Models (LLMs) to provide accurate and up-to-date information about ${USER.displayName}'s work as a ${USER.jobTitle}.</SYSTEM>
 
 # ${SITE_INFO.name}
 

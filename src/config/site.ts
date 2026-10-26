@@ -33,6 +33,10 @@ export const MAIN_NAV: NavItem<Route>[] = [
     title: "Brand",
     href: "/brand-guidelines",
   },
+  {
+    title: "Roast",
+    href: "/roast",
+  },
 ];
 
 export const MOBILE_NAV: NavItem<Route>[] = [

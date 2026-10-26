@@ -15,7 +15,12 @@ function escapeXml(value: string) {
 }
 
 export function GET() {
-  const items = sortBookmarksNewestFirst(BOOKMARKS)
+  const sorted = sortBookmarksNewestFirst(BOOKMARKS);
+  const lastBuildDate = sorted[0]
+    ? new Date(sorted[0].bookmarkedAt).toUTCString()
+    : new Date().toUTCString();
+
+  const items = sorted
     .map((bookmark) => {
       const description = [
         bookmark.category,
@@ -43,6 +48,7 @@ export function GET() {
     <link>${SITE_INFO.url}/bookmarks</link>
     <description>Hand-picked articles, courses, books, and references worth your time.</description>
     <language>en</language>
+    <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <atom:link href="${SITE_INFO.url}/rss" rel="self" type="application/rss+xml" />
 ${items}
   </channel>

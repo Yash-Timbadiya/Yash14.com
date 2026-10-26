@@ -111,6 +111,16 @@ export const ANALYTICS_EVENTS = {
   YT_MARK_CLICK: "yt_mark_click",
   YT_MARK_RIGHT_CLICK: "yt_mark_right_click",
   CAR_MODEL_CHANGED: "car_model_changed",
+
+  // Roast my site
+  VIEW_ROAST: "view_roast",
+  ROAST_SUBMITTED: "roast_submitted",
+  ROAST_COMPLETED: "roast_completed",
+  ROAST_FAILED: "roast_failed",
+  ROAST_FIXES_OPENED: "roast_fixes_opened",
+  ROAST_FIX_CLICK: "roast_fix_click",
+  ROAST_ANOTHER: "roast_another",
+  ROAST_EXPORT: "roast_export",
 } as const;
 
 export type AnalyticsEvent =
@@ -140,6 +150,8 @@ export const ANALYTICS_SECTIONS = {
   NOT_FOUND: "not_found",
   /** Global keyboard shortcuts, which are not tied to one part of the page. */
   KEYBOARD: "keyboard",
+  /** The /roast page. */
+  ROAST_PAGE: "roast_page",
 } as const;
 
 export type AnalyticsSection =
