@@ -30,6 +30,17 @@ export function displayDomain(url: URL) {
 }
 
 /**
+ * Cache key that ignores the protocol, a leading www and a trailing slash,
+ * so https://www.example.com/ and example.com share one cached roast.
+ */
+export function roastCacheKey(url: URL) {
+  const query = new URLSearchParams(url.searchParams);
+  query.sort();
+  const search = query.size > 0 ? `?${query}` : "";
+  return `${displayDomain(url)}${url.pathname.replace(/\/+$/, "")}${search}`;
+}
+
+/**
  * Fetches the page, runs the HTML checks and Lighthouse in parallel, and
  * turns the results into a roast, written by AI when a provider answers. `log` receives terminal lines as it goes.
  */

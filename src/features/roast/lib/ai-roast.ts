@@ -60,6 +60,17 @@ Reply with JSON only, no markdown, exactly this shape:
 
 The first six keys are the roast lines for the matching categories in <site_data>. "verdict" sums up the whole site in one or two sentences and ends on the idea that it is fixable.`;
 
+const OWNER_DOMAIN = new URL(config.app.url).hostname.replace(/^www\./, "");
+
+// The roaster's own site gets a victory lap instead of a roast.
+const PRAISE_RULES = `
+
+This site belongs to the developer who built this roaster. Do NOT roast it. Write confident, witty praise instead, with the same specifics: quote its real headline or text and cite its real scores and numbers. If a check failed, spin it as a tiny quirk on an otherwise excellent site, never a flaw. Keep the same JSON shape, length and plain-language rules. "verdict" celebrates the whole site.`;
+
+function isOwnerSite(domain: string) {
+  return domain === OWNER_DOMAIN;
+}
+
 function buildUserPrompt({ roast, checks, copy }: AiRoastInput) {
   const categories = ROAST_CATEGORIES.map(({ key, label }) => ({
     key,
@@ -79,7 +90,10 @@ function buildUserPrompt({ roast, checks, copy }: AiRoastInput) {
     copy,
   };
 
-  return `Roast this website.\n\n<site_data>\n${JSON.stringify(siteData, null, 2)}\n</site_data>`;
+  const task = isOwnerSite(roast.domain)
+    ? "Praise this website."
+    : "Roast this website.";
+  return `${task}\n\n<site_data>\n${JSON.stringify(siteData, null, 2)}\n</site_data>`;
 }
 
 /** Pulls the first JSON object out of a reply, tolerating code fences. */
@@ -111,6 +125,7 @@ type OpenRouterResponse = {
 async function roastWithOpenRouter(
   apiKey: string,
   model: string,
+  systemPrompt: string,
   prompt: string,
   signal: AbortSignal,
 ) {
@@ -125,7 +140,7 @@ async function roastWithOpenRouter(
     body: JSON.stringify({
       model,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
       // With reasoning on, the free Nemotron models often take 45 s or more.
@@ -156,6 +171,9 @@ export async function generateAiRoast(
   if (!apiKey) return null;
 
   const prompt = buildUserPrompt(input);
+  const systemPrompt = isOwnerSite(input.roast.domain)
+    ? SYSTEM_PROMPT + PRAISE_RULES
+    : SYSTEM_PROMPT;
   const deadline = AbortSignal.any([signal, AbortSignal.timeout(AI_BUDGET_MS)]);
 
   for (const model of models) {
@@ -165,6 +183,7 @@ export async function generateAiRoast(
         const roast = await roastWithOpenRouter(
           apiKey,
           model,
+          systemPrompt,
           prompt,
           deadline,
         );
@@ -207,6 +226,7 @@ function tidy(line: string) {
 export function applyAiRoast(roast: RoastResult, ai: AiRoast): RoastResult {
   return {
     ...roast,
+    aiWritten: true,
     verdict: tidy(ai.verdict),
     categories: roast.categories.map((category) => ({
       ...category,
