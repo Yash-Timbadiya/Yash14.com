@@ -11,9 +11,13 @@ import { z } from "zod";
 import { config } from "@/config";
 import { ROAST_CATEGORIES } from "@/features/roast/data/roast-content";
 
-// Free models queue for minutes when busy, and Lighthouse has already used
-// most of the request budget by now, so each model gets a short leash.
-const MODEL_TIMEOUT_MS = 25_000;
+// Free models are slow when busy, so each one gets a minute. The whole AI
+// step is capped too, so retries can't push past the route's maxDuration.
+const MODEL_TIMEOUT_MS = 60_000;
+const AI_BUDGET_MS = 150_000;
+// Free endpoints often answer 429 or 5xx once and succeed right after.
+const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
+const RETRY_DELAY_MS = 800;
 
 const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -94,6 +98,12 @@ function parseAiRoast(text: string): AiRoast | null {
   }
 }
 
+class OpenRouterError extends Error {
+  constructor(readonly status: number) {
+    super(`HTTP ${status}`);
+  }
+}
+
 type OpenRouterResponse = {
   choices?: { message?: { content?: string | null } }[];
 };
@@ -125,7 +135,7 @@ async function roastWithOpenRouter(
     cache: "no-store",
   });
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+    throw new OpenRouterError(response.status);
   }
 
   const data = (await response.json()) as OpenRouterResponse;
@@ -134,7 +144,8 @@ async function roastWithOpenRouter(
 
 /**
  * Personal roast lines written from the audit and the page's own words.
- * Tries each OpenRouter model in order. Null means all of them failed, so
+ * Tries each OpenRouter model in order, retrying a quick 429 or 5xx once.
+ * Null means all of them failed, so
  * the caller keeps the prewritten lines. Never throws.
  */
 export async function generateAiRoast(
@@ -145,17 +156,32 @@ export async function generateAiRoast(
   if (!apiKey) return null;
 
   const prompt = buildUserPrompt(input);
+  const deadline = AbortSignal.any([signal, AbortSignal.timeout(AI_BUDGET_MS)]);
 
   for (const model of models) {
-    if (signal.aborted) return null;
-    try {
-      const roast = await roastWithOpenRouter(apiKey, model, prompt, signal);
-      if (roast) return roast;
-      console.warn(`[roast] ${model} gave no usable roast`);
-    } catch (error) {
-      // The message is enough; a logged DOMException dumps every error code.
-      const reason = error instanceof Error ? error.message : String(error);
-      console.warn(`[roast] ${model} failed: ${reason}`);
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      if (deadline.aborted) return null;
+      try {
+        const roast = await roastWithOpenRouter(
+          apiKey,
+          model,
+          prompt,
+          deadline,
+        );
+        if (roast) return roast;
+        console.warn(`[roast] ${model} gave no usable roast`);
+        break;
+      } catch (error) {
+        // The message is enough; a logged DOMException dumps every error code.
+        const reason = error instanceof Error ? error.message : String(error);
+        console.warn(`[roast] ${model} failed: ${reason}`);
+        // A timeout already spent this model's budget, so only fast errors retry.
+        const retryable =
+          error instanceof OpenRouterError &&
+          RETRYABLE_STATUS.has(error.status);
+        if (!retryable || attempt === 2) break;
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
     }
   }
   return null;

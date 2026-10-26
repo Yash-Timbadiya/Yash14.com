@@ -19,8 +19,8 @@ import {
   setCachedRoast,
 } from "@/features/roast/lib/roast-store";
 
-// Lighthouse can take up to 80 s on heavy sites, then the AI roast up to 50 s.
-export const maxDuration = 150;
+// Lighthouse can take up to 80 s on heavy sites, then the AI roast up to 150 s.
+export const maxDuration = 300;
 
 const bodySchema = z.object({ url: z.string().trim().min(1).max(2048) });
 
