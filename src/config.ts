@@ -36,7 +36,7 @@ export const config = {
       apiKey: process.env.OPENROUTER_API_KEY,
       models: (
         process.env.OPENROUTER_MODELS ||
-        "nvidia/nemotron-3.5-super-vl:free,nvidia/nemotron-3.5-lightning:free"
+        "nvidia/nemotron-3.5-lightning:free,nvidia/nemotron-3.5-super-vl:free"
       )
         .split(",")
         .map((model) => model.trim())
