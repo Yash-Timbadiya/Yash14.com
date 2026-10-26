@@ -1,7 +1,28 @@
 import type { DeadSiteReason, RoastCategoryKey } from "@/features/roast/types";
 
 /** Bump when lines or their order change, so cached roasts are rebuilt. */
-export const ROAST_CONTENT_VERSION = 5;
+export const ROAST_CONTENT_VERSION = 7;
+
+/** Heading over the score dial on the roaster's own site. */
+export const OWNER_GRADE = {
+  label: "Built by the roaster",
+  note: "Nothing to roast here. Obviously.",
+};
+
+/** Used on the roaster's own site when the AI can't write the praise. */
+export const OWNER_PRAISE: Record<RoastCategoryKey | "verdict", string> = {
+  speed:
+    "Shows up fast and gets straight to the point. Visitors see the work before they think about leaving.",
+  seo: "Google knows exactly who this is and what he does. Being found is the easy part here.",
+  copy: "Clear words, no buzzword soup. You know who he is and what he builds in one read.",
+  social:
+    "Share this link anywhere and it arrives dressed properly, title, image and all.",
+  trust:
+    "Real work, real name, real contact. Nothing here makes a visitor hesitate.",
+  mobile: "Works on a phone like it was designed there first. Thumbs approve.",
+  verdict:
+    "The roaster looked hard and found nothing to roast. Turns out the chef cooks well too.",
+};
 
 export const ROAST_CATEGORIES: { key: RoastCategoryKey; label: string }[] = [
   { key: "speed", label: "Load speed" },

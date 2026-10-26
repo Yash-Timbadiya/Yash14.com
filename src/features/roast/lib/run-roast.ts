@@ -3,11 +3,19 @@ import "server-only";
 import type { RoastResult } from "@/features/roast/types";
 
 import { runPageSpeed } from "@/features/roast/lib/pagespeed";
-import { SCAN_QUIPS } from "@/features/roast/data/roast-content";
 import { runPageChecks } from "@/features/roast/lib/page-checks";
 import { extractPageCopy } from "@/features/roast/lib/page-copy";
-import { applyAiRoast, generateAiRoast } from "@/features/roast/lib/ai-roast";
 import { buildRoast, buildDeadRoast } from "@/features/roast/lib/build-roast";
+import {
+  isOwnerSite,
+  applyAiRoast,
+  generateAiRoast,
+} from "@/features/roast/lib/ai-roast";
+import {
+  OWNER_GRADE,
+  OWNER_PRAISE,
+  SCAN_QUIPS,
+} from "@/features/roast/data/roast-content";
 import {
   fetchPage,
   DeadSiteError,
@@ -102,7 +110,23 @@ export async function runRoast(
     log(aiRoast ? SCAN_QUIPS.aiDone : SCAN_QUIPS.aiSkipped);
 
     log(SCAN_QUIPS.compiling);
-    return aiRoast ? applyAiRoast(roast, aiRoast) : roast;
+    const written = aiRoast ? applyAiRoast(roast, aiRoast) : roast;
+    if (!isOwnerSite(domain)) return written;
+
+    // The grade and prewritten lines are all roasts, so the owner's site
+    // gets its own heading, and praise lines when the AI couldn't write them.
+    return {
+      ...written,
+      grade: OWNER_GRADE.label,
+      gradeNote: OWNER_GRADE.note,
+      ...(!aiRoast && {
+        verdict: OWNER_PRAISE.verdict,
+        categories: roast.categories.map((category) => ({
+          ...category,
+          line: OWNER_PRAISE[category.key],
+        })),
+      }),
+    };
   } catch (error) {
     if (!(error instanceof DeadSiteError)) throw error;
 
