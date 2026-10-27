@@ -14,7 +14,7 @@ import { getWordmarkSVG } from "./yt-wordmark";
 import { useRouter } from "@bprogress/next/app";
 import { useTiks } from "@rexa-developer/tiks/react";
 import { motion, useReducedMotion } from "motion/react";
-import { Download, SquareDashed, Type } from "lucide-react";
+import { ArrowUpRight, Download, SquareDashed, Type } from "lucide-react";
 import { ANALYTICS_EVENTS, ANALYTICS_SOURCES } from "@/lib/analytics-events";
 import {
   ContextMenu,
@@ -91,6 +91,22 @@ export function BrandContextMenu({
           <BrandMenuItem
             onActivate={activateFromElement}
             onSelect={() => {
+              trackEvent(ANALYTICS_EVENTS.VIEW_HOME, {
+                section,
+                source: ANALYTICS_SOURCES.LOGO_MENU,
+              });
+              window.open("/", "_blank", "noopener");
+            }}
+          >
+            <ArrowUpRight />
+            Open in New Tab
+          </BrandMenuItem>
+
+          <ContextMenuSeparator />
+
+          <BrandMenuItem
+            onActivate={activateFromElement}
+            onSelect={() => {
               trackEvent(ANALYTICS_EVENTS.COPY_MARK_SVG, {
                 section,
                 source: ANALYTICS_SOURCES.LOGO_MENU,
@@ -120,22 +136,6 @@ export function BrandContextMenu({
             Copy Logotype as SVG
           </BrandMenuItem>
 
-          <ContextMenuSeparator />
-
-          <BrandMenuItem
-            onActivate={activateFromElement}
-            onSelect={() => {
-              trackEvent(ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES, {
-                section,
-                source: ANALYTICS_SOURCES.LOGO_MENU,
-              });
-              router.push("/brand-guidelines");
-            }}
-          >
-            <SquareDashed />
-            Brand Guidelines
-          </BrandMenuItem>
-
           <BrandMenuItem
             onActivate={activateFromElement}
             onSelect={() => {
@@ -152,6 +152,22 @@ export function BrandContextMenu({
           >
             <Download />
             Download Brand Assets
+          </BrandMenuItem>
+
+          <ContextMenuSeparator />
+
+          <BrandMenuItem
+            onActivate={activateFromElement}
+            onSelect={() => {
+              trackEvent(ANALYTICS_EVENTS.VIEW_BRAND_GUIDELINES, {
+                section,
+                source: ANALYTICS_SOURCES.LOGO_MENU,
+              });
+              router.push("/brand-guidelines");
+            }}
+          >
+            <SquareDashed />
+            Visit Brand Guidelines
           </BrandMenuItem>
         </div>
       </ContextMenuContent>

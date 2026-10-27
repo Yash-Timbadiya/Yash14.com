@@ -53,6 +53,7 @@ import {
   CornerDownLeftIcon,
   DownloadIcon,
   FileTextIcon,
+  FlameIcon,
   LineChartIcon,
   MonitorIcon,
   MoonStarIcon,
@@ -107,6 +108,15 @@ const MENU_LINKS: CommandLinkItem[] = [
     shortcut: "GB",
     keywords: ["links", "resources", "reading"],
     event: ANALYTICS_EVENTS.VIEW_BOOKMARKS,
+  },
+  {
+    title: "Roast My Site",
+    href: "/roast",
+    kind: "page",
+    icon: <FlameIcon />,
+    shortcut: "GR",
+    keywords: ["roast", "audit", "website", "seo", "lighthouse", "review"],
+    event: ANALYTICS_EVENTS.VIEW_ROAST,
   },
 ];
 

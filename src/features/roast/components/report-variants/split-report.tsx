@@ -8,13 +8,14 @@ import { CategoryList } from "@/features/roast/components/category-list";
 import { FinalVerdict } from "@/features/roast/components/final-verdict";
 import { LighthouseGauges } from "@/features/roast/components/score-summary";
 
-/** Split layout: the score column on the left, the categories on the right. */
+/** Split layout: a score column that stays in view, the categories beside it. */
 export function SplitReport({ result }: ReportVariantProps) {
   return (
     <section>
       <div className="screen-line-bottom grid md:grid-cols-[18rem_1fr]">
         <aside className="border-b border-line p-4 md:border-r md:border-b-0">
-          <div className="space-y-5">
+          {/* Stays in view below the sticky site header while the rows scroll. */}
+          <div className="space-y-5 md:sticky md:top-[calc(var(--header-height)+1rem)]">
             <ScoreSpeedometer result={result} />
             <div className="space-y-1 text-center md:text-left">
               <p className="text-2xl font-medium tracking-tight">
