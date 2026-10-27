@@ -56,11 +56,11 @@ const DUST = (() => {
 
 /** A solid brand block that asks for the fix after the verdict. */
 export function FixCta({
-  mailto,
+  href,
   onFixClick,
   onRoastAnother,
 }: {
-  mailto: string;
+  href: string;
   onFixClick: () => void;
   onRoastAnother: () => void;
 }) {
@@ -83,7 +83,12 @@ export function FixCta({
             size="lg"
             className="bg-background text-foreground hover:bg-background/90 brand:bg-white brand:text-[#ff4d00] brand:hover:bg-white/90"
           >
-            <a href={mailto} onClick={onFixClick}>
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onFixClick}
+            >
               Get it fixed
               <ArrowRightIcon />
             </a>

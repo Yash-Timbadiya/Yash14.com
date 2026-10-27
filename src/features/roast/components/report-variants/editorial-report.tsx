@@ -5,41 +5,33 @@ import type { RoastCategory } from "@/features/roast/types";
 
 import { cn } from "@/lib/utils";
 import { useId, useState } from "react";
-import {
-  Reveal,
-  toneFor,
-  TONE_TEXT,
-  ReportCta,
-  IssueFixes,
-  ACCENT_TEXT,
-  ScannedNote,
-} from "./shared";
+import { ReportHeader } from "./report-header";
+import { ScoreSpeedometer } from "./score-speedometer";
+import { Reveal, toneFor, TONE_TEXT, IssueFixes, ACCENT_TEXT } from "./shared";
 
-/** Variant 5: a magazine feature. The verdict is the headline, categories are numbered sections. */
-export function EditorialReport({
-  result,
-  onRoastAnother,
-}: ReportVariantProps) {
+/** A magazine feature. The verdict is the headline, categories are numbered sections. */
+export function EditorialReport({ result }: ReportVariantProps) {
   return (
     <section>
-      <header className="screen-line-bottom space-y-4 p-4 sm:p-6">
-        <p className="font-mono text-xs tracking-[0.25em] text-muted-foreground uppercase">
-          The roast · Issue {result.score}
-        </p>
-        <h2 className="font-serif text-3xl leading-tight text-balance sm:text-5xl">
-          {result.verdict}
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          A review of{" "}
-          <span className={cn("font-medium", ACCENT_TEXT)}>
-            {result.domain}
-          </span>{" "}
-          · scored{" "}
-          <span className="font-medium text-foreground">
-            {result.score}/100
-          </span>{" "}
-          · {result.grade.toLowerCase()}
-        </p>
+      <ReportHeader result={result} />
+
+      <header className="screen-line-bottom grid items-center gap-6 p-4 sm:grid-cols-[1fr_14rem] sm:p-6">
+        <div className="space-y-4">
+          <p className="font-mono text-xs tracking-[0.25em] text-muted-foreground uppercase">
+            The roast · Issue {result.score}
+          </p>
+          <h3 className="font-serif text-3xl leading-tight text-balance sm:text-4xl">
+            {result.verdict}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            A review of{" "}
+            <span className={cn("font-medium", ACCENT_TEXT)}>
+              {result.domain}
+            </span>{" "}
+            · {result.grade}. {result.gradeNote}
+          </p>
+        </div>
+        <ScoreSpeedometer result={result} className="max-sm:order-first" />
       </header>
 
       {result.lighthouse && (
@@ -52,15 +44,15 @@ export function EditorialReport({
               ["SEO", result.lighthouse.seo],
             ] as const
           ).map(([label, value]) => (
-            <div key={label} className="p-3">
+            <div key={label} className="flex flex-col-reverse p-3">
+              <dt className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+                {label}
+              </dt>
               <dd
                 className={cn("font-serif text-2xl", TONE_TEXT[toneFor(value)])}
               >
                 {value}
               </dd>
-              <dt className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-                {label}
-              </dt>
             </div>
           ))}
         </dl>
@@ -75,15 +67,6 @@ export function EditorialReport({
           />
         ))}
       </ol>
-
-      <ReportCta
-        result={result}
-        onRoastAnother={onRoastAnother}
-        title="Letters to the editor: fixes welcome."
-      />
-      <div className="px-4 pb-4">
-        <ScannedNote result={result} />
-      </div>
     </section>
   );
 }

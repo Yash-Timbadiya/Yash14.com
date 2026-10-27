@@ -12,6 +12,8 @@ import {
   GaugeStack,
   GaugeTrack,
   GaugeValue,
+  GaugeHub,
+  GaugeNeedle,
   GaugeTickLabels,
 } from "@/components/gauge";
 
@@ -57,9 +59,12 @@ export function ScoreSummary({ result }: { result: RoastResult }) {
  */
 export function LighthouseGauges({
   result,
+  needle = false,
   className,
 }: {
   result: RoastResult;
+  /** Point a needle at each score, like the main speedometer. */
+  needle?: boolean;
   className?: string;
 }) {
   if (!result.lighthouse) {
@@ -90,7 +95,7 @@ export function LighthouseGauges({
           <dt className="mt-1 font-mono text-[11px] leading-4 text-muted-foreground">
             {label}
           </dt>
-          <dd className="h-13 w-full max-w-24">
+          <dd className="flex w-full max-w-24 flex-col items-center">
             <Gauge
               value={value}
               initialValue={0}
@@ -103,7 +108,7 @@ export function LighthouseGauges({
               aria-label={`Lighthouse ${label} ${value} out of 100`}
               // Colour lives in the progress; the number stays neutral.
               // Fixed box height keeps the row on whole pixels; the dial scales to fit.
-              className={cn(ACCENT, "h-full")}
+              className={cn(ACCENT, "h-13")}
             >
               <GaugeTrack width={34} opacity={TINT.rest} cap="butt" />
               <GaugeArc width={34} cap="butt" />
@@ -113,14 +118,32 @@ export function LighthouseGauges({
                 width={6}
                 color="var(--muted-foreground)"
               />
-              <GaugeValue
-                y={-12}
-                fontSize={84}
-                font="mono"
-                color="var(--foreground)"
-                format={(v) => `${Math.round(v)}%`}
-              />
+              {needle ? (
+                <>
+                  <GaugeNeedle
+                    style="line"
+                    length={0.8}
+                    width={12}
+                    color="var(--foreground)"
+                  />
+                  <GaugeHub radius={20} color="var(--foreground)" />
+                </>
+              ) : (
+                <GaugeValue
+                  y={-12}
+                  fontSize={84}
+                  font="mono"
+                  color="var(--foreground)"
+                  format={(v) => `${Math.round(v)}%`}
+                />
+              )}
             </Gauge>
+            {/* A full needle runs through the centre, so the number sits below. */}
+            {needle && (
+              <span className="mt-0.5 font-mono text-sm leading-4 font-semibold tabular-nums">
+                {value}%
+              </span>
+            )}
           </dd>
         </div>
       ))}

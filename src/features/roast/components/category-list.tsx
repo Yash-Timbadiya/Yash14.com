@@ -14,16 +14,24 @@ import {
 } from "@/features/roast/components/report-variants/shared";
 
 /**
- * Full-width category rows: label and roast line on the left, bar and score
- * on the right. Rows with problems open to show their fixes.
+ * `bar` puts a score bar and number beside the line. `watermark` gives the
+ * line the full width and prints the score huge and faded behind the row.
+ */
+export type CategoryScoreStyle = "bar" | "watermark";
+
+/**
+ * Full-width category rows: label and roast line on the left, the score on
+ * the right. Rows with problems open to show their fixes.
  */
 export function CategoryList({
   categories,
   onFixesOpened,
+  scoreStyle = "bar",
   className,
 }: {
   categories: RoastCategory[];
   onFixesOpened?: (category: RoastCategory) => void;
+  scoreStyle?: CategoryScoreStyle;
   className?: string;
 }) {
   return (
@@ -32,6 +40,7 @@ export function CategoryList({
         <CategoryRow
           key={category.key}
           category={category}
+          scoreStyle={scoreStyle}
           onOpen={() => onFixesOpened?.(category)}
         />
       ))}
@@ -41,9 +50,11 @@ export function CategoryList({
 
 function CategoryRow({
   category,
+  scoreStyle,
   onOpen,
 }: {
   category: RoastCategory;
+  scoreStyle: CategoryScoreStyle;
   onOpen: () => void;
 }) {
   const contentId = useId();
@@ -64,17 +75,49 @@ function CategoryRow({
         className={cn(
           "flex w-full items-center gap-4 border-b-2 border-dashed border-transparent p-4 text-left hover:bg-muted/40 disabled:hover:bg-transparent",
           open && "border-line",
+          scoreStyle === "watermark" && "relative isolate overflow-hidden",
         )}
       >
-        <div className="min-w-0 flex-1 space-y-1">
-          <p className="font-mono text-xs tracking-wide uppercase">
+        {scoreStyle === "watermark" && (
+          <span
+            aria-hidden
+            className={cn(
+              "pointer-events-none absolute top-2 right-2 -z-10 font-sans text-3xl leading-none font-bold tracking-tighter tabular-nums opacity-20 select-none sm:text-5xl",
+              ACCENT_TEXT,
+            )}
+          >
+            {category.score}
+          </span>
+        )}
+        <div
+          className={cn(
+            "min-w-0 flex-1 space-y-1",
+            // Keeps the text clear of the score; the chevron covers the rest of its width.
+            scoreStyle === "watermark" && "pr-0 sm:pr-22",
+          )}
+        >
+          <p className="flex items-center gap-1.5 font-mono text-xs tracking-wide uppercase">
             {category.label}
+            {scoreStyle === "watermark" && (
+              <>
+                <span className="sr-only">
+                  , scored {category.score} of 100
+                </span>
+                {/* Beside the heading, since the score holds the right edge. */}
+                {hasIssues && <RowChevron open={open} />}
+              </>
+            )}
           </p>
           <p className="font-serif text-base text-pretty text-muted-foreground italic">
             {category.line}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div
+          className={cn(
+            "flex items-center gap-3",
+            scoreStyle === "watermark" && "hidden",
+          )}
+        >
           <div
             aria-hidden
             className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-muted sm:block"
@@ -93,13 +136,9 @@ function CategoryRow({
             {category.score}
           </span>
         </div>
-        <ChevronDownIcon
-          className={cn(
-            "size-4 shrink-0 text-muted-foreground transition-transform",
-            open && "rotate-180",
-            !hasIssues && "invisible",
-          )}
-        />
+        {scoreStyle === "bar" && (
+          <RowChevron open={open} className={cn(!hasIssues && "invisible")} />
+        )}
       </button>
       {hasIssues && (
         <Reveal open={open} id={contentId}>
@@ -115,5 +154,23 @@ function CategoryRow({
         </Reveal>
       )}
     </li>
+  );
+}
+
+function RowChevron({
+  open,
+  className,
+}: {
+  open: boolean;
+  className?: string;
+}) {
+  return (
+    <ChevronDownIcon
+      className={cn(
+        "size-4 shrink-0 text-muted-foreground transition-transform",
+        open && "rotate-180",
+        className,
+      )}
+    />
   );
 }
