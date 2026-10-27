@@ -23,7 +23,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "speed",
       label: "Load speed",
       score: 47,
-      line: "Even turtles use your site as a benchmark for taking things slow.",
+      line: "Your page takes 4.6 seconds to show up, and the HTML alone weighs 596 KB. That is",
       passedCount: 2,
       issues: [
         {
@@ -85,7 +85,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "seo",
       label: "SEO",
       score: 100,
-      line: "Google loves you. Now give the humans it sends a reason to stay.",
+      line: 'Perfect 100 for search, so Google finds you every time. Then visitors land on "Full Stack Developer & Design Engineer", a title fifty thousand portfolios share. Google sent them here. Give them a reason to remember you.',
       passedCount: 9,
       issues: [],
     },
@@ -93,7 +93,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "copy",
       label: "Copywriting",
       score: 100,
-      line: "Clear words, perfect score. Clear isn't the same as convincing, though.",
+      line: '485 words, no typos, nothing repeated. Clean copy. But "pixel-perfect" and "attention to detail" are what every developer promises. Show one result you got a client and it beats both phrases put together.',
       passedCount: 4,
       issues: [],
     },
@@ -101,7 +101,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "social",
       label: "Social previews",
       score: 100,
-      line: "Perfect previews. Pretty wrapping only works if the gift inside is worth opening.",
+      line: "Share this link anywhere and it shows up dressed properly, title, image and a 140 character description. Pretty wrapping. Now make sure the page behind it loads before the curious click gets bored.",
       passedCount: 5,
       issues: [],
     },
@@ -109,7 +109,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "trust",
       label: "Trust",
       score: 100,
-      line: "Nothing broken, nothing scary. Safe is the floor, not the finish line.",
+      line: "Secure connection, no broken links, a favicon that shows up. Nothing here scares a visitor off. But safe is the floor, not the finish line. A few client logos or one testimonial would do the actual convincing.",
       passedCount: 5,
       issues: [],
     },
@@ -117,7 +117,7 @@ export const SAMPLE_ROAST_RESULT: RoastResult = {
       key: "mobile",
       label: "Mobile & a11y",
       score: 87,
-      line: "Almost phone-friendly. Thumbs still find every rough edge you missed.",
+      line: 'Works on a phone and nothing jumps around while it loads. But 4% of 82 images have no description, so screen readers announce them as "image" and move on. Small gap, easy fix, and it opens the site to everyone.',
       passedCount: 5,
       issues: [
         {
