@@ -273,15 +273,6 @@ function RoastReport({
           <span className="min-w-0 break-all">{result.domain}</span>
         </h2>
         <div className="flex shrink-0 items-center gap-2">
-          <VisitSiteButton
-            result={result}
-            onVisit={() =>
-              trackEvent(ANALYTICS_EVENTS.ROAST_VISIT_SITE, {
-                section: SECTION,
-                domain: result.domain,
-              })
-            }
-          />
           <ExportMenu
             result={result}
             onExport={(format) =>
@@ -289,6 +280,15 @@ function RoastReport({
                 section: SECTION,
                 domain: result.domain,
                 format,
+              })
+            }
+          />
+          <VisitSiteButton
+            result={result}
+            onVisit={() =>
+              trackEvent(ANALYTICS_EVENTS.ROAST_VISIT_SITE, {
+                section: SECTION,
+                domain: result.domain,
               })
             }
           />

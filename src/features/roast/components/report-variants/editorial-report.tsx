@@ -6,57 +6,36 @@ import type { RoastCategory } from "@/features/roast/types";
 import { cn } from "@/lib/utils";
 import { useId, useState } from "react";
 import { ReportHeader } from "./report-header";
-import { ScoreSpeedometer } from "./score-speedometer";
-import { Reveal, toneFor, TONE_TEXT, IssueFixes, ACCENT_TEXT } from "./shared";
+import { Reveal, toneFor, TONE_TEXT, IssueFixes } from "./shared";
+import { ClimateScoreDial, LighthouseKnobs } from "./editorial-gauges";
+import { FinalVerdict } from "@/features/roast/components/final-verdict";
 
-/** A magazine feature. The verdict is the headline, categories are numbered sections. */
+/**
+ * A magazine feature: the grade is the headline beside the score dial,
+ * categories are numbered sections, and the verdict closes it as a quote.
+ */
 export function EditorialReport({ result }: ReportVariantProps) {
   return (
     <section>
       <ReportHeader result={result} />
 
       <header className="screen-line-bottom grid items-center gap-6 p-4 sm:grid-cols-[1fr_14rem] sm:p-6">
-        <div className="space-y-4">
-          <p className="font-mono text-xs tracking-[0.25em] text-muted-foreground uppercase">
-            The roast · Issue {result.score}
-          </p>
+        <div className="space-y-2">
           <h3 className="font-serif text-3xl leading-tight text-balance sm:text-4xl">
-            {result.verdict}
+            {result.grade}
           </h3>
-          <p className="text-sm text-muted-foreground">
-            A review of{" "}
-            <span className={cn("font-medium", ACCENT_TEXT)}>
-              {result.domain}
-            </span>{" "}
-            · {result.grade}. {result.gradeNote}
-          </p>
+          <p className="text-muted-foreground">{result.gradeNote}</p>
         </div>
-        <ScoreSpeedometer result={result} className="max-sm:order-first" />
+        <ClimateScoreDial
+          result={result}
+          className="justify-self-center max-sm:order-first"
+        />
       </header>
 
-      {result.lighthouse && (
-        <dl className="screen-line-bottom grid grid-cols-4 divide-x divide-line text-center">
-          {(
-            [
-              ["Perf", result.lighthouse.performance],
-              ["A11y", result.lighthouse.accessibility],
-              ["Best", result.lighthouse.bestPractices],
-              ["SEO", result.lighthouse.seo],
-            ] as const
-          ).map(([label, value]) => (
-            <div key={label} className="flex flex-col-reverse p-3">
-              <dt className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-                {label}
-              </dt>
-              <dd
-                className={cn("font-serif text-2xl", TONE_TEXT[toneFor(value)])}
-              >
-                {value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      )}
+      <LighthouseKnobs
+        result={result}
+        className="screen-line-bottom divide-line sm:grid-cols-4 sm:divide-x"
+      />
 
       <ol className="screen-line-bottom divide-y divide-line">
         {result.categories.map((category, i) => (
@@ -67,6 +46,10 @@ export function EditorialReport({ result }: ReportVariantProps) {
           />
         ))}
       </ol>
+
+      <div className="screen-line-bottom">
+        <FinalVerdict result={result} />
+      </div>
     </section>
   );
 }
@@ -119,13 +102,19 @@ function EditorialSection({
                 issues={category.issues}
                 className="mt-3 border-l border-line pl-4"
               />
+              {category.passedCount > 0 && (
+                <p className="mt-3 pl-4 font-mono text-xs text-muted-foreground">
+                  {category.passedCount} other check
+                  {category.passedCount === 1 ? "" : "s"} passed.
+                </p>
+              )}
             </Reveal>
           </>
-        ) : (
+        ) : category.passedCount > 0 ? (
           <p className="mt-3 font-mono text-xs text-muted-foreground">
             All {category.passedCount} checks passed.
           </p>
-        )}
+        ) : null}
       </div>
     </li>
   );

@@ -15,8 +15,8 @@ export function ReportHeader({ result }: { result: RoastResult }) {
         <span className="min-w-0 break-all">{result.domain}</span>
       </h2>
       <div className="flex shrink-0 items-center gap-2">
-        <VisitSiteButton result={result} />
         <ExportMenu result={result} />
+        <VisitSiteButton result={result} />
       </div>
     </div>
   );

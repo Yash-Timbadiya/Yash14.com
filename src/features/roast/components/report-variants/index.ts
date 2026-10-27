@@ -23,7 +23,7 @@ export const REPORT_VARIANTS: ReportVariant[] = [
     slug: "editorial",
     name: "Editorial",
     description:
-      "A magazine feature: the verdict is the headline beside the speedometer, categories are numbered sections with footnotes.",
+      "A magazine feature: the grade is the headline beside a thermostat score dial, Lighthouse scores are volume knobs, categories are numbered sections, the verdict closes it.",
     Component: EditorialReport,
   },
 ];
