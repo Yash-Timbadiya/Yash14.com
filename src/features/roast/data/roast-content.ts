@@ -1,7 +1,11 @@
-import type { DeadSiteReason, RoastCategoryKey } from "@/features/roast/types";
+import type {
+  AiCategoryKey,
+  DeadSiteReason,
+  RoastCategoryKey,
+} from "@/features/roast/types";
 
 /** Bump when lines or their order change, so cached roasts are rebuilt. */
-export const ROAST_CONTENT_VERSION = 7;
+export const ROAST_CONTENT_VERSION = 8;
 
 /** Heading over the score dial on the roaster's own site. */
 export const OWNER_GRADE = {
@@ -32,6 +36,23 @@ export const ROAST_CATEGORIES: { key: RoastCategoryKey; label: string }[] = [
   { key: "trust", label: "Trust" },
   { key: "mobile", label: "Mobile & a11y" },
 ];
+
+/** Added after the checked categories when the AI writes and scores them. */
+export const AI_CATEGORIES: { key: AiCategoryKey; label: string }[] = [
+  { key: "design", label: "Design" },
+  { key: "ux", label: "User experience" },
+  { key: "technical", label: "Technical" },
+  { key: "accessibility", label: "Accessibility" },
+  { key: "business", label: "Business" },
+  { key: "originality", label: "Originality" },
+  { key: "wildcard", label: "Wildcard" },
+];
+
+export function isCheckedCategory(
+  key: RoastCategoryKey | AiCategoryKey,
+): key is RoastCategoryKey {
+  return ROAST_CATEGORIES.some((category) => category.key === key);
+}
 
 export type RoastTier = "brutal" | "harsh" | "mild";
 

@@ -8,6 +8,16 @@ export type RoastCategoryKey =
   | "trust"
   | "mobile";
 
+/** Sections only the AI writes and scores; no checks stand behind them. */
+export type AiCategoryKey =
+  | "design"
+  | "ux"
+  | "technical"
+  | "accessibility"
+  | "business"
+  | "originality"
+  | "wildcard";
+
 export type RoastCheck = {
   id: string;
   category: RoastCategoryKey;
@@ -20,9 +30,11 @@ export type RoastCheck = {
 };
 
 export type RoastCategory = {
-  key: RoastCategoryKey;
+  key: RoastCategoryKey | AiCategoryKey;
   label: string;
   score: number;
+  /** True when the AI gave the score, so no checks or fixes stand behind it. */
+  aiScored?: boolean;
   line: string;
   /** Failing and warning checks, worst first. */
   issues: RoastCheck[];

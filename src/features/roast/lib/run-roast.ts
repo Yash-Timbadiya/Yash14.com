@@ -12,15 +12,16 @@ import {
   generateAiRoast,
 } from "@/features/roast/lib/ai-roast";
 import {
-  OWNER_GRADE,
-  OWNER_PRAISE,
-  SCAN_QUIPS,
-} from "@/features/roast/data/roast-content";
-import {
   fetchPage,
   DeadSiteError,
   assertPublicHost,
 } from "@/features/roast/lib/safe-fetch";
+import {
+  OWNER_GRADE,
+  OWNER_PRAISE,
+  isCheckedCategory,
+  SCAN_QUIPS,
+} from "@/features/roast/data/roast-content";
 
 /** Stable cache key: no hash, no trailing slash, sorted query. */
 export function normalizeRoastUrl(url: URL) {
@@ -123,7 +124,9 @@ export async function runRoast(
         verdict: OWNER_PRAISE.verdict,
         categories: roast.categories.map((category) => ({
           ...category,
-          line: OWNER_PRAISE[category.key],
+          line: isCheckedCategory(category.key)
+            ? OWNER_PRAISE[category.key]
+            : category.line,
         })),
       }),
     };
