@@ -16,7 +16,9 @@ export function FinalVerdict({ result }: { result: RoastResult }) {
       >
         &ldquo;
       </span>
-      <blockquote className="relative font-serif text-2xl text-balance italic sm:text-3xl">
+      {/* The verdict is capped at 180 characters upstream; the clamp only
+          catches a reply that slipped past it. */}
+      <blockquote className="relative font-serif text-xl text-balance italic sm:line-clamp-3 sm:text-2xl">
         {result.verdict}
       </blockquote>
       <figcaption className="relative mt-4 flex items-baseline justify-between gap-4">

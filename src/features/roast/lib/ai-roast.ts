@@ -33,6 +33,8 @@ const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 // means the model found no evidence for that section, which the prompt allows.
 const roastLine = z.string().trim().max(1000).catch("");
 const MAX_LINE_CHARS = 280;
+// The verdict is a big pull quote that has to fit in three lines.
+const MAX_VERDICT_CHARS = 180;
 
 // Models send scores as numbers, numeric strings or null; anything else is
 // treated as no score rather than failing the whole reply.
@@ -230,14 +232,14 @@ export async function generateAiRoast(
  * Models ignore the no-em-dash and length rules often enough to enforce them
  * here. Keeps whole sentences up to the limit, and always at least the first.
  */
-function tidy(line: string) {
+function tidy(line: string, maxChars = MAX_LINE_CHARS) {
   const sentences = line
     .replace(/\s+[-—–]\s+|\s*[—–]\s*/g, ", ")
     .split(/(?<=[.!?])\s+/);
 
   let result = sentences[0];
   for (const sentence of sentences.slice(1)) {
-    if (result.length + sentence.length + 1 > MAX_LINE_CHARS) break;
+    if (result.length + sentence.length + 1 > maxChars) break;
     result = `${result} ${sentence}`;
   }
   return result;
@@ -274,7 +276,7 @@ export function applyAiRoast(roast: RoastResult, ai: AiRoast): RoastResult {
   return {
     ...roast,
     aiWritten: true,
-    verdict: tidy(ai.verdict),
-    categories: [...checked, ...aiOnly],
+    verdict: tidy(ai.verdict, MAX_VERDICT_CHARS),
+    categories: [...aiOnly, ...checked],
   };
 }

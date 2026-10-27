@@ -3,6 +3,7 @@
 import type { RoastResult } from "@/features/roast/types";
 
 import { ExportMenu } from "@/features/roast/components/export-menu";
+import { VisitSiteButton } from "@/features/roast/components/visit-site-button";
 import { AnimatedFlameIcon } from "@/features/roast/components/animated-flame-icon";
 
 /** The live report's top row: the roasted domain and the Export menu. */
@@ -13,7 +14,10 @@ export function ReportHeader({ result }: { result: RoastResult }) {
         <AnimatedFlameIcon className="size-[0.8em] shrink-0 text-foreground brand:text-[#ff4d00]" />
         <span className="min-w-0 break-all">{result.domain}</span>
       </h2>
-      <ExportMenu result={result} />
+      <div className="flex shrink-0 items-center gap-2">
+        <VisitSiteButton result={result} />
+        <ExportMenu result={result} />
+      </div>
     </div>
   );
 }

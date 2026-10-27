@@ -98,14 +98,6 @@ function CategoryRow({
         >
           <p className="flex items-center gap-1.5 font-mono text-xs tracking-wide uppercase">
             {category.label}
-            {category.aiScored && (
-              <span
-                title="Scored by the AI from the page, not by a measured check"
-                className="rounded-sm border border-line px-1 py-px text-[10px] leading-none tracking-normal text-muted-foreground normal-case"
-              >
-                AI score
-              </span>
-            )}
             {scoreStyle === "watermark" && (
               <>
                 <span className="sr-only">

@@ -19,6 +19,7 @@ import { FinalVerdict } from "@/features/roast/components/final-verdict";
 import { ScoreSummary } from "@/features/roast/components/score-summary";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
+import { VisitSiteButton } from "@/features/roast/components/visit-site-button";
 import { AnimatedFlameIcon } from "@/features/roast/components/animated-flame-icon";
 
 const SECTION = ANALYTICS_SECTIONS.ROAST_PAGE;
@@ -40,9 +41,6 @@ export function RoastApp() {
     if (!trimmed) return;
 
     const request = ++roastRequest.current;
-    // The domain moves into the result heading, so the box empties (with the
-    // dissolve) and is ready for the next URL.
-    setInput("");
     syncUrlParam(trimmed);
     trackEvent(ANALYTICS_EVENTS.ROAST_SUBMITTED, {
       section: SECTION,
@@ -59,15 +57,17 @@ export function RoastApp() {
         dead: roasted.dead?.reason ?? null,
         cached: roasted.cached,
       });
+      // The URL stays in the box while it's roasted. Once the domain moves
+      // into the result heading, the box empties (with the dissolve), unless
+      // a newer roast or "Roast another" has taken over since.
+      if (request === roastRequest.current) setInput("");
       requestAnimationFrame(() => resultHeadingRef.current?.focus());
     } else {
       trackEvent(ANALYTICS_EVENTS.ROAST_FAILED, {
         section: SECTION,
         url: trimmed,
       });
-      // Give the URL back so it can be fixed or retried, unless a newer roast
-      // or "Roast another" has taken over since.
-      if (request === roastRequest.current) setInput(trimmed);
+      // The URL is still in the box, so it can be fixed or retried.
     }
   }
 
@@ -272,16 +272,27 @@ function RoastReport({
           <AnimatedFlameIcon className="size-[0.8em] shrink-0 text-foreground brand:text-[#ff4d00]" />
           <span className="min-w-0 break-all">{result.domain}</span>
         </h2>
-        <ExportMenu
-          result={result}
-          onExport={(format) =>
-            trackEvent(ANALYTICS_EVENTS.ROAST_EXPORT, {
-              section: SECTION,
-              domain: result.domain,
-              format,
-            })
-          }
-        />
+        <div className="flex shrink-0 items-center gap-2">
+          <VisitSiteButton
+            result={result}
+            onVisit={() =>
+              trackEvent(ANALYTICS_EVENTS.ROAST_VISIT_SITE, {
+                section: SECTION,
+                domain: result.domain,
+              })
+            }
+          />
+          <ExportMenu
+            result={result}
+            onExport={(format) =>
+              trackEvent(ANALYTICS_EVENTS.ROAST_EXPORT, {
+                section: SECTION,
+                domain: result.domain,
+                format,
+              })
+            }
+          />
+        </div>
       </div>
 
       <ScoreSummary result={result} />
