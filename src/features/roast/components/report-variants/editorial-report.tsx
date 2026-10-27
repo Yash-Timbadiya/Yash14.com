@@ -6,6 +6,7 @@ import type { RoastCategory } from "@/features/roast/types";
 import { cn } from "@/lib/utils";
 import { useId, useState } from "react";
 import { ReportHeader } from "./report-header";
+import { Separator } from "@/components/section-separator";
 import { Reveal, toneFor, TONE_TEXT, IssueFixes } from "./shared";
 import { ClimateScoreDial, LighthouseKnobs } from "./editorial-gauges";
 import { FinalVerdict } from "@/features/roast/components/final-verdict";
@@ -14,10 +15,13 @@ import { FinalVerdict } from "@/features/roast/components/final-verdict";
  * A magazine feature: the grade is the headline beside the score dial,
  * categories are numbered sections, and the verdict closes it as a quote.
  */
-export function EditorialReport({ result }: ReportVariantProps) {
+export function EditorialReport({
+  result,
+  showHeader = true,
+}: ReportVariantProps) {
   return (
     <section>
-      <ReportHeader result={result} />
+      {showHeader && <ReportHeader result={result} />}
 
       <header className="screen-line-bottom grid items-center gap-6 p-4 sm:grid-cols-[1fr_14rem] sm:p-6">
         <div className="space-y-2">
@@ -37,6 +41,8 @@ export function EditorialReport({ result }: ReportVariantProps) {
         className="screen-line-bottom divide-line sm:grid-cols-4 sm:divide-x"
       />
 
+      <Separator className="screen-line-bottom border-x-0" />
+
       <ol className="screen-line-bottom divide-y divide-line">
         {result.categories.map((category, i) => (
           <EditorialSection
@@ -46,6 +52,8 @@ export function EditorialReport({ result }: ReportVariantProps) {
           />
         ))}
       </ol>
+
+      <Separator className="screen-line-bottom border-x-0" />
 
       <div className="screen-line-bottom">
         <FinalVerdict result={result} />

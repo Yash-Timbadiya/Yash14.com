@@ -4,15 +4,16 @@ import type { ReportVariantProps } from "./shared";
 
 import { ReportHeader } from "./report-header";
 import { ScoreSpeedometer } from "./score-speedometer";
+import { Separator } from "@/components/section-separator";
 import { CategoryList } from "@/features/roast/components/category-list";
 import { FinalVerdict } from "@/features/roast/components/final-verdict";
 import { LighthouseGauges } from "@/features/roast/components/score-summary";
 
 /** Split layout: the score column on the left, the categories on the right. */
-export function SplitReport({ result }: ReportVariantProps) {
+export function SplitReport({ result, showHeader = true }: ReportVariantProps) {
   return (
     <section>
-      <ReportHeader result={result} />
+      {showHeader && <ReportHeader result={result} />}
 
       <div className="screen-line-bottom grid md:grid-cols-[18rem_1fr]">
         <aside className="border-b border-line p-4 md:border-r md:border-b-0">
@@ -37,6 +38,8 @@ export function SplitReport({ result }: ReportVariantProps) {
 
         <CategoryList categories={result.categories} scoreStyle="watermark" />
       </div>
+
+      <Separator className="screen-line-bottom border-x-0" />
 
       <div className="screen-line-bottom">
         <FinalVerdict result={result} />

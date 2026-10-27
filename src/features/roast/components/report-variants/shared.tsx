@@ -7,6 +7,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 export type ReportVariantProps = {
   result: RoastResult;
+  /** False when the page draws its own header row above the report. */
+  showHeader?: boolean;
 };
 
 export const EASE_OUT = [0.22, 1, 0.36, 1] as const;

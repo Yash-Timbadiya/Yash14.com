@@ -21,9 +21,16 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { VisitSiteButton } from "@/features/roast/components/visit-site-button";
 import { AnimatedFlameIcon } from "@/features/roast/components/animated-flame-icon";
+import { SplitReport } from "@/features/roast/components/report-variants/split-report";
+import { EditorialReport } from "@/features/roast/components/report-variants/editorial-report";
+import {
+  type RoastView,
+  ViewModeMenu,
+} from "@/features/roast/components/view-mode-menu";
 
 const SECTION = ANALYTICS_SECTIONS.ROAST_PAGE;
 const URL_PARAM = "url";
+const VIEW_STORAGE_KEY = "roast-view";
 // Brand mode gets the flame orange; monochrome keeps the theme's own primary
 // (black in light mode, white in dark mode).
 const ROAST_BUTTON_CLASS =
@@ -172,6 +179,31 @@ export function RoastApp() {
   );
 }
 
+/** The chosen report layout, remembered in this browser for the next roast. */
+function useRoastView() {
+  const [view, setView] = useState<RoastView>("roast");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(VIEW_STORAGE_KEY);
+      if (saved === "split" || saved === "editorial") setView(saved);
+    } catch {
+      // Storage blocked (private mode); the roast view it is.
+    }
+  }, []);
+
+  function choose(next: RoastView) {
+    setView(next);
+    try {
+      localStorage.setItem(VIEW_STORAGE_KEY, next);
+    } catch {
+      // Storage blocked; the choice still holds for this visit.
+    }
+  }
+
+  return [view, choose] as const;
+}
+
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 function ScanLog({ logs, scanning }: { logs: string[]; scanning: boolean }) {
@@ -240,6 +272,9 @@ function RoastReport({
   onRoastAnother: () => void;
 }) {
   const reduceMotion = useReducedMotion();
+  const [view, setView] = useRoastView();
+  // A dead site has nothing but the roast view to show.
+  const shownView: RoastView = result.dead ? "roast" : view;
   // WhatsApp, not mailto: a mailto link does nothing on machines with no
   // mail app set up, which is most desktop browsers.
   const whatsappNumber = decodePhoneNumber(USER.phoneNumberB64).replace(
@@ -292,42 +327,78 @@ function RoastReport({
               })
             }
           />
+          {/* A dead site only has the roast view's fix list to show. */}
+          {!result.dead && (
+            <ViewModeMenu
+              view={view}
+              onChange={(next) => {
+                setView(next);
+                trackEvent(ANALYTICS_EVENTS.ROAST_VIEW_CHANGE, {
+                  section: SECTION,
+                  view: next,
+                });
+              }}
+            />
+          )}
         </div>
       </div>
 
-      <ScoreSummary result={result} />
+      {/* Only the body between the header row and the CTA swaps, so the
+          buttons stay put while the layouts cross-fade. */}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={shownView}
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
+        >
+          {shownView === "split" ? (
+            <SplitReport result={result} showHeader={false} />
+          ) : shownView === "editorial" ? (
+            <EditorialReport result={result} showHeader={false} />
+          ) : (
+            <>
+              <ScoreSummary result={result} />
 
-      <Separator className="screen-line-bottom border-x-0" />
+              <Separator className="screen-line-bottom border-x-0" />
 
-      <CategoryList
-        categories={result.categories}
-        className="screen-line-bottom"
-        onFixesOpened={(category) =>
-          trackEvent(ANALYTICS_EVENTS.ROAST_FIXES_OPENED, {
-            section: SECTION,
-            category: category.key,
-          })
-        }
-      />
+              <CategoryList
+                categories={result.categories}
+                className="screen-line-bottom"
+                onFixesOpened={(category) =>
+                  trackEvent(ANALYTICS_EVENTS.ROAST_FIXES_OPENED, {
+                    section: SECTION,
+                    category: category.key,
+                  })
+                }
+              />
 
-      {result.dead && (
-        <div className="screen-line-bottom p-4">
-          <FixesToggle
-            label="How do I fix this?"
-            eventProperties={{ section: SECTION, category: "dead_site" }}
-          >
-            <ul className="list-disc space-y-1 pl-5 text-sm">
-              {result.dead.fixes.map((fix) => (
-                <li key={fix}>{fix}</li>
-              ))}
-            </ul>
-          </FixesToggle>
-        </div>
-      )}
+              {result.dead && (
+                <div className="screen-line-bottom p-4">
+                  <FixesToggle
+                    label="How do I fix this?"
+                    eventProperties={{
+                      section: SECTION,
+                      category: "dead_site",
+                    }}
+                  >
+                    <ul className="list-disc space-y-1 pl-5 text-sm">
+                      {result.dead.fixes.map((fix) => (
+                        <li key={fix}>{fix}</li>
+                      ))}
+                    </ul>
+                  </FixesToggle>
+                </div>
+              )}
 
-      <div className="screen-line-bottom">
-        <FinalVerdict result={result} />
-      </div>
+              <div className="screen-line-bottom">
+                <FinalVerdict result={result} />
+              </div>
+            </>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       <Separator className="screen-line-bottom border-x-0" />
 
