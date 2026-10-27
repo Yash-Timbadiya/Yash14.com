@@ -5,7 +5,6 @@ import type { RoastCategory } from "@/features/roast/types";
 
 import { cn } from "@/lib/utils";
 import { useId, useState } from "react";
-import { ReportHeader } from "./report-header";
 import { Separator } from "@/components/section-separator";
 import { Reveal, toneFor, TONE_TEXT, IssueFixes } from "./shared";
 import { ClimateScoreDial, LighthouseKnobs } from "./editorial-gauges";
@@ -15,14 +14,9 @@ import { FinalVerdict } from "@/features/roast/components/final-verdict";
  * A magazine feature: the grade is the headline beside the score dial,
  * categories are numbered sections, and the verdict closes it as a quote.
  */
-export function EditorialReport({
-  result,
-  showHeader = true,
-}: ReportVariantProps) {
+export function EditorialReport({ result }: ReportVariantProps) {
   return (
     <section>
-      {showHeader && <ReportHeader result={result} />}
-
       <header className="screen-line-bottom grid items-center gap-6 p-4 sm:grid-cols-[1fr_14rem] sm:p-6">
         <div className="space-y-2">
           <h3 className="font-serif text-3xl leading-tight text-balance sm:text-4xl">

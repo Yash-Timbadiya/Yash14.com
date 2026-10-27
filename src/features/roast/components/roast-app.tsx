@@ -354,9 +354,9 @@ function RoastReport({
           transition={{ duration: 0.3, ease: EASE_OUT }}
         >
           {shownView === "split" ? (
-            <SplitReport result={result} showHeader={false} />
+            <SplitReport result={result} />
           ) : shownView === "editorial" ? (
-            <EditorialReport result={result} showHeader={false} />
+            <EditorialReport result={result} />
           ) : (
             <>
               <ScoreSummary result={result} />

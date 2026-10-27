@@ -19,7 +19,7 @@ import {
 
 const PAGE_TITLE = "Roast My Site";
 const PAGE_DESCRIPTION =
-  "Paste a URL. Get a brutally honest roast backed by real SEO, speed and Lighthouse checks.";
+  "Paste a URL. Get a brutally honest AI roast of its design, copy, UX, SEO and speed, backed by real Lighthouse checks and fixes.";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -119,6 +119,14 @@ function getWebApplicationJsonLd(): WithContext<WebApplication> {
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    featureList: [
+      "Google Lighthouse speed, SEO, accessibility and best-practice scores",
+      "AI-written roast of design, copy, user experience and business",
+      "Plain-language fixes for every failing check",
+      "Classic, Split and Editorial report layouts",
+      "Export as Markdown, HTML or JSON",
+    ],
+    creator: { "@id": JSON_LD_ID.person },
     isPartOf: { "@id": JSON_LD_ID.website },
   };
 }

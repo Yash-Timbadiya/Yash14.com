@@ -7,6 +7,10 @@ import { EDUCATION } from "@/features/portfolio/data/education";
 import { TECH_STACK } from "@/features/portfolio/data/tech-stack";
 import { EXPERIENCES } from "@/features/portfolio/data/experiences";
 import { sortBookmarksNewestFirst } from "@/features/bookmark/lib/sort";
+import {
+  AI_CATEGORIES,
+  ROAST_CATEGORIES,
+} from "@/features/roast/data/roast-content";
 
 // Shared by the per-section .md routes and llms-full.txt, which nests the
 // same content one heading level deeper.
@@ -189,4 +193,35 @@ The identity is monochrome. Use Ink on light surfaces and Paper on dark surfaces
 ${heading(level, "Downloads")}
 
 - Brand assets pack (mark, logotype, and icon in SVG): ${BRAND_ASSETS.url}`;
+}
+
+const listLabels = (items: { label: string }[]) =>
+  items.map((item) => item.label).join(", ");
+
+// Mirrors how /roast works; keep it in sync when the roaster changes.
+export function getRoastMarkdown(level = 2) {
+  return `> Roast My Site is a free tool on ${SITE_INFO.url} that gives any website a brutally honest, funny roast backed by real checks, with concrete fixes for every problem it finds.
+
+- Use it: ${SITE_INFO.url}/roast
+- Share a roast: ${SITE_INFO.url}/roast?url=example.com
+
+${heading(level, "How It Works")}
+
+1. Paste a URL. The homepage is fetched and checked, while Google Lighthouse (PageSpeed Insights) tests it at the same time.
+2. Measured categories, each scored from its checks: ${listLabels(ROAST_CATEGORIES)}.
+3. An AI model reads the results and the page's own words, then writes a plain-language roast line for each category, plus these AI-scored sections: ${listLabels(AI_CATEGORIES)}.
+4. A final verdict sums up the site. The overall score comes only from the measured checks.
+
+${heading(level, "Features")}
+
+- Fixes for every failing check, in plain language
+- Three report layouts: Classic, Split, and Editorial
+- Export a report as Markdown, HTML, or JSON
+- A link to visit the roasted site, tagged with UTM parameters
+- Results are cached for 24 hours, so the same site is not tested twice in a day
+
+${heading(level, "Limits")}
+
+- Only the homepage is checked, and content rendered by JavaScript may be missed
+- Each visitor can run 5 new roasts an hour and 25 a day; cached roasts do not count`;
 }

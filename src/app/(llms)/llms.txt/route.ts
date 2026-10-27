@@ -36,6 +36,7 @@ Links to each tool: ${SITE_INFO.url}/about.md
 - [Home](${SITE_INFO.url}): Profile, stack, experience, education, and latest bookmarks.
 - [Bookmarks](${SITE_INFO.url}/bookmarks): Every bookmark, filterable by category.
 - [Brand guidelines](${SITE_INFO.url}/brand-guidelines): Mark, logotype, clear space, color, and downloadable assets.
+- [Roast My Site](${SITE_INFO.url}/roast): A free tool that roasts any website's design, copy, UX, SEO, and speed, with real Lighthouse checks and fixes.
 - [Sitemap](${SITE_INFO.url}/sitemap.xml): Every indexable page.
 
 ## Docs
@@ -45,6 +46,7 @@ Links to each tool: ${SITE_INFO.url}/about.md
 - [Education](${SITE_INFO.url}/education.md): Where ${USER.displayName} studied, the focus, and selected projects.
 - [Bookmarks](${SITE_INFO.url}/bookmarks.md): Articles, courses, books, references, and tools I recommend.
 - [Brand](${SITE_INFO.url}/brand.md): The mark, logotype, clear space, color, and asset downloads.
+- [Roast My Site](${SITE_INFO.url}/roast.md): How the website roaster works, what it checks, and its limits.
 - [RSS](${SITE_INFO.url}/rss): Feed of new bookmarks.
 - [Full context](${SITE_INFO.url}/llms-full.txt): Everything on this site in a single document.
 
