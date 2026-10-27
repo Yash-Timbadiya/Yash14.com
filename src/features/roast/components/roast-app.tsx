@@ -4,8 +4,8 @@ import type { RoastResult } from "@/features/roast/types";
 
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
-import { decodeEmail } from "@/utils/string";
 import { Button } from "@/components/ui/button";
+import { decodePhoneNumber } from "@/utils/string";
 import { USER } from "@/features/portfolio/data/user";
 import { Separator } from "@/components/section-separator";
 import { useId, useRef, useState, useEffect } from "react";
@@ -240,13 +240,17 @@ function RoastReport({
   onRoastAnother: () => void;
 }) {
   const reduceMotion = useReducedMotion();
-  const email = decodeEmail(USER.emailB64);
-  const mailto = `mailto:${email}?${new URLSearchParams({
-    subject: `Fix my site: you roasted ${result.domain}`,
-    body: `Hi ${USER.firstName},\n\nYour roaster gave ${result.domain} ${result.score}/100 ("${result.grade}"). Let's fix that.\n\n`,
-  })
-    .toString()
-    .replaceAll("+", "%20")}`;
+  // WhatsApp, not mailto: a mailto link does nothing on machines with no
+  // mail app set up, which is most desktop browsers.
+  const whatsappNumber = decodePhoneNumber(USER.phoneNumberB64).replace(
+    /\D/g,
+    "",
+  );
+  // A plain hello, no scores or roast talk. Names the visitor's site unless
+  // they roasted this one.
+  const isOwnSite = result.domain === new URL(USER.website).hostname;
+  const whatsappText = `Hi ${USER.firstName}, I came across your website and really liked your work. I'd love to work with you${isOwnSite ? "" : ` on ${result.domain}`}.`;
+  const fixHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
 
   return (
     <motion.section
@@ -318,7 +322,7 @@ function RoastReport({
 
       <div className="screen-line-bottom">
         <FixCta
-          mailto={mailto}
+          href={fixHref}
           onRoastAnother={onRoastAnother}
           onFixClick={() =>
             trackEvent(ANALYTICS_EVENTS.ROAST_FIX_CLICK, {
