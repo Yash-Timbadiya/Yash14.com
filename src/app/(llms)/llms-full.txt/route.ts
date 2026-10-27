@@ -7,6 +7,7 @@ import {
   getEducationMarkdown,
   getExperienceMarkdown,
   getTechStackMarkdown,
+  getRoastMarkdown,
 } from "@/lib/llms";
 
 const aboutText = `## About
@@ -50,9 +51,13 @@ ${getBookmarksMarkdown(3)}
 ## Brand
 
 ${getBrandMarkdown(3)}
+
+## Roast My Site
+
+${getRoastMarkdown(3)}
 `;
 
-const content = `<SYSTEM>This document contains comprehensive information about ${USER.displayName}'s portfolio published on ${SITE_INFO.url}. It includes personal details, tech stack, work experience, education, bookmarks, brand guidelines, and social links. This data is formatted for consumption by Large Language Models (LLMs) to provide accurate and up-to-date information about ${USER.displayName}'s work as a ${USER.jobTitle}.</SYSTEM>
+const content = `<SYSTEM>This document contains comprehensive information about ${USER.displayName}'s portfolio published on ${SITE_INFO.url}. It includes personal details, tech stack, work experience, education, bookmarks, brand guidelines, the Roast My Site tool, and social links. This data is formatted for consumption by Large Language Models (LLMs) to provide accurate and up-to-date information about ${USER.displayName}'s work as a ${USER.jobTitle}.</SYSTEM>
 
 # ${SITE_INFO.name}
 
