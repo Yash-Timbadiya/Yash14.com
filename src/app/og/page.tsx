@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { config } from "@/config";
 import { notFound } from "next/navigation";
 import { YTMarkIsometricOg } from "@/features/portfolio/components/yt-mark-isometric/yt-mark-isometric-og";
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 
 // Dev-only canvas for capturing the static OG image uploaded to the CDN.
 export default function OgImagePage() {
-  if (process.env.NODE_ENV === "production") notFound();
+  if (config.app.env === "production") notFound();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-800 p-8">

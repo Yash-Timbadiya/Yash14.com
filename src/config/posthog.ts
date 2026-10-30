@@ -1,3 +1,6 @@
+// Relative, not `@/config`: `next.config.ts` imports this file too.
+import { config } from "../config";
+
 /**
  * Same-origin path that Next.js rewrites to PostHog (see `next.config.ts`), so
  * ad blockers that block posthog.com still let analytics through. Kept
@@ -6,8 +9,7 @@
 export const POSTHOG_PROXY_PATH = "/relay-yt";
 
 /** PostHog's ingestion host for this project's region (US Cloud). */
-export const POSTHOG_INGEST_HOST =
-  process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
+export const POSTHOG_INGEST_HOST = config.analytics.posthogHost;
 
 /** Static SDK assets are served from a separate host in the same region. */
 export const POSTHOG_ASSETS_HOST = POSTHOG_INGEST_HOST.replace(

@@ -5,8 +5,6 @@ import type { RoastCheck, RoastResult } from "@/features/roast/types";
 import { config } from "@/config";
 import { check } from "@/features/roast/lib/page-checks";
 
-const PAGESPEED_ENDPOINT =
-  "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
 // Heavy sites (ads, many scripts) take Lighthouse 50 to 70 s.
 const PAGESPEED_TIMEOUT_MS = 80_000;
 
@@ -44,7 +42,7 @@ export async function runPageSpeed(
   const timeout = AbortSignal.timeout(PAGESPEED_TIMEOUT_MS);
   let data: PageSpeedResponse;
   try {
-    const response = await fetch(`${PAGESPEED_ENDPOINT}?${params}`, {
+    const response = await fetch(`${config.roast.pagespeedEndpoint}?${params}`, {
       signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
       cache: "no-store",
     });

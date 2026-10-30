@@ -35,7 +35,7 @@ const ratelimits = redis
     ]
   : null;
 
-if (!redis && process.env.NODE_ENV === "production") {
+if (!redis && config.app.env === "production") {
   console.warn(
     "[roast] Upstash Redis is not configured: no rate limit and no cache.",
   );
@@ -47,7 +47,7 @@ if (!redis && process.env.NODE_ENV === "production") {
  */
 export async function takeRateLimit(ip: string) {
   // Unlimited during `next dev` so testing doesn't lock you out.
-  if (!ratelimits || process.env.NODE_ENV === "development") {
+  if (!ratelimits || config.app.env === "development") {
     return { allowed: true, retryAfterSeconds: 0 };
   }
 

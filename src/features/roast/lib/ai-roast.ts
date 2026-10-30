@@ -28,7 +28,6 @@ const AI_BUDGET_MS = 150_000;
 const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
 const RETRY_DELAY_MS = 800;
 
-const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
 // Loose on purpose: long lines are trimmed to whole sentences later. Empty
 // means the model found no evidence for that section, which the prompt allows.
@@ -135,63 +134,100 @@ function parseAiRoast(text: string): AiRoast | null {
   }
 }
 
-class OpenRouterError extends Error {
+class ProviderError extends Error {
   constructor(readonly status: number) {
     super(`HTTP ${status}`);
   }
 }
 
-type OpenRouterResponse = {
+type ChatCompletionResponse = {
   choices?: { message?: { content?: string | null } }[];
 };
 
-async function roastWithOpenRouter(
-  apiKey: string,
-  model: string,
+/** An OpenAI-compatible chat completions endpoint and the model to call. */
+type AiProvider = {
+  name: string;
+  endpoint: string;
+  apiKey: string | undefined;
+  model: string;
+  headers?: Record<string, string>;
+  /** Provider-specific request fields, mostly to keep reasoning short. */
+  extraBody?: Record<string, unknown>;
+};
+
+function aiProviders(): AiProvider[] {
+  const { groq, openrouter } = config.roast;
+  return [
+    {
+      name: "groq",
+      endpoint: groq.endpoint,
+      apiKey: groq.apiKey,
+      model: groq.model,
+      // gpt-oss always reasons; low keeps it fast without hurting the jokes.
+      extraBody: { reasoning_effort: "low" },
+    },
+    {
+      name: "openrouter",
+      endpoint: openrouter.endpoint,
+      apiKey: openrouter.apiKey,
+      model: openrouter.model,
+      headers: {
+        "HTTP-Referer": config.app.url,
+        "X-Title": "Roast My Site",
+      },
+      // With reasoning on, the free Nemotron models often take 45 s or more.
+      extraBody: { reasoning: { enabled: false } },
+    },
+  ];
+}
+
+async function roastWithProvider(
+  provider: AiProvider & { apiKey: string },
   systemPrompt: string,
   prompt: string,
   signal: AbortSignal,
 ) {
-  const response = await fetch(OPENROUTER_ENDPOINT, {
+  const response = await fetch(provider.endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": config.app.url,
-      "X-Title": "Roast My Site",
+      Authorization: `Bearer ${provider.apiKey}`,
+      ...provider.headers,
     },
     body: JSON.stringify({
-      model,
+      model: provider.model,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
-      // With reasoning on, the free Nemotron models often take 45 s or more.
-      reasoning: { enabled: false },
+      ...provider.extraBody,
     }),
     signal: AbortSignal.any([signal, AbortSignal.timeout(MODEL_TIMEOUT_MS)]),
     cache: "no-store",
   });
   if (!response.ok) {
-    throw new OpenRouterError(response.status);
+    throw new ProviderError(response.status);
   }
 
-  const data = (await response.json()) as OpenRouterResponse;
+  const data = (await response.json()) as ChatCompletionResponse;
   return parseAiRoast(data.choices?.[0]?.message?.content ?? "");
 }
 
 /**
  * Personal roast lines written from the audit and the page's own words.
- * Tries each OpenRouter model in order, retrying a quick 429 or 5xx once.
- * Null means all of them failed, so
- * the caller keeps the prewritten lines. Never throws.
+ * Tries Groq, then OpenRouter, retrying a quick 429 or 5xx once each.
+ * Null means none had a key or all of them failed, so the caller keeps the
+ * prewritten lines. Never throws.
  */
 export async function generateAiRoast(
   input: AiRoastInput,
   signal: AbortSignal,
 ): Promise<AiRoast | null> {
-  const { apiKey, models } = config.roast.openrouter;
-  if (!apiKey) return null;
+  const providers = aiProviders().filter(
+    (provider): provider is AiProvider & { apiKey: string } =>
+      Boolean(provider.apiKey),
+  );
+  if (providers.length === 0) return null;
 
   const prompt = buildUserPrompt(input);
   const systemPrompt = isOwnerSite(input.roast.domain)
@@ -199,28 +235,27 @@ export async function generateAiRoast(
     : ROAST_SYSTEM_PROMPT;
   const deadline = AbortSignal.any([signal, AbortSignal.timeout(AI_BUDGET_MS)]);
 
-  for (const model of models) {
+  for (const provider of providers) {
+    const label = `${provider.name}/${provider.model}`;
     for (let attempt = 1; attempt <= 2; attempt++) {
       if (deadline.aborted) return null;
       try {
-        const roast = await roastWithOpenRouter(
-          apiKey,
-          model,
+        const roast = await roastWithProvider(
+          provider,
           systemPrompt,
           prompt,
           deadline,
         );
         if (roast) return roast;
-        console.warn(`[roast] ${model} gave no usable roast`);
+        console.warn(`[roast] ${label} gave no usable roast`);
         break;
       } catch (error) {
         // The message is enough; a logged DOMException dumps every error code.
         const reason = error instanceof Error ? error.message : String(error);
-        console.warn(`[roast] ${model} failed: ${reason}`);
+        console.warn(`[roast] ${label} failed: ${reason}`);
         // A timeout already spent this model's budget, so only fast errors retry.
         const retryable =
-          error instanceof OpenRouterError &&
-          RETRYABLE_STATUS.has(error.status);
+          error instanceof ProviderError && RETRYABLE_STATUS.has(error.status);
         if (!retryable || attempt === 2) break;
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
       }

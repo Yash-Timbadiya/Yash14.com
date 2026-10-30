@@ -3,6 +3,7 @@
 import { encode } from "qss";
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { config } from "@/config";
 import { cdn } from "@/utils/cdn";
 import {
   getLinkPreviewSlug,
@@ -86,7 +87,7 @@ export function LinkPreview({
       "viewport.width": DESKTOP_VIEWPORT_WIDTH,
       "viewport.height": Math.round((DESKTOP_VIEWPORT_WIDTH * height) / width),
     });
-    src = `https://api.microlink.io/?${params}`;
+    src = `${config.microlink.apiUrl}/?${params}`;
   } else {
     src = imageSrc;
   }
