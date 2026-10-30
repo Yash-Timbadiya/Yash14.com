@@ -1,6 +1,7 @@
 export const config = {
   app: {
     url: process.env.NEXT_PUBLIC_APP_URL || "https://yash14.com",
+    env: process.env.NODE_ENV,
   },
 
   cdn: {
@@ -9,8 +10,14 @@ export const config = {
   },
 
   github: {
+    apiUrl: "https://api.github.com",
     apiToken: process.env.GITHUB_API_TOKEN,
     contributionsApiUrl: process.env.GITHUB_CONTRIBUTIONS_API_URL,
+  },
+
+  /** Renders the live screenshots shown in link previews. */
+  microlink: {
+    apiUrl: "https://api.microlink.io",
   },
 
   analytics: {
@@ -19,9 +26,14 @@ export const config = {
      * production insights; turn it on to debug events end to end.
      */
     trackInDevelopment: false,
+    /** PostHog's ingestion host for this project's region (US Cloud). */
+    posthogHost:
+      process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
   },
 
   roast: {
+    pagespeedEndpoint:
+      "https://www.googleapis.com/pagespeedonline/v5/runPagespeed",
     /** Google PageSpeed Insights key. Without one, Google's shared quota runs dry fast. */
     pagespeedApiKey: process.env.PAGESPEED_API_KEY,
     /** Upstash Redis for the rate limit and result cache. The Vercel integration sets the KV_ names. */
@@ -29,18 +41,19 @@ export const config = {
     redisToken:
       process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN,
     /**
-     * Writes the personal roast lines. Models are tried in order; without a
-     * key, or when all of them fail, the prewritten lines are used.
+     * Writes the personal roast lines. Groq is tried first, then OpenRouter;
+     * a provider without a key is skipped, and when both fail the prewritten
+     * lines are used.
      */
+    groq: {
+      endpoint: "https://api.groq.com/openai/v1/chat/completions",
+      apiKey: process.env.GROQ_API_KEY,
+      model: "openai/gpt-oss-120b",
+    },
     openrouter: {
+      endpoint: "https://openrouter.ai/api/v1/chat/completions",
       apiKey: process.env.OPENROUTER_API_KEY,
-      models: (
-        process.env.OPENROUTER_MODELS ||
-        "nvidia/nemotron-3.5-lightning:free,nvidia/nemotron-3.5-super-vl:free"
-      )
-        .split(",")
-        .map((model) => model.trim())
-        .filter(Boolean),
+      model: "nvidia/nemotron-3.5-lightning:free",
     },
   },
 

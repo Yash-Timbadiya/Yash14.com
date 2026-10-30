@@ -3,13 +3,16 @@
 import type { BuildInfo } from "@/lib/build-info";
 
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { config } from "@/config";
 import packageJson from "../../package.json";
 import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
+import { USER } from "@/features/portfolio/data/user";
 import { LinkPreview } from "@/components/link-preview";
 import { motion, useReducedMotion } from "motion/react";
 import { getBuildInfo, getStack } from "@/lib/build-info";
+import { YashSignature } from "@/components/yash-signature";
 import { SOCIAL } from "@/features/portfolio/data/social-links";
 import { SiteFooterLinks } from "@/components/site-footer-links";
 import { LICENSE, SOURCE_CODE_GITHUB_URL, UTM_PARAMS } from "@/config/site";
@@ -41,6 +44,7 @@ const SITE_SUBTITLE = packageJson.description;
 export function SiteFooter() {
   const xLink = SOCIAL.x;
   const shouldReduceMotion = useReducedMotion();
+  const [signatureDrawKey, setSignatureDrawKey] = useState(0);
 
   const build = getBuildInfo();
   const stack = getStack();
@@ -245,18 +249,12 @@ export function SiteFooter() {
               </ul>
             </Field>
 
-            <Field
-              className="col-span-2 md:col-span-4"
-              label="Also inspired by"
-            >
-              <ol className="-mx-4 grid grid-cols-2 gap-x-px gap-y-0.5 font-sans md:grid-cols-4">
+            <Field className="col-span-2" label="Also inspired by">
+              <ol className="-mx-4 grid grid-cols-2 gap-x-px gap-y-0.5 font-sans">
                 {INSPIRED_BY.map((name, index) => (
-                  <li
-                    className="group/item flex gap-2 px-4 transition-transform duration-200 hover:translate-x-0.5"
-                    key={name}
-                  >
+                  <li className="flex gap-2 px-4" key={name}>
                     <span
-                      className="font-mono text-muted-foreground/80 transition-colors duration-200 group-hover/item:text-foreground"
+                      className="font-mono text-muted-foreground/80"
                       aria-hidden
                     >
                       {String(index + 1).padStart(2, "0")}
@@ -265,6 +263,24 @@ export function SiteFooter() {
                   </li>
                 ))}
               </ol>
+            </Field>
+
+            <Field
+              className="col-span-2"
+              label="Approved by"
+              onPointerEnter={() => {
+                if (!shouldReduceMotion) setSignatureDrawKey((key) => key + 1);
+              }}
+            >
+              <div className="flex h-full flex-col justify-end gap-2">
+                <YashSignature
+                  drawKey={signatureDrawKey}
+                  className="ml-1 h-16 w-auto self-start text-blue-900 dark:text-foreground"
+                />
+                <span className="border-t border-line pt-2 font-sans text-sm/none font-medium tracking-wide uppercase transition-colors duration-200 group-hover:border-foreground/25">
+                  {USER.displayName}
+                </span>
+              </div>
             </Field>
           </dl>
         </div>
@@ -354,13 +370,13 @@ function Field({
   className,
   label,
   children,
-}: {
-  className?: string;
+  ...props
+}: React.ComponentProps<"div"> & {
   label: string;
-  children: React.ReactNode;
 }) {
   return (
     <div
+      {...props}
       className={cn(
         "group flex min-w-0 flex-col gap-1 bg-background px-4 py-3 transition-colors duration-200 hover:bg-muted/40",
         className,
@@ -369,7 +385,7 @@ function Field({
       <dt className="text-[0.625rem]/4 font-medium tracking-wider text-muted-foreground uppercase transition-colors duration-200 group-hover:text-foreground/80">
         {label}
       </dt>
-      <dd className="text-sm">{children}</dd>
+      <dd className="flex-1 text-sm">{children}</dd>
     </div>
   );
 }
