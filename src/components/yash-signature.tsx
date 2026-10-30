@@ -15,6 +15,7 @@ export function YashSignature({
   const shouldReduceMotion = useReducedMotion();
 
   return (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: decorative and aria-hidden; the printed name beside it is the label
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"

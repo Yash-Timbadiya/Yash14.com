@@ -5,8 +5,8 @@ import type { RoastCategory } from "@/features/roast/types";
 
 import { cn } from "@/lib/utils";
 import { useId, useState } from "react";
-import { Separator } from "@/components/section-separator";
 import { Reveal, ACCENT_TEXT, IssueFixes } from "./shared";
+import { Separator } from "@/components/section-separator";
 import { ClimateScoreDial, LighthouseKnobs } from "./editorial-gauges";
 import { FinalVerdict } from "@/features/roast/components/final-verdict";
 
@@ -74,10 +74,7 @@ function EditorialSection({
         </span>
         <span className="font-medium">{category.label}</span>
         <span
-          className={cn(
-            "ml-auto font-serif text-3xl sm:ml-0",
-            ACCENT_TEXT,
-          )}
+          className={cn("ml-auto font-serif text-3xl sm:ml-0", ACCENT_TEXT)}
         >
           {category.score}
         </span>

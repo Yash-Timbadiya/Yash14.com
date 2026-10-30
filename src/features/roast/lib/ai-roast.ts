@@ -10,11 +10,11 @@ import type {
 
 import { z } from "zod";
 import { config } from "@/config";
+import { overallScoreFor } from "@/features/roast/lib/build-roast";
 import {
   AI_CATEGORIES,
   ROAST_CATEGORIES,
 } from "@/features/roast/data/roast-content";
-import { overallScoreFor } from "@/features/roast/lib/build-roast";
 import {
   ROAST_SYSTEM_PROMPT,
   PRAISE_SYSTEM_PROMPT,
@@ -27,7 +27,6 @@ const AI_BUDGET_MS = 150_000;
 // Free endpoints often answer 429 or 5xx once and succeed right after.
 const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
 const RETRY_DELAY_MS = 800;
-
 
 // Loose on purpose: long lines are trimmed to whole sentences later. Empty
 // means the model found no evidence for that section, which the prompt allows.

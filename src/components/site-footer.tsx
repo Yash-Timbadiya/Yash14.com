@@ -3,16 +3,16 @@
 import type { BuildInfo } from "@/lib/build-info";
 
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { config } from "@/config";
 import packageJson from "../../package.json";
 import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
-import { LinkPreview } from "@/components/link-preview";
-import { YashSignature } from "@/components/yash-signature";
 import { USER } from "@/features/portfolio/data/user";
-import { useState } from "react";
+import { LinkPreview } from "@/components/link-preview";
 import { motion, useReducedMotion } from "motion/react";
 import { getBuildInfo, getStack } from "@/lib/build-info";
+import { YashSignature } from "@/components/yash-signature";
 import { SOCIAL } from "@/features/portfolio/data/social-links";
 import { SiteFooterLinks } from "@/components/site-footer-links";
 import { LICENSE, SOURCE_CODE_GITHUB_URL, UTM_PARAMS } from "@/config/site";

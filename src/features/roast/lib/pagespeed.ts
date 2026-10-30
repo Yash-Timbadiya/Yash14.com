@@ -42,10 +42,13 @@ export async function runPageSpeed(
   const timeout = AbortSignal.timeout(PAGESPEED_TIMEOUT_MS);
   let data: PageSpeedResponse;
   try {
-    const response = await fetch(`${config.roast.pagespeedEndpoint}?${params}`, {
-      signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `${config.roast.pagespeedEndpoint}?${params}`,
+      {
+        signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+        cache: "no-store",
+      },
+    );
     if (!response.ok) {
       console.warn(`[roast] PageSpeed returned HTTP ${response.status}`);
       return null;
