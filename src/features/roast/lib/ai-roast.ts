@@ -14,6 +14,7 @@ import {
   AI_CATEGORIES,
   ROAST_CATEGORIES,
 } from "@/features/roast/data/roast-content";
+import { overallScoreFor } from "@/features/roast/lib/build-roast";
 import {
   ROAST_SYSTEM_PROMPT,
   PRAISE_SYSTEM_PROMPT,
@@ -273,10 +274,18 @@ export function applyAiRoast(roast: RoastResult, ai: AiRoast): RoastResult {
     ];
   });
 
+  const categories = [...aiOnly, ...checked];
+  // The base score only covers the checked categories, so it has to be
+  // recomputed once the AI-scored sections are in the report.
+  const { score, grade } = overallScoreFor(categories);
+
   return {
     ...roast,
     aiWritten: true,
+    score,
+    grade: grade.label,
+    gradeNote: grade.note,
     verdict: tidy(ai.verdict, MAX_VERDICT_CHARS),
-    categories: [...aiOnly, ...checked],
+    categories,
   };
 }

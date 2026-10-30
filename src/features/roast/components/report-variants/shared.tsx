@@ -14,19 +14,6 @@ export const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 /** Brand orange in brand mode, plain ink in monochrome. */
 export const ACCENT_TEXT = "brand:text-[#ff4d00]";
 
-export type Tone = "bad" | "meh" | "good";
-
-export function toneFor(score: number): Tone {
-  if (score < 50) return "bad";
-  return score < 80 ? "meh" : "good";
-}
-
-export const TONE_TEXT: Record<Tone, string> = {
-  bad: ACCENT_TEXT,
-  meh: "text-foreground/80",
-  good: "text-foreground",
-};
-
 /**
  * One scale spanning the whole track, so a fill reveals only the part of the
  * gradient its score reaches: low scores stay deep orange, full scores end in a light orange.

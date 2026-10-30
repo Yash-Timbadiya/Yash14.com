@@ -58,6 +58,16 @@ function gradeFor(score: number) {
   return { ...ROAST_GRADES[index], index };
 }
 
+/** Overall score as the plain average of every category shown in the report. */
+export function overallScoreFor(categories: Pick<RoastCategory, "score">[]) {
+  const score = categories.length
+    ? Math.round(
+        categories.reduce((sum, c) => sum + c.score, 0) / categories.length,
+      )
+    : 0;
+  return { score, grade: gradeFor(score) };
+}
+
 export function buildRoast({
   url,
   domain,
@@ -98,10 +108,7 @@ export function buildRoast({
     };
   });
 
-  const score = Math.round(
-    categories.reduce((sum, c) => sum + c.score, 0) / categories.length,
-  );
-  const grade = gradeFor(score);
+  const { score, grade } = overallScoreFor(categories);
 
   return {
     url,
