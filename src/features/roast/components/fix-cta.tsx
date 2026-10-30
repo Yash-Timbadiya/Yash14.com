@@ -1,4 +1,7 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowRightIcon, RotateCcwIcon } from "lucide-react";
 
 /**
@@ -31,6 +34,17 @@ function seeded(seed: number) {
   };
 }
 
+// One loop, in seconds: hold, crumble away, stay gone, rebuild.
+const LOOP_SECONDS = 9.5;
+const CRUMBLE_START = 1;
+const CRUMBLE_SECONDS = 2.8;
+const REBUILD_START = 7;
+const REBUILD_SPREAD = 1.4;
+const REBUILD_SECONDS = 0.6;
+
+const DUST_LEFT = Math.min(...EDGE_COLS);
+const DUST_RIGHT = Math.max(...EDGE_COLS) + 1;
+
 const DUST = (() => {
   const random = seeded(7);
   return EDGE_COLS.flatMap((col, row) => {
@@ -40,15 +54,39 @@ const DUST = (() => {
     return Array.from({ length: DUST_SPLIT * DUST_SPLIT }, (_, index) => {
       const ix = index % DUST_SPLIT;
       const iy = Math.floor(index / DUST_SPLIT);
+      const x = col + ix * DUST_SIZE;
+
+      // The right side of a cube goes first, like it is blown off.
+      const crumbleAt =
+        CRUMBLE_START +
+        cubeDelay +
+        (DUST_SPLIT - 1 - ix) * 0.18 +
+        random() * 0.5;
+      const goneAt = crumbleAt + CRUMBLE_SECONDS;
+      // Rebuilding runs the other way, sweeping left to right.
+      const rebuildAt =
+        REBUILD_START +
+        ((x - DUST_LEFT) / (DUST_RIGHT - DUST_LEFT)) * REBUILD_SPREAD +
+        random() * 0.15;
+      const at = (seconds: number) => seconds / LOOP_SECONDS;
+
       return {
         key: `${row}-${index}`,
-        x: col + ix * DUST_SIZE,
+        x,
         y: row + iy * DUST_SIZE,
-        // The right side of a cube goes first, like it is blown off.
-        delay: cubeDelay + (DUST_SPLIT - 1 - ix) * 0.18 + random() * 0.5,
         dx: 1.2 + random() * 3.3,
         dy: -1.6 + random() * 2.1,
         rot: Math.round((random() - 0.5) * 180),
+        // Hold, crumble, snap home while invisible, wait, fade back in, hold.
+        times: [
+          0,
+          at(crumbleAt),
+          at(goneAt),
+          at(goneAt + 0.01),
+          at(rebuildAt),
+          at(rebuildAt + REBUILD_SECONDS),
+          1,
+        ],
       };
     });
   });
@@ -64,6 +102,8 @@ export function FixCta({
   onFixClick: () => void;
   onRoastAnother: () => void;
 }) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <div className="flex">
       <div className="w-full bg-foreground p-6 text-background brand:bg-[#ff4d00] brand:text-white sm:w-[62%] sm:p-8">
@@ -128,8 +168,8 @@ export function FixCta({
               shapeRendering="crispEdges"
             />
           ))}
-          {DUST.map(({ key, x, y, delay, dx, dy, rot }) => (
-            <rect
+          {DUST.map(({ key, x, y, dx, dy, rot, times }) => (
+            <motion.rect
               key={key}
               x={x}
               y={y}
@@ -138,17 +178,23 @@ export function FixCta({
               width={DUST_SIZE + 0.01}
               height={DUST_SIZE + 0.01}
               fill="currentColor"
-              className="animate-snap-dust motion-reduce:animate-none"
-              style={
-                {
-                  transformBox: "fill-box",
-                  transformOrigin: "center",
-                  animationDelay: `${delay.toFixed(2)}s`,
-                  "--dx": `${dx.toFixed(2)}px`,
-                  "--dy": `${dy.toFixed(2)}px`,
-                  "--rot": `${rot}deg`,
-                } as React.CSSProperties
+              style={{ transformBox: "fill-box", transformOrigin: "center" }}
+              animate={
+                shouldReduceMotion
+                  ? undefined
+                  : {
+                      x: [0, 0, dx, 0, 0, 0, 0],
+                      y: [0, 0, dy, 0, 0, 0, 0],
+                      rotate: [0, 0, rot, 0, 0, 0, 0],
+                      opacity: [1, 1, 0, 0, 0, 1, 1],
+                    }
               }
+              transition={{
+                duration: LOOP_SECONDS,
+                times,
+                ease: "easeIn",
+                repeat: Infinity,
+              }}
             />
           ))}
         </svg>
