@@ -23,14 +23,45 @@ import {
 
 const DESKTOP_VIEWPORT_WIDTH = 1280;
 
-/**
- * How long Microlink gets before the CDN screenshot is shown instead. Uncached
- * Microlink renders take 3-30s, and its free tier stops after 25 a day per IP.
- */
-const LIVE_SCREENSHOT_TIMEOUT_MS = 3500;
+/** Shared across every preview so each image is fetched once per page view. */
+const preloadedImages = new Map<string, Promise<boolean>>();
 
-/** `live` is Microlink (or `imageSrc`), `fallback` the CDN screenshot, `none` neither loaded. */
-type PreviewSource = "live" | "fallback" | "none";
+function preloadImage(src: string) {
+  let pending = preloadedImages.get(src);
+  if (!pending) {
+    pending = new Promise<boolean>((resolve) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.onload = () => resolve(true);
+      image.onerror = () => resolve(false);
+      image.src = src;
+    });
+    preloadedImages.set(src, pending);
+  }
+  return pending;
+}
+
+/** Runs after the page has loaded and the main thread is idle. */
+function onPageIdle(callback: () => void) {
+  let idleId: number | undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const schedule = () => {
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(callback, { timeout: 2000 });
+    } else {
+      timeoutId = setTimeout(callback, 200);
+    }
+  };
+
+  if (document.readyState === "complete") schedule();
+  else window.addEventListener("load", schedule, { once: true });
+
+  return () => {
+    window.removeEventListener("load", schedule);
+    if (idleId !== undefined) window.cancelIdleCallback(idleId);
+    clearTimeout(timeoutId);
+  };
+}
 
 function getHostname(url: string) {
   try {
@@ -72,7 +103,7 @@ export function LinkPreview({
   side = "top",
   onClick,
 }: LinkPreviewProps) {
-  let src: string;
+  let liveSrc: string;
   if (!isStatic) {
     const params = encode({
       url,
@@ -87,9 +118,9 @@ export function LinkPreview({
       "viewport.width": DESKTOP_VIEWPORT_WIDTH,
       "viewport.height": Math.round((DESKTOP_VIEWPORT_WIDTH * height) / width),
     });
-    src = `${config.microlink.apiUrl}/?${params}`;
+    liveSrc = `${config.microlink.apiUrl}/?${params}`;
   } else {
-    src = imageSrc;
+    liveSrc = imageSrc;
   }
 
   const hostname = getHostname(url);
@@ -97,36 +128,40 @@ export function LinkPreview({
   const fallbackSrc = slug ? cdn(`/${LINK_PREVIEW_DIR}/${slug}.webp`) : null;
 
   const [isOpen, setOpen] = React.useState(false);
-  const [source, setSource] = React.useState<PreviewSource>("live");
 
-  const showFallback = React.useCallback(() => {
-    setSource((current) =>
-      current === "live" ? (fallbackSrc ? "fallback" : "none") : current,
-    );
-  }, [fallbackSrc]);
+  // The pre-captured CDN screenshot comes first because it loads instantly;
+  // Microlink takes 3-30s uncached and its free tier stops after 25 a day per
+  // IP, so it is only used for links that have no CDN screenshot yet.
+  const sources = React.useMemo(
+    () => [fallbackSrc, liveSrc].filter((source): source is string => !!source),
+    [fallbackSrc, liveSrc],
+  );
+  const [sourceIndex, setSourceIndex] = React.useState(0);
+  const currentSrc = sources[sourceIndex];
 
-  const liveLoaded = React.useRef(false);
-  const fallbackTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
-  React.useEffect(() => () => clearTimeout(fallbackTimer.current), []);
+  const skipSource = React.useCallback(
+    (failedSrc: string) => {
+      setSourceIndex((index) =>
+        sources[index] === failedSrc ? index + 1 : index,
+      );
+    },
+    [sources],
+  );
 
-  // Warm the screenshot on intent (hover/focus) rather than on mount, so a page
-  // with many previews doesn't fetch every screenshot up front.
-  const preloaded = React.useRef(false);
-  const preload = () => {
-    if (preloaded.current || !src) return;
-    preloaded.current = true;
-    const image = new Image();
-    image.onload = () => {
-      liveLoaded.current = true;
-    };
-    // A rate-limited Microlink request fails fast, so switch without waiting.
-    image.onerror = showFallback;
-    image.src = src;
-    if (isStatic) return;
-    fallbackTimer.current = setTimeout(() => {
-      if (!liveLoaded.current) showFallback();
-    }, LIVE_SCREENSHOT_TIMEOUT_MS);
-  };
+  const warm = React.useCallback(
+    (src: string | undefined) => {
+      if (!src) return;
+      void preloadImage(src).then((loaded) => {
+        if (!loaded) skipSource(src);
+      });
+    },
+    [skipSource],
+  );
+
+  // Warm the first source in the background so hovering shows it immediately.
+  React.useEffect(() => onPageIdle(() => warm(sources[0])), [sources, warm]);
+
+  const preload = () => warm(currentSrc);
 
   const springConfig = { stiffness: 100, damping: 15 };
   const x = useMotionValue(0);
@@ -203,7 +238,7 @@ export function LinkPreview({
                     </span>
                   ) : null}
                 </div>
-                {source === "none" ? (
+                {!currentSrc ? (
                   <div
                     style={{ width, height }}
                     className="flex items-center justify-center bg-background font-mono text-xs text-muted-foreground"
@@ -212,20 +247,13 @@ export function LinkPreview({
                   </div>
                 ) : (
                   <img
-                    key={source}
-                    src={
-                      source === "fallback" && fallbackSrc ? fallbackSrc : src
-                    }
+                    key={currentSrc}
+                    src={currentSrc}
                     width={width}
                     height={height}
                     className="block bg-background object-cover object-top"
                     alt=""
-                    onLoad={() => {
-                      if (source === "live") liveLoaded.current = true;
-                    }}
-                    onError={() =>
-                      source === "live" ? showFallback() : setSource("none")
-                    }
+                    onError={() => skipSource(currentSrc)}
                   />
                 )}
               </a>
