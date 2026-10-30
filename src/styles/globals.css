@@ -119,29 +119,6 @@
       opacity: 0.15;
     }
   }
-
-  /* Each particle drifts by its own --dx/--dy/--rot, then reforms unseen. */
-  --animate-snap-dust: snap-dust 7s ease-in infinite both;
-
-  @keyframes snap-dust {
-    0%,
-    30% {
-      transform: none;
-      opacity: 1;
-    }
-    70% {
-      transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
-      opacity: 0;
-    }
-    88% {
-      transform: none;
-      opacity: 0;
-    }
-    100% {
-      transform: none;
-      opacity: 1;
-    }
-  }
 }
 
 @utility link {
