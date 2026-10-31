@@ -37,7 +37,7 @@ export const EXPERIENCES: Experience[] = [
 Products I've built and maintain:
 - [Wellness Wag](https://wellnesswag.com) — Online ESA and PSD letters from licensed therapists.
 - [ParkingMD](https://parkingmd.com) — Online medical evaluations for disabled parking permits.
-- [Minimal](https://joinminimal.com) — Doctor-guided weight loss and telehealth treatment programs.
+- [Minimal](https://shop.joinminimal.com) — Doctor-guided weight loss and telehealth treatment programs.
 - [LeafyRX](https://leafyrx.org) — Online medical marijuana card evaluations.
 - [Emma & Buddy](https://emmaandbuddy.com) — ESA letters for college and housing.
 - [FMLADocs](https://fmladocs.com) — FMLA paperwork approved in 24 hours or less.
