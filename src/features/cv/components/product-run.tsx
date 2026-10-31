@@ -96,7 +96,7 @@ export function ProductRun({ products }: { products: Product[] }) {
                 height={24}
               />
             </span>
-            {product.name}.
+            {product.name}
             {product.note && (
               <span className="run-note"> {sentence(product.note)}</span>
             )}{" "}

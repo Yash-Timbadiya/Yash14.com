@@ -266,13 +266,16 @@ html:has(.cv) {
   flex-direction: column;
   min-height: 320px;
   border-radius: 16px;
-  background: var(--card);
+  /* Shapes in the illustration fill with --card-fill too, so they always
+     match the card, hovered or not. */
+  --card-fill: var(--card);
+  background: var(--card-fill);
   overflow: hidden;
   transition: background-color 200ms ease;
 }
 
 .cv a.card:hover {
-  background: color-mix(in srgb, var(--card), var(--text) 3%);
+  --card-fill: color-mix(in srgb, var(--card), var(--text) 3%);
 }
 
 .cv .card-art {
@@ -297,6 +300,291 @@ html:has(.cv) {
 
 .cv .card-art .accent-stroke {
   stroke: var(--orange);
+}
+
+/* Card illustrations come alive on hover. Parts settle into a new pose with a
+   soft overshoot and ease back on leave; a few loop while hovered. Lengths
+   are in the drawing's own units (220 x 150 viewBox). */
+
+.cv .card-art svg * {
+  transform-box: view-box;
+}
+
+.cv
+  .card-art
+  :is(
+    .pulse-back,
+    .pulse-badge,
+    .tag-body,
+    .tag-shadow,
+    .window-back,
+    .window-front,
+    .window-block,
+    .open-plus,
+    .nodes-card,
+    .photos-back,
+    .photos-front,
+    .photos-sun
+  ) {
+  transition: transform 600ms cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+
+/* Cross Even: the heartbeat traces itself, the back sheet slides out and
+   the plus badge pops. */
+.cv .pulse-trace {
+  stroke-dasharray: 1 1;
+}
+
+.cv .pulse-back {
+  transform-origin: 102px 78px;
+}
+
+.cv .pulse-badge {
+  transform-origin: 150px 30px;
+}
+
+.cv .card:is(:hover, :focus-visible) .pulse-trace {
+  animation: cv-trace 2.4s ease-in-out infinite;
+}
+
+.cv .card:is(:hover, :focus-visible) .pulse-back {
+  transform: translate(-8px, 6px) rotate(-4deg);
+}
+
+.cv .card:is(:hover, :focus-visible) .pulse-badge {
+  transform: scale(1.25);
+}
+
+/* Starts and ends fully drawn: erase from the start, then draw back in. */
+@keyframes cv-trace {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  45% {
+    stroke-dashoffset: -1;
+  }
+  45.01% {
+    stroke-dashoffset: 1;
+  }
+  90%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* EnactOn: the tag swings on its hole and the barcode scans. */
+.cv .tag-body {
+  transform-origin: 146px 75px;
+}
+
+.cv .card:is(:hover, :focus-visible) .tag-body {
+  transform: rotate(-10deg);
+}
+
+.cv .card:is(:hover, :focus-visible) .tag-shadow {
+  transform: translate(-6px, 6px);
+}
+
+.cv .card:is(:hover, :focus-visible) .tag-bar {
+  animation: cv-scan 1.2s ease-in-out infinite;
+}
+
+.cv .tag-bar:nth-child(2) {
+  animation-delay: 80ms;
+}
+.cv .tag-bar:nth-child(3) {
+  animation-delay: 160ms;
+}
+.cv .tag-bar:nth-child(4) {
+  animation-delay: 240ms;
+}
+.cv .tag-bar:nth-child(5) {
+  animation-delay: 320ms;
+}
+.cv .tag-bar:nth-child(6) {
+  animation-delay: 400ms;
+}
+.cv .tag-bar:nth-child(7) {
+  animation-delay: 480ms;
+}
+.cv .tag-bar:nth-child(8) {
+  animation-delay: 560ms;
+}
+.cv .tag-bar:nth-child(9) {
+  animation-delay: 640ms;
+}
+
+@keyframes cv-scan {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.15;
+  }
+}
+
+/* Freelance: the windows separate, the text lines retype one by one and
+   the orange block pops in its corner. */
+.cv .card:is(:hover, :focus-visible) .window-back {
+  transform: translate(10px, -8px);
+}
+
+.cv .card:is(:hover, :focus-visible) .window-front {
+  transform: translate(-6px, 4px);
+}
+
+.cv .window-block {
+  transform-origin: 145px 99px;
+}
+
+.cv .card:is(:hover, :focus-visible) .window-block {
+  transform: scale(1.18);
+}
+
+.cv .window-line {
+  stroke-dasharray: 1 1;
+}
+
+.cv .card:is(:hover, :focus-visible) .window-line {
+  animation: cv-type 500ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.cv .window-line:nth-child(n + 6) {
+  animation-delay: 120ms;
+}
+.cv .window-line:nth-child(n + 7) {
+  animation-delay: 240ms;
+}
+.cv .window-line:nth-child(n + 8) {
+  animation-delay: 360ms;
+}
+
+@keyframes cv-type {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Next role: the dashes march around the frame and the plus turns. */
+.cv .open-plus {
+  transform-origin: 110px 75px;
+}
+
+.cv .card:is(:hover, :focus-visible) .open-frame {
+  animation: cv-march 0.9s linear infinite;
+}
+
+.cv .card:is(:hover, :focus-visible) .open-plus {
+  transform: rotate(90deg) scale(1.3);
+}
+
+@keyframes cv-march {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+/* Board: the tilted orange card drops into the next column's empty slot. */
+.cv .nodes-card {
+  transform-origin: 110px 67px;
+  transform: rotate(-6deg);
+}
+
+.cv .card:is(:hover, :focus-visible) .nodes-card {
+  transform: translate(54px, 44px) rotate(0deg);
+}
+
+/* Chat: the typing dots bounce in turn. */
+.cv .card:is(:hover, :focus-visible) .chat-dots circle {
+  animation: cv-bounce 1s ease-in-out infinite;
+}
+
+.cv .chat-dots circle:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.cv .chat-dots circle:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes cv-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Photos: the stack fans out and the sun moves across the picture. */
+.cv .photos-back {
+  transform-origin: 98px 72px;
+  transform: rotate(-8deg);
+}
+
+.cv .photos-front {
+  transform-origin: 118px 70px;
+}
+
+.cv .card:is(:hover, :focus-visible) .photos-back {
+  transform: translateX(-8px) rotate(-16deg);
+}
+
+.cv .card:is(:hover, :focus-visible) .photos-front {
+  transform: translate(6px, -2px) rotate(5deg);
+}
+
+.cv .card:is(:hover, :focus-visible) .photos-sun {
+  transform: translateX(-34px);
+}
+
+/* Desktop: a key travels along the keyboard and the cursor wanders. */
+.cv .card:is(:hover, :focus-visible) .desktop-key {
+  animation: cv-keys 2s ease-in-out infinite;
+}
+
+.cv .card:is(:hover, :focus-visible) .desktop-cursor {
+  animation: cv-cursor 3s ease-in-out infinite;
+}
+
+@keyframes cv-keys {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(20px);
+  }
+  75% {
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes cv-cursor {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  35% {
+    transform: translate(50px, 12px);
+  }
+  70% {
+    transform: translate(18px, 32px);
+  }
+}
+
+/* :is() lifts this selector above every hover rule without !important. */
+@media (prefers-reduced-motion: reduce) {
+  .cv .card:is(*, :hover, :focus-visible) .card-art svg * {
+    animation: none;
+    transition: none;
+  }
 }
 
 .cv .card-foot {

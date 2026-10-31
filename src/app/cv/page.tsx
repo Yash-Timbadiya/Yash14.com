@@ -181,7 +181,7 @@ export default function CvPage() {
             </h2>
             <div className="copy">
               <p>
-                My work is split across three places&mdash;
+                My work is split across three places {" "}
                 {ROLES.map((role, i) => (
                   <span key={role.id}>
                     <a className="dim" href={`#${role.id}`}>
