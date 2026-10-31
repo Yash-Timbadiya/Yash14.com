@@ -13,7 +13,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/*  Base utility — default 1px gradient border                         */
+/*  Base utility - default 1px gradient border                         */
 /* ------------------------------------------------------------------ */
 
 @utility gradient-border {
@@ -50,7 +50,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/*  Width variants — gradient-border-2, gradient-border-3, etc.        */
+/*  Width variants - gradient-border-2, gradient-border-3, etc.        */
 /* ------------------------------------------------------------------ */
 
 @utility gradient-border-* {
@@ -87,7 +87,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/*  Direction — mirrors bg-linear-to-* from Tailwind                   */
+/*  Direction - mirrors bg-linear-to-* from Tailwind                   */
 /*  gradient-border-to-r, gradient-border-to-bl, etc.                  */
 /* ------------------------------------------------------------------ */
 
@@ -124,7 +124,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/*  Color stops — mirrors from-*, via-*, to-* from Tailwind            */
+/*  Color stops - mirrors from-*, via-*, to-* from Tailwind            */
 /*  gradient-border-from-blue-500, gradient-border-to-pink-300, etc.   */
 /* ------------------------------------------------------------------ */
 
@@ -161,7 +161,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/*  animate-gradient-border — rotates the angle of whatever gradient   */
+/*  animate-gradient-border - rotates the angle of whatever gradient   */
 /*  the element already has. Pairs with any combination of the         */
 /*  from, via, and to color utilities. Override speed via              */
 /*  --gradient-border-duration (default 4s).                           */

@@ -26,7 +26,7 @@ ${getTechStackMarkdown(3)}
 
 ## Social Links
 
-${SOCIAL_LINKS.map((item) => `- [${item.title}](${item.href}) — ${item.handle}`).join("\n")}
+${SOCIAL_LINKS.map((item) => `- [${item.title}](${item.href}) - ${item.handle}`).join("\n")}
 `;
 
 export const revalidate = false;

@@ -8,7 +8,7 @@
   --line-strong: #c7c7c7;
   --text: #000000;
   --heading: #171717;
-  --muted: #6f6f6f;
+  --subtle: #6f6f6f;
   --faint: #8f8f8f;
 
   --sheet-width: 1152px;
@@ -35,7 +35,7 @@
   --line-strong: #505050;
   --text: #ffffff;
   --heading: #ededed;
-  --muted: #a0a0a0;
+  --subtle: #a0a0a0;
   --faint: #707070;
   color-scheme: dark;
 }
@@ -83,7 +83,7 @@ html:has(.cv) {
   line-height: 19.5px;
   font-weight: 400;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--subtle);
 }
 
 .cv .serif {
@@ -112,6 +112,7 @@ html:has(.cv) {
 /* Header */
 
 .cv .masthead {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -142,7 +143,15 @@ html:has(.cv) {
 }
 
 .cv .nav a:hover {
-  color: var(--muted);
+  color: var(--subtle);
+}
+
+/* Theme toggle, centred on the logo's row at the sheet's right edge. */
+.cv .masthead-actions {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  color: var(--heading);
 }
 
 /* Hero */
@@ -173,7 +182,7 @@ html:has(.cv) {
 }
 
 .cv .dim {
-  color: var(--muted);
+  color: var(--subtle);
 }
 
 .cv a.dim {
@@ -181,7 +190,7 @@ html:has(.cv) {
 }
 
 .cv a.dim:hover {
-  color: var(--text);
+  color: var(--orange);
 }
 
 .cv .external {
@@ -212,17 +221,7 @@ html:has(.cv) {
   font-size: 16px;
   line-height: 24px;
   font-weight: 500;
-  color: var(--muted);
-}
-
-.cv .caption-dot {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 4px;
-  border-radius: 50%;
-  background: var(--orange);
-  vertical-align: -1px;
+  color: var(--subtle);
 }
 
 /* Sections */
@@ -339,6 +338,12 @@ html:has(.cv) {
   color: var(--heading);
 }
 
+/* Logos keep their aspect ratio at the width set per logo in stack-logos.tsx. */
+.cv .tile-logo {
+  height: auto;
+  max-width: 60%;
+}
+
 /* Role detail list with orange ticks hanging in the gutter */
 
 .cv .role {
@@ -432,34 +437,49 @@ html:has(.cv) {
   opacity: 0;
 }
 
+/* All products readable by default; hovering one blurs the rest. Each
+   name is in full colour and its description lighter. */
 .cv .run-item {
-  transition: color 150ms ease;
+  transition:
+    filter 300ms ease,
+    opacity 300ms ease;
 }
 
-.cv .run-item:nth-child(even) {
-  color: var(--muted);
+.cv .run-note {
+  color: var(--subtle);
 }
 
-.cv .run-item:hover {
-  color: var(--orange);
+.cv .run-text[data-focusing] .run-item:not([data-active]) {
+  filter: blur(3px);
+  opacity: 0.3;
 }
 
-.cv .run-badge {
+/* The favicon sits small inside a white circle, so every site's icon reads
+   the same size whatever its own padding. */
+.cv .run-icon {
   display: inline-grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
-  margin-right: 6px;
+  width: 26px;
+  height: 26px;
+  margin-right: 8px;
   border-radius: 50%;
-  vertical-align: -3px;
-  background: var(--card);
-  box-shadow: inset 0 0 0 1px var(--line);
-  font-family: var(--cv-font-mono), monospace;
-  font-size: 10px;
-  line-height: 24px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  color: var(--muted);
+  /* The grid's baseline is the favicon's bottom edge, which puts the circle's
+     centre on the middle of the capital letters. */
+  vertical-align: baseline;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.cv .run-icon img {
+  width: var(--icon-size, 18px);
+  height: var(--icon-size, 18px);
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv .run-item {
+    transition: none;
+  }
 }
 
 .cv .run-toggle {
@@ -470,7 +490,7 @@ html:has(.cv) {
   font-size: 16px;
   line-height: 24px;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--subtle);
   transition: color 150ms ease;
 }
 
@@ -547,7 +567,7 @@ html:has(.cv) {
   text-align: center;
   font-size: 16px;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--subtle);
 }
 
 /* FAQ */
@@ -611,7 +631,7 @@ html:has(.cv) {
   font-size: 20px;
   line-height: 32px;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--subtle);
   text-wrap: pretty;
 }
 
@@ -654,10 +674,12 @@ html:has(.cv) {
   pointer-events: none;
 }
 
+/* 1.5px, centred on its tick like the canvas ticks. */
 .cv .career-now {
   position: absolute;
   bottom: 0;
-  width: 1px;
+  width: 1.5px;
+  margin-left: -0.75px;
 }
 
 .cv .career-now {
@@ -665,12 +687,12 @@ html:has(.cv) {
   background: var(--orange);
 }
 
-/* A 9px-wide arrow whose centre (-4px + 4.5px) sits on the line's centre (0.5px). */
+/* A 9px-wide arrow whose centre (-3.75px + 4.5px) sits on the line's centre (0.75px). */
 .cv .career-now::before {
   content: "";
   position: absolute;
   top: -1px;
-  left: -4px;
+  left: -3.75px;
   width: 9px;
   height: 6px;
   background: var(--orange);
@@ -724,8 +746,9 @@ html:has(.cv) {
   content: "";
   position: absolute;
   bottom: calc(12px - var(--tick-height));
-  left: 11.5px;
-  width: 1px;
+  /* career-ticks.tsx sets both to the tick's exact screen pixels. */
+  left: var(--bar-left, 11.25px);
+  width: var(--bar-width, 1.5px);
   height: calc(var(--tick-height) + var(--grow, 0px) + var(--lift));
   background: var(--orange);
   /* Masks the grey tick underneath so no sliver of it shows beside the bar. */
@@ -755,7 +778,7 @@ html:has(.cv) {
 .cv .career-dot-label small {
   display: block;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--subtle);
 }
 
 .cv .career-dot[aria-expanded="true"],
@@ -813,7 +836,7 @@ html:has(.cv) {
 .cv .career-event small {
   display: block;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--subtle);
 }
 
 .cv .career-mark[data-now] .career-event {
@@ -860,13 +883,13 @@ html:has(.cv) {
   pointer-events: none;
 }
 
-/* Invisible 11px rows: hover targets, and click targets for long ticks.
+/* Invisible 9px rows: hover targets, and click targets for long ticks.
    Their `color` only carries the tone for the canvas to read. */
 .cv .ruler-tick {
   --tone: 0%;
   display: block;
   width: 100%;
-  height: 11px;
+  height: 9px;
   color: color-mix(in srgb, var(--heading) var(--tone), var(--line-strong));
 }
 
@@ -937,6 +960,27 @@ html:has(.cv) {
   .cv .ruler {
     display: none;
   }
+}
+
+/* Bottom fade: the home page's soft blur, tinted to the desk on the sides
+   and to the sheet in the middle so the edge between them stays clean. */
+.cv .bottom-fade {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 9;
+  height: 96px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--page));
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  mask-image: linear-gradient(to top, #000 25%, transparent);
+}
+
+.cv .bottom-fade-sheet {
+  width: min(var(--sheet-width), 100%);
+  height: 100%;
+  margin: 0 auto;
+  background: linear-gradient(to bottom, transparent, var(--sheet));
 }
 
 /* Smaller screens */
@@ -1087,6 +1131,7 @@ html:has(.cv) {
   }
 
   .cv .ruler,
+  .cv .bottom-fade,
   .cv .run-toggle,
   .cv .run-fade,
   .cv .nav,

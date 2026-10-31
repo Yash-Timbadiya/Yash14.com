@@ -41,7 +41,7 @@ export const useAnimatedValue = (
 
   /* With `wrap` the target is folded into a continuous series so the spring
      crosses the seam instead of doubling back. Each change is folded in as
-     it renders — the sanctioned way to adjust state to a new prop — and the
+     it renders - the sanctioned way to adjust state to a new prop - and the
      series snaps back to the canonical target at rest, so turning forever
      never drifts far. */
   const start = initial ?? target;

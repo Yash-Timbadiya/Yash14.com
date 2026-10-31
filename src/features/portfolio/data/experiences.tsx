@@ -35,13 +35,13 @@ export const EXPERIENCES: Experience[] = [
 - Integrate Stripe and Square for billing, and Twilio and Retell AI for real-time patient-physician communication.
 
 Products I've built and maintain:
-- [Wellness Wag](https://wellnesswag.com) — Online ESA and PSD letters from licensed therapists.
-- [ParkingMD](https://parkingmd.com) — Online medical evaluations for disabled parking permits.
-- [Minimal](https://shop.joinminimal.com) — Doctor-guided weight loss and telehealth treatment programs.
-- [LeafyRX](https://leafyrx.org) — Online medical marijuana card evaluations.
-- [Emma & Buddy](https://emmaandbuddy.com) — ESA letters for college and housing.
-- [FMLADocs](https://fmladocs.com) — FMLA paperwork approved in 24 hours or less.
-- [TintedMD](https://tintedmd.com) — Medical window tint exemptions for vehicles.`,
+- [Wellness Wag](https://wellnesswag.com) - Online ESA and PSD letters from licensed therapists.
+- [ParkingMD](https://parkingmd.com) - Online medical evaluations for disabled parking permits.
+- [Minimal](https://shop.joinminimal.com) - Doctor-guided weight loss and telehealth treatment programs.
+- [LeafyRX](https://leafyrx.org) - Online medical marijuana card evaluations.
+- [Emma & Buddy](https://emmaandbuddy.com) - ESA letters for college and housing.
+- [FMLADocs](https://fmladocs.com) - FMLA paperwork approved in 24 hours or less.
+- [TintedMD](https://tintedmd.com) - Medical window tint exemptions for vehicles.`,
         skills: [
           "Next.js",
           "TypeScript",
@@ -78,10 +78,10 @@ Products I've built and maintain:
 - Streamline deployment pipelines and enhance application performance through efficient database management and API integration.
 
 Products I've built and maintain:
-- [Proposal.biz](https://proposal.biz) — Online proposal creation and document collaboration platform.
-- [Coupomated](https://coupomated.com) — Coupon and deals data feed API for affiliate marketers.
-- [EnactSoft](https://enactsoft.com) — Cashback, coupon, and affiliate marketing software solutions.
-- [Sparissimo](https://sparissimo.world) — Platform with ClickandFood, Wallet, Community, Academy, API Business, and Cashback modules.`,
+- [Proposal.biz](https://proposal.biz) - Online proposal creation and document collaboration platform.
+- [Coupomated](https://coupomated.com) - Coupon and deals data feed API for affiliate marketers.
+- [EnactSoft](https://enactsoft.com) - Cashback, coupon, and affiliate marketing software solutions.
+- [Sparissimo](https://sparissimo.world) - Platform with ClickandFood, Wallet, Community, Academy, API Business, and Cashback modules.`,
         skills: [
           "MongoDB",
           "Express.js",
@@ -107,7 +107,7 @@ Products I've built and maintain:
           end: "06.2026",
         },
         employmentType: "Part-time",
-        description: `- Built custom business sites for [Infinity Infotech](https://infinityinfotech.tech) — surveillance, solar, and smart wiring solutions.
+        description: `- Built custom business sites for [Infinity Infotech](https://infinityinfotech.tech) - surveillance, solar, and smart wiring solutions.
 - Designed and built the [MEI Solar](https://meisolar.in) marketing site for a utility-scale solar farm developer with sun-tracking panel technology.
 - Developed custom e-commerce sites and Shopify stores for small businesses.`,
         icon: <CodeXmlIcon />,

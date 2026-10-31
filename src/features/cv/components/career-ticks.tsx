@@ -24,6 +24,9 @@ const EASE = 0.2;
 /** Canvas height: tall enough for the largest magnified tick. */
 const CANVAS_HEIGHT = 128;
 
+/** Tick thickness in CSS px, rounded to whole screen pixels when drawn. */
+const THICKNESS = 1.5;
+
 /** Months still ahead are drawn faded. */
 const FUTURE_ALPHA = 0.4;
 
@@ -101,14 +104,14 @@ export function CareerTicks({ ticks }: { ticks: CareerTick[] }) {
       });
 
       // Position, thickness and height all rounded to whole screen pixels.
-      const thickness = Math.max(1, Math.round(dpr));
+      const thickness = Math.max(1, Math.round(THICKNESS * dpr));
       context.clearRect(0, 0, canvas.width, canvas.height);
       ticks.forEach((tick, i) => {
         const h = Math.round(heights[i] * dpr);
         context.globalAlpha = tick.future ? FUTURE_ALPHA : 1;
         context.fillStyle = tick.year ? colors.year : colors.month;
         context.fillRect(
-          Math.round((tick.x * width - 0.5 + shift) * dpr),
+          Math.round((tick.x * width - THICKNESS / 2 + shift) * dpr),
           canvas.height - h,
           thickness,
           h,
@@ -118,6 +121,16 @@ export function CareerTicks({ ticks }: { ticks: CareerTick[] }) {
 
       for (const dot of dots()) {
         const i = Number(dot.dataset.tick);
+        // The orange bar takes the exact screen pixels of the tick it covers,
+        // measured from the dot's 24px-wide button centred on the tick.
+        const tickLeft = Math.round(
+          (ticks[i].x * width - THICKNESS / 2 + shift) * dpr,
+        );
+        dot.style.setProperty(
+          "--bar-left",
+          `${(tickLeft / dpr - shift - (ticks[i].x * width - 12)).toFixed(4)}px`,
+        );
+        dot.style.setProperty("--bar-width", `${thickness / dpr}px`);
         // The button stays put as a stable hover target; only its visible
         // dot, bar and label follow the tick's extra height.
         dot.style.setProperty(

@@ -149,7 +149,7 @@ export const useGaugeContextValue = ({
 
   return {
     /* Folded when wrapped, otherwise as the spring left it, overshoot and
-       all — a bounce past the end is part of the motion. */
+       all - a bounce past the end is part of the motion. */
     value: wrap ? fold(shown) : shown,
     target,
     from: range && wrap ? fold(shownFrom) : shownFrom,

@@ -84,8 +84,8 @@ export const toMonthIndex = (value: string) => {
 
 const PRODUCTS_HEADING = /^products i've built/i;
 const BULLET = /^-\s+/;
-const LIST_LINK = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s+—\s+(.+)$/;
-const INLINE_LINK = /\[([^\]]+)\]\(([^)]+)\)(?:\s+—\s+(.+))?/;
+const LIST_LINK = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s+-\s+(.+)$/;
+const INLINE_LINK = /\[([^\]]+)\]\(([^)]+)\)(?:\s+-\s+(.+))?/;
 
 function toRole(experience: Experience): Role {
   const position = experience.positions[0];
@@ -100,7 +100,7 @@ function toRole(experience: Experience): Role {
     company: experience.companyName,
     href: experience.companyWebsite,
     title: position.title,
-    period: `${year(start)} — ${end ? year(end) : "Now"}`,
+    period: `${year(start)} - ${end ? year(end) : "Now"}`,
     meta: [
       experience.location,
       experience.locationType ?? position.employmentType,
@@ -124,6 +124,11 @@ export type Product = {
   note?: string;
 };
 
+/** Short descriptions for products whose experience line doesn't have one. */
+const PRODUCT_NOTES: Record<string, string> = {
+  "MEI Solar": "Let's Track The Sun",
+};
+
 /** Every product linked from an experience description, in the order listed. */
 export const PRODUCTS: Product[] = EXPERIENCES.flatMap((experience) =>
   (experience.positions[0].description ?? "").split("\n").flatMap((line) => {
@@ -138,7 +143,10 @@ export const PRODUCTS: Product[] = EXPERIENCES.flatMap((experience) =>
     }
     return [];
   }),
-);
+).map((product) => ({
+  ...product,
+  note: PRODUCT_NOTES[product.name] ?? product.note,
+}));
 
 /** Timeline milestones, derived from the same dates as the portfolio. */
 export const CAREER_EVENTS = (() => {
@@ -247,7 +255,7 @@ export const EDUCATION_ITEMS = EDUCATION.map((item) => ({
   title: [item.degree, item.fieldOfStudy].filter(Boolean).join(", "),
   school: item.school,
   detail: [
-    `${year(item.period.start)} — ${item.period.end ? year(item.period.end) : "Now"}`,
+    `${year(item.period.start)} - ${item.period.end ? year(item.period.end) : "Now"}`,
     EDUCATION_NOTES[item.id],
   ]
     .filter(Boolean)

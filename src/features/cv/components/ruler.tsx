@@ -9,9 +9,11 @@ const SPACING = 7;
 const MID_EVERY = 4;
 
 /** Each tick sits in a row this tall, which is also its hover target. */
-const ROW = 11;
-/** Where the 1px line sits inside its row. */
-const LINE_OFFSET = 5;
+const ROW = 9;
+/** Where the line sits inside its row. */
+const LINE_OFFSET = 4;
+/** Tick thickness in CSS px, rounded to whole screen pixels when drawn. */
+const THICKNESS = 1.5;
 const LENGTH = { short: 21, long: 35 };
 
 /**
@@ -203,7 +205,7 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
 
       // Position, thickness and length all rounded to whole screen pixels,
       // so identical ticks render identically.
-      const thickness = Math.max(1, Math.round(dpr));
+      const thickness = Math.max(1, Math.round(THICKNESS * dpr));
       context.clearRect(0, 0, canvas.width, canvas.height);
       for (const i of positions) {
         context.fillStyle = colors[i];

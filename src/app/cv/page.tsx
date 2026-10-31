@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { Ruler } from "@/features/cv/components/ruler";
 import { EmailLink } from "@/features/cv/components/email-link";
 import { CareerLine } from "@/features/cv/components/career-line";
 import { ProductRun } from "@/features/cv/components/product-run";
+import { StackLogo } from "@/features/cv/components/stack-logos";
 import { InlineMarkdown } from "@/features/cv/components/inline-markdown";
 import {
   ArrowRightIcon,
@@ -25,7 +28,7 @@ import {
   withUtm,
 } from "@/features/cv/data/cv";
 
-const TITLE = `${PROFILE.name} — Resume`;
+const TITLE = `${PROFILE.name} - Resume`;
 const DESCRIPTION = `${PROFILE.name} is a ${PROFILE.role} in ${PROFILE.location}, building production Next.js, React, Node.js and PostgreSQL apps for clients in the US and Europe.`;
 
 // The career timeline marks the current month; rebuilding daily keeps it moving.
@@ -77,6 +80,9 @@ export default function CvPage() {
               ))}
               <EmailLink>Contact</EmailLink>
             </nav>
+            <div className="masthead-actions" data-print="hide">
+              <ThemeToggle />
+            </div>
           </header>
 
           <section className="hero">
@@ -121,24 +127,14 @@ export default function CvPage() {
                 >
                   {CROSS_EVEN?.company}
                 </a>{" "}
-                on telehealth platforms used by tens of thousands of patients,
-                and at{" "}
-                <a
-                  className="dim"
-                  href={withUtm(ENACTON?.href ?? PROFILE.website)}
-                  target="_blank"
-                  rel="noopener"
-                >
-                  {ENACTON?.company}
-                </a>{" "}
-                building web apps for clients in the USA and Germany.
+                on telehealth platforms used by tens of thousands of patients.
               </p>
               <p>
-                I care about the parts most people skip: the loading state, the
-                error copy, the extra millisecond. I learned most of what I know
-                by building something, finding out it{" "}
-                <span className="serif">felt</span> wrong, and fixing it until
-                it didn&rsquo;t. You can see more on{" "}
+                I care about the parts most people skip: micro-interactions,
+                smooth transitions, and pixel-perfect details. I learned most of
+                what I know by{" "}
+                <span className="serif hover:text-">building </span>
+                something. You can see more on{" "}
                 <a
                   className="dim"
                   href={withUtm(PROFILE.website)}
@@ -165,14 +161,11 @@ export default function CvPage() {
             <ul className="tiles" aria-label="Core stack">
               {STACK_WORDMARKS.map((name) => (
                 <li key={name} className="tile">
-                  {name}
+                  <StackLogo name={name} />
                 </li>
               ))}
             </ul>
-            <p className="caption">
-              <span className="caption-dot" aria-hidden />
-              The stack I ship with every day
-            </p>
+            <p className="caption">The stack I ship with every day</p>
 
             <ProductRun products={PRODUCTS} />
           </section>
@@ -456,6 +449,12 @@ export default function CvPage() {
           </footer>
         </div>
       </main>
+
+      {/* Same soft blur the home page has, tinted to the sheet and the desk. */}
+      <div className="bottom-fade" aria-hidden="true">
+        <div className="bottom-fade-sheet" />
+      </div>
+      <ScrollToTop data-print="hide" />
     </>
   );
 }

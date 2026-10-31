@@ -175,13 +175,9 @@ export function ExternalIcon() {
       fill="none"
       aria-hidden="true"
     >
-      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.3" />
       <path
-        d="M6 10l4-4M6.5 6H10v3.5"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M7 2.59082C4.43989 3.06109 2.5 5.30394 2.5 8C2.5 11.0376 4.96243 13.5 8 13.5C10.6961 13.5 12.9389 11.5601 13.4092 9H14.9287C14.4435 12.3923 11.5265 15 8 15C4.13401 15 1 11.866 1 8C1 4.47355 3.60773 1.55654 7 1.07129V2.59082ZM15 7H13.5V3.56055L8.53027 8.53027L7.46973 7.46973L12.4395 2.5H9V1H15V7Z"
+        fill="currentColor"
       />
     </svg>
   );
