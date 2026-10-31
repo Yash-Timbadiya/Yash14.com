@@ -522,6 +522,82 @@ html:has(.cv) {
   }
 }
 
+/* Yash14.com: the project tiles lift in turn and the pointer glides onto
+   the orange one. */
+.cv .card-art :is(.folio-tile, .folio-cursor) {
+  transition: transform 600ms cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+
+.cv .card:is(:hover, :focus-visible) .folio-tile {
+  transform: translateY(-5px);
+}
+
+.cv .card:is(:hover, :focus-visible) .folio-cursor {
+  transform: translate(-36px, -6px);
+}
+
+/* Community: the speaker outline moves around the call as people take
+   turns talking. */
+.cv .card:is(:hover, :focus-visible) .community-speaker {
+  animation: cv-speaker 3.2s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+
+@keyframes cv-speaker {
+  0%,
+  18%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25%,
+  43% {
+    transform: translate(56px, 0);
+  }
+  50%,
+  68% {
+    transform: translate(56px, 52px);
+  }
+  75%,
+  93% {
+    transform: translate(0, 52px);
+  }
+}
+
+/* RTC: a message travels from one phone to the other while the line
+   between them streams. */
+.cv .card:is(:hover, :focus-visible) .live-signal {
+  animation: cv-send 1.6s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+
+.cv .card:is(:hover, :focus-visible) .live-wire {
+  animation: cv-stream 0.6s linear infinite;
+}
+
+@keyframes cv-send {
+  0%,
+  10% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  70% {
+    transform: translateX(36px);
+    opacity: 1;
+  }
+  85% {
+    transform: translateX(36px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+@keyframes cv-stream {
+  to {
+    stroke-dashoffset: -8;
+  }
+}
+
 /* Photos: the stack fans out and the sun moves across the picture. */
 .cv .photos-back {
   transform-origin: 98px 72px;
@@ -632,26 +708,146 @@ html:has(.cv) {
   max-width: 60%;
 }
 
-/* Role detail list with orange ticks hanging in the gutter */
+/* Role detail: company, title and dates up top, a one-line summary, three
+   highlights and the rest behind "Show more". Orange ticks hang in the
+   gutter. */
 
 .cv .role {
   margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
 }
 
 .cv .role-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 4px 16px;
-  margin-bottom: 12px;
+  gap: 8px 24px;
 }
 
 .cv .role-name {
-  font-size: 24px;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--heading);
+}
+
+.cv .role-name a {
+  transition: color 150ms ease;
+}
+
+.cv .role-name a:hover {
+  color: var(--orange);
+}
+
+.cv .role-title {
+  margin-top: 2px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--subtle);
+}
+
+.cv .role-meta {
+  display: grid;
+  justify-items: end;
+  padding-top: 6px;
+}
+
+.cv .role-summary {
+  margin-top: 20px;
+  font-size: 20px;
   line-height: 32px;
   font-weight: 500;
   letter-spacing: -0.01em;
+  color: var(--heading);
+  text-wrap: pretty;
+}
+
+.cv .role-checks {
+  gap: 10px;
+}
+
+.cv .role-checks li {
+  font-size: 17px;
+  line-height: 27px;
+  color: var(--subtle);
+}
+
+.cv .role-checks li::before {
+  top: 6px;
+  width: 16px;
+  height: 13px;
+}
+
+.cv .role-more summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--heading);
+  list-style: none;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.cv .role-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.cv .role-more summary:hover {
+  color: var(--orange);
+}
+
+.cv .role-more summary svg {
+  width: 12px;
+  height: 12px;
+  transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.cv .role-more[open] summary svg {
+  transform: rotate(45deg);
+}
+
+.cv .role-more-close,
+.cv .role-more[open] .role-more-open {
+  display: none;
+}
+
+.cv .role-more[open] .role-more-close {
+  display: inline;
+}
+
+.cv .role-more::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    content-visibility 350ms allow-discrete;
+}
+
+.cv .role-more[open]::details-content {
+  block-size: auto;
+}
+
+/* The expanding area reaches into the gutter so the ticks there aren't
+   clipped. */
+.cv .role-more {
+  margin-left: calc(var(--gutter) * -1);
+}
+
+.cv .role-more summary,
+.cv .role-more .role-checks {
+  margin-left: var(--gutter);
+}
+
+.cv .role-more .role-checks {
+  margin-top: 10px;
 }
 
 .cv .checks {
@@ -687,6 +883,83 @@ html:has(.cv) {
   flex-wrap: wrap;
   gap: 6px 14px;
   margin-top: 20px;
+}
+
+/* Skills: a ruled table, group label on the left and pills on the right.
+   Education follows as two short entries with dates on the right. */
+
+.cv .skills {
+  border-bottom: 1px solid var(--line);
+}
+
+.cv .skills-row {
+  display: grid;
+  grid-template-columns: 136px 1fr;
+  gap: 8px 24px;
+  align-items: baseline;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.cv .skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cv .skills-list li {
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--card);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--heading);
+}
+
+.cv .skills-sub {
+  margin-top: 56px;
+  margin-bottom: 4px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--heading);
+}
+
+.cv .edu-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.cv .edu-item:last-child {
+  border-bottom: 0;
+}
+
+.cv .edu-school {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--heading);
+}
+
+.cv .edu-degree {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--subtle);
+}
+
+.cv .edu-meta {
+  display: grid;
+  justify-items: end;
+  padding-top: 5px;
 }
 
 /* Inline product run, faded at the bottom until expanded */
@@ -1354,6 +1627,15 @@ html:has(.cv) {
     grid-template-columns: repeat(3, 1fr);
   }
 
+  .cv .skills-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cv .edu-meta {
+    justify-items: start;
+    padding-top: 0;
+  }
+
   .cv .tile {
     font-size: 16px;
   }
@@ -1435,9 +1717,14 @@ html:has(.cv) {
     max-height: none;
   }
 
-  .cv .faq details::details-content {
+  .cv .faq details::details-content,
+  .cv .role-more::details-content {
     block-size: auto;
     content-visibility: visible;
+  }
+
+  .cv .role-more summary {
+    display: none;
   }
 
   .cv .section {

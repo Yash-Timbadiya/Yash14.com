@@ -4,6 +4,9 @@ type Name =
   | "window"
   | "nodes"
   | "chat"
+  | "live"
+  | "portfolio"
+  | "community"
   | "photos"
   | "desktop"
   | "open";
@@ -39,7 +42,13 @@ export function Illustration({ name }: { name: Name }) {
               width="112"
               height="128"
             />
-            <rect x="54" y="8" width="112" height="128" fill="var(--card-fill, var(--card))" />
+            <rect
+              x="54"
+              y="8"
+              width="112"
+              height="128"
+              fill="var(--card-fill, var(--card))"
+            />
             <path
               className="pulse-trace"
               d="M66 70h22l8-22 14 46 10-30 6 6h28"
@@ -65,7 +74,10 @@ export function Illustration({ name }: { name: Name }) {
           </g>
           <g className="tag-body">
             <g {...STROKE}>
-              <path d="M54 30h78l40 45-40 45H54z" fill="var(--card-fill, var(--card))" />
+              <path
+                d="M54 30h78l40 45-40 45H54z"
+                fill="var(--card-fill, var(--card))"
+              />
               <path d="M74 60l32 32" />
               <circle cx="76" cy="90" r="5" />
               <circle cx="104" cy="62" r="5" />
@@ -94,7 +106,13 @@ export function Illustration({ name }: { name: Name }) {
           </g>
           <g className="window-front">
             <g {...STROKE}>
-              <rect x="50" y="30" width="120" height="96" fill="var(--card-fill, var(--card))" />
+              <rect
+                x="50"
+                y="30"
+                width="120"
+                height="96"
+                fill="var(--card-fill, var(--card))"
+              />
               <path d="M50 48h120" />
               <circle cx="72" cy="39" r="3" />
               <circle cx="82" cy="39" r="3" />
@@ -155,6 +173,102 @@ export function Illustration({ name }: { name: Name }) {
           </g>
         </svg>
       );
+    case "portfolio":
+      return (
+        <svg viewBox="0 0 220 150" aria-hidden="true">
+          <g {...STROKE}>
+            <rect x="40" y="18" width="140" height="114" rx="6" />
+            <path d="M40 34h140" />
+            <circle cx="52" cy="26" r="2.5" />
+            <circle cx="61" cy="26" r="2.5" />
+            <circle cx="70" cy="26" r="2.5" />
+            <circle cx="76" cy="62" r="14" />
+            <path d="M100 56h52M100 68h34" />
+            <rect
+              className="folio-tile"
+              x="56"
+              y="94"
+              width="30"
+              height="22"
+              rx="3"
+            />
+            <rect
+              className="folio-tile"
+              x="128"
+              y="94"
+              width="30"
+              height="22"
+              rx="3"
+            />
+          </g>
+          <rect
+            className="accent folio-tile"
+            x="92"
+            y="94"
+            width="30"
+            height="22"
+            rx="3"
+          />
+          <g transform="translate(150 112)">
+            <path
+              className="folio-cursor"
+              d="M0 0v15l4-4 3 7 3-1.4-3-6.8h5.6z"
+              fill="var(--card-fill, var(--card))"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
+          </g>
+        </svg>
+      );
+    case "community":
+      return (
+        <svg viewBox="0 0 220 150" aria-hidden="true">
+          <g {...STROKE}>
+            <rect x="26" y="20" width="168" height="114" rx="6" />
+            <path d="M72 20v114" />
+            <path d="M38 40h22M38 68h18M38 82h22M38 96h14" />
+            <rect x="80" y="30" width="48" height="44" rx="4" />
+            <circle cx="104" cy="47" r="6" />
+            <path d="M93 67a11 9 0 0 1 22 0" />
+            <rect x="136" y="30" width="48" height="44" rx="4" />
+            <circle cx="160" cy="47" r="6" />
+            <path d="M149 67a11 9 0 0 1 22 0" />
+            <rect x="80" y="82" width="48" height="44" rx="4" />
+            <circle cx="104" cy="99" r="6" />
+            <path d="M93 119a11 9 0 0 1 22 0" />
+            <rect x="136" y="82" width="48" height="44" rx="4" />
+            <circle cx="160" cy="99" r="6" />
+            <path d="M149 119a11 9 0 0 1 22 0" />
+          </g>
+          <rect className="accent" x="36" y="51" width="26" height="6" rx="3" />
+          <rect
+            className="community-speaker"
+            x="80"
+            y="30"
+            width="48"
+            height="44"
+            rx="4"
+            fill="none"
+            stroke="var(--orange)"
+            strokeWidth="2.5"
+          />
+        </svg>
+      );
+    case "live":
+      return (
+        <svg viewBox="0 0 220 150" aria-hidden="true">
+          <g {...STROKE}>
+            <rect x="34" y="34" width="44" height="82" rx="8" />
+            <rect x="142" y="34" width="44" height="82" rx="8" />
+            <path d="M48 104h16M156 104h16" />
+            <path d="M44 50h24M44 60h16M152 72h24M160 82h16" />
+            <path className="live-wire" d="M86 75h48" strokeDasharray="3 5" />
+          </g>
+          <circle className="accent live-signal" cx="92" cy="75" r="5" />
+          <circle className="accent" cx="68" cy="44" r="3" />
+        </svg>
+      );
     case "photos":
       return (
         <svg viewBox="0 0 220 150" aria-hidden="true">
@@ -170,7 +284,13 @@ export function Illustration({ name }: { name: Name }) {
           </g>
           <g className="photos-front">
             <g {...STROKE}>
-              <rect x="76" y="20" width="84" height="100" fill="var(--card-fill, var(--card))" />
+              <rect
+                x="76"
+                y="20"
+                width="84"
+                height="100"
+                fill="var(--card-fill, var(--card))"
+              />
               <rect x="84" y="28" width="68" height="66" />
               <path d="M84 84l20-22 16 16 10-10 22 22" />
             </g>

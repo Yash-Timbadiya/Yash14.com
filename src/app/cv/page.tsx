@@ -50,6 +50,9 @@ export const metadata: Metadata = {
 const CROSS_EVEN = ROLES.find((role) => role.id === "cross-even");
 const ENACTON = ROLES.find((role) => role.id === "enacton");
 
+/** Highlights shown per role before "Show more". */
+const VISIBLE_HIGHLIGHTS = 3;
+
 // One long ruler tick per entry, top to bottom; "top" is the header.
 const SECTION_IDS = [
   "top",
@@ -181,7 +184,7 @@ export default function CvPage() {
             </h2>
             <div className="copy">
               <p>
-                My work is split across three places {" "}
+                My work is split across three places{" "}
                 {ROLES.map((role, i) => (
                   <span key={role.id}>
                     <a className="dim" href={`#${role.id}`}>
@@ -220,48 +223,69 @@ export default function CvPage() {
               </div>
             </div>
 
-            {ROLES.map((role) => (
-              <article key={role.id} className="role" id={role.id}>
-                <div className="role-head">
-                  <h3 className="role-name">
-                    {role.title}
-                    {", "}
-                    {role.href ? (
-                      <a
-                        className="dim"
-                        href={withUtm(role.href)}
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        {role.company}
-                      </a>
-                    ) : (
-                      <span className="dim">{role.company}</span>
-                    )}
-                  </h3>
-                  <span className="mono">
-                    {role.period} · {role.meta}
-                  </span>
-                </div>
-                <div className="copy">
-                  <p>{role.summary}</p>
-                </div>
-                <ul className="checks">
-                  {role.highlights.map((item) => (
-                    <li key={item}>
-                      <InlineMarkdown>{item}</InlineMarkdown>
-                    </li>
-                  ))}
-                </ul>
-                <ul className="chips">
-                  {role.stack.map((item) => (
-                    <li key={item} className="mono">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            ))}
+            {ROLES.map((role) => {
+              const shown = role.highlights.slice(0, VISIBLE_HIGHLIGHTS);
+              const more = role.highlights.slice(VISIBLE_HIGHLIGHTS);
+              return (
+                <article key={role.id} className="role" id={role.id}>
+                  <header className="role-head">
+                    <div>
+                      <h3 className="role-name">
+                        {role.href ? (
+                          <a
+                            href={withUtm(role.href)}
+                            target="_blank"
+                            rel="noopener"
+                          >
+                            {role.company}
+                          </a>
+                        ) : (
+                          role.company
+                        )}
+                      </h3>
+                      <p className="role-title">{role.title}</p>
+                    </div>
+                    <p className="role-meta mono">
+                      <span>{role.period}</span>
+                      <span>{role.meta}</span>
+                    </p>
+                  </header>
+                  <p className="role-summary">{role.summary}</p>
+                  <ul className="checks role-checks">
+                    {shown.map((item) => (
+                      <li key={item}>
+                        <InlineMarkdown>{item}</InlineMarkdown>
+                      </li>
+                    ))}
+                  </ul>
+                  {more.length > 0 && (
+                    <details className="role-more">
+                      <summary>
+                        <span className="role-more-open">
+                          Show {more.length} more
+                        </span>
+                        <span className="role-more-close">Show less</span>
+                        <PlusIcon />
+                      </summary>
+                      <ul className="checks role-checks">
+                        {more.map((item) => (
+                          <li key={item}>
+                            <InlineMarkdown>{item}</InlineMarkdown>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
+                  <ul className="chips">
+                    {role.stack.map((item) => (
+                      <li key={item} className="mono">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
           </section>
 
           {/* Projects */}
@@ -275,8 +299,7 @@ export default function CvPage() {
             </h2>
             <div className="copy">
               <p>
-                Side projects are where I try things before clients need
-                them&mdash;
+                Side projects are where I try things before clients need them:{" "}
                 {PROJECTS.map((project, i) => (
                   <span key={project.id}>
                     <span className="dim">{project.name}</span>
@@ -331,8 +354,8 @@ export default function CvPage() {
             <ul className="checks">
               {PROJECTS.map((project) => (
                 <li key={project.id}>
-                  {project.name}
-                  <span className="dim"> &mdash; {project.description}</span>
+                  {project.name}.
+                  <span className="dim"> {project.description}</span>
                 </li>
               ))}
             </ul>
@@ -347,24 +370,36 @@ export default function CvPage() {
             <h2 className="section-title" id="skills-title" data-dot>
               Skills
             </h2>
-            <div className="copy">
+            <dl className="skills">
               {SKILLS.map((skill) => (
-                <p key={skill.group}>
-                  <span className="dim">{skill.group}</span>{" "}
-                  {skill.items.join(", ")}.
-                </p>
+                <div key={skill.group} className="skills-row">
+                  <dt className="mono">{skill.group}</dt>
+                  <dd>
+                    <ul className="skills-list">
+                      {skill.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
               ))}
-              <p>
-                <span className="dim">Education</span>{" "}
-                {EDUCATION_ITEMS.map((item, i) => (
-                  <span key={item.id}>
-                    {item.title} at {item.school}{" "}
-                    <span className="dim">({item.detail})</span>
-                    {i < EDUCATION_ITEMS.length - 1 ? ", and " : "."}
-                  </span>
-                ))}
-              </p>
-            </div>
+            </dl>
+
+            <h3 className="skills-sub">Education</h3>
+            <ul className="edu">
+              {EDUCATION_ITEMS.map((item) => (
+                <li key={item.id} className="edu-item">
+                  <div>
+                    <p className="edu-school">{item.school}</p>
+                    <p className="edu-degree">{item.degree}</p>
+                  </div>
+                  <p className="edu-meta mono">
+                    <span>{item.period}</span>
+                    {item.note && <span>{item.note}</span>}
+                  </p>
+                </li>
+              ))}
+            </ul>
           </section>
 
           {/* Contact */}

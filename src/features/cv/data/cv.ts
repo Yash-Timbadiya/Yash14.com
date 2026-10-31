@@ -178,17 +178,25 @@ export type Project = {
   label: string;
   href?: string;
   description: string;
-  illustration: "nodes" | "chat" | "photos" | "desktop";
+  illustration: "portfolio" | "nodes" | "community" | "live";
 };
 
 export const PROJECTS: Project[] = [
+  {
+    id: "yash14",
+    name: "Yash14.com",
+    label: "Yash14.com",
+    href: "https://yash14.com",
+    description: "My portfolio and this resume, built with Next.js and Motion",
+    illustration: "portfolio",
+  },
   {
     id: "plura",
     name: "Plura",
     label: "Plura",
     href: "https://github.com/Yash-Timbadiya/Plura",
     description:
-      "Multi-vendor B2B2B SaaS with a website builder, Kanban boards, team access and Stripe Connect fees on every sale.",
+      "Multi-vendor B2B2B SaaS with a website builder, team access and Stripe Connect.",
     illustration: "nodes",
   },
   {
@@ -198,24 +206,15 @@ export const PROJECTS: Project[] = [
     href: "https://github.com/Yash-Timbadiya/Community",
     description:
       "Channels, private one-on-one chats, and audio and video calls for diverse communities.",
-    illustration: "chat",
+    illustration: "community",
   },
   {
-    id: "memories",
-    name: "Memories",
-    label: "Memories",
-    description:
-      "MERN social network with email verification, threaded comments and friend connections.",
-    illustration: "photos",
-  },
-  {
-    id: "macos",
-    name: "macOS on the web",
-    label: "macOS Web",
-    href: "https://creative.yash14.com",
-    description:
-      "A virtual simulation of macOS in React, TypeScript and UnoCSS, deployed on Vercel.",
-    illustration: "desktop",
+    id: "rtc",
+    name: "RTC",
+    label: "RTC",
+    href: "https://1rtc.vercel.app",
+    description: "A real-time chat app with live messaging.",
+    illustration: "live",
   },
 ];
 
@@ -244,22 +243,19 @@ export const STACK_WORDMARKS = [
   "PostgreSQL",
 ];
 
-/** Details the portfolio doesn't carry, keyed by education id. */
+/** Grades the portfolio doesn't carry, keyed by education id. */
 const EDUCATION_NOTES: Record<string, string> = {
   ppsu: "CGPA 7.91 / 10",
-  "ashadeep-higher-secondary": "IIT-JEE preparation",
 };
 
 export const EDUCATION_ITEMS = EDUCATION.map((item) => ({
   id: item.id,
-  title: [item.degree, item.fieldOfStudy].filter(Boolean).join(", "),
   school: item.school,
-  detail: [
-    `${year(item.period.start)} - ${item.period.end ? year(item.period.end) : "Now"}`,
-    EDUCATION_NOTES[item.id],
-  ]
+  degree: [item.degree?.replace("–", "-"), item.fieldOfStudy]
     .filter(Boolean)
-    .join(" · "),
+    .join(", "),
+  period: `${year(item.period.start)} - ${item.period.end ? year(item.period.end) : "Now"}`,
+  note: EDUCATION_NOTES[item.id],
 }));
 
 export const FAQ: { q: string; a: string }[] = [
