@@ -1,8 +1,13 @@
 import { CAREER_EVENTS } from "@/features/cv/data/cv";
 import { USER } from "@/features/portfolio/data/user";
+import { CareerTicks } from "@/features/cv/components/career-ticks";
 import { CareerEvents } from "@/features/cv/components/career-events";
 
 const NOW_LABEL_BOTTOM = 160;
+const NOW_LINE_HEIGHT = NOW_LABEL_BOTTOM - 6;
+
+/** Every active event's orange bar reaches the same height: half the Now line. */
+const EVENT_BAR_HEIGHT = NOW_LINE_HEIGHT / 2;
 
 /** Tick heights in px: every month, each quarter, and each January. */
 const TICK_HEIGHT = { month: 18, quarter: 28, year: 40 } as const;
@@ -53,37 +58,27 @@ export function CareerLine() {
 
   return (
     <div className="career">
-      <div className="career-track">
-        {/* One SVG with crisp edges: every tick snaps to a whole pixel, so
-            all of them render at the same 1px width and brightness. */}
-        <svg
-          className="career-ticks"
-          viewBox={`0 0 ${total - 1} ${TICK_HEIGHT.year}`}
-          preserveAspectRatio="none"
-          style={{ height: TICK_HEIGHT.year }}
-          aria-hidden="true"
-        >
-          {months.map((month) => {
-            const height = tickHeight(month);
-            return (
-              <line
-                key={month}
-                x1={month - first}
-                x2={month - first}
-                y1={TICK_HEIGHT.year - height}
-                y2={TICK_HEIGHT.year}
-                data-year={month % 12 === 0 ? "" : undefined}
-                data-future={month > now ? "" : undefined}
-              />
-            );
-          })}
-        </svg>
+      <div
+        className="career-track"
+        style={
+          { "--event-bar": `${EVENT_BAR_HEIGHT}px` } as React.CSSProperties
+        }
+      >
+        <CareerTicks
+          ticks={months.map((month) => ({
+            x: (month - first) / (total - 1),
+            height: tickHeight(month),
+            year: month % 12 === 0,
+            future: month > now,
+          }))}
+        />
 
         <CareerEvents
           events={CAREER_EVENTS.map((event) => ({
             label: event.label,
             date: event.date,
             left: x(event.month),
+            tick: event.month - first,
             tickHeight: tickHeight(event.month),
           }))}
         />
@@ -91,7 +86,7 @@ export function CareerLine() {
         <span className="career-mark" data-now="">
           <span
             className="career-now"
-            style={{ left: x(now), height: NOW_LABEL_BOTTOM - 6 }}
+            style={{ left: x(now), height: NOW_LINE_HEIGHT }}
           />
           <span
             className="career-event serif"

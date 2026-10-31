@@ -103,7 +103,7 @@ Products I've built and maintain:
         id: "1",
         title: "Full-stack Developer",
         employmentPeriod: {
-          start: "2024",
+          start: "10.2023",
           end: "06.2026",
         },
         employmentType: "Part-time",

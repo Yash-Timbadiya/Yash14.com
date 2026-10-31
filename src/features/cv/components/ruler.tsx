@@ -1,97 +1,196 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-const TICKS = 36;
-const TICK_INDEXES = Array.from({ length: TICKS }, (_, i) => i);
+/** A long tick every SPACING rows; 6 short ticks sit between two long ones. */
+const SPACING = 7;
+
+/** Short ticks follow a slim, slim, slim, mid rhythm. */
+const MID_EVERY = 4;
 
 /** Each tick sits in a row this tall, which is also its hover target. */
 const ROW = 11;
-const LENGTH = { minor: 30, major: 50 };
-
-/** Every Nth minor tick is drawn a shade darker, like a ruler's half marks. */
-const MID_EVERY = 4;
+/** Where the 1px line sits inside its row. */
+const LINE_OFFSET = 5;
+const LENGTH = { short: 21, long: 35 };
 
 /**
  * Magnifier: ticks near the pointer are *scaled*, not lengthened by a fixed
- * amount, so a long section tick grows far more than a short one. `gain` is
- * the extra scale at the centre (2.6 → 3.6x) and `reach` the bell's spread
- * in px. A gentler one rides with the orange scroll indicator.
+ * amount, so a long tick grows far more than a short one. `gain` is the
+ * extra scale at the centre (1.8 → 2.8x) and `reach` the bell's spread in
+ * px.
  */
-const HOVER = { gain: 2.6, reach: 24 };
-const SCROLL = { gain: 0.6, reach: 14 };
+const HOVER = { gain: 1.8, reach: 24 };
+// Half the hover growth, and only while the page is actually scrolling.
+const SCROLL = { gain: HOVER.gain / 2, reach: 18 };
+
+/** How long after the last scroll event the swell settles back, in ms. */
+const SCROLL_IDLE = 150;
+
+/**
+ * The scroll swell's strength eases on its own: in quickly as scrolling
+ * starts, out slowly (about 0.6s) once it stops, so the ticks settle back as
+ * smoothly as they grew.
+ */
+const SCROLL_FADE = { in: 0.25, out: 0.07 };
 
 /** Fraction of the remaining distance covered each frame; lower is softer. */
 const EASE = 0.2;
 
+/** Matches the page's scroll-padding-top, so a section lands below the edge. */
+const SECTION_OFFSET = 96;
+
 const bell = (distance: number, { gain, reach }: typeof HOVER) =>
   gain * Math.exp(-(distance * distance) / (2 * reach * reach));
 
-/** Ends are ink, section starts grey, every Nth tick a shade darker. */
-function toneOf(index: number, majors: number[]) {
-  if (index === 0 || index === TICKS - 1) return "ink";
-  if (majors.includes(index)) return "major";
-  if (index % MID_EVERY === 0) return "mid";
-  return undefined;
+type Tick = { position: number } & (
+  | { kind: "long"; section: string; tone: "ink" | "major" }
+  | { kind: "short"; tone?: "mid" }
+);
+
+const tickCount = (sections: number) => (sections - 1) * SPACING + 1;
+const isLong = (position: number) => position % SPACING === 0;
+
+/** Long ticks for each section (first and last in ink), short ones between. */
+function buildTicks(sectionIds: string[]): Tick[] {
+  return Array.from({ length: tickCount(sectionIds.length) }, (_, position) => {
+    if (isLong(position)) {
+      const index = position / SPACING;
+      const isEnd = index === 0 || index === sectionIds.length - 1;
+      return {
+        position,
+        kind: "long",
+        section: sectionIds[index],
+        tone: isEnd ? "ink" : "major",
+      };
+    }
+    return (position % SPACING) % MID_EVERY === 0
+      ? { position, kind: "short", tone: "mid" }
+      : { position, kind: "short" };
+  });
+}
+
+/** Scroll position at which a section sits at the top of the viewport. */
+function sectionScrollTop(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const top = el.getBoundingClientRect().top + window.scrollY - SECTION_OFFSET;
+  return Math.min(max, Math.max(0, top));
+}
+
+/** The canvas wants plain rgb(); computed colours may be color(srgb ...). */
+function toCanvasColor(computed: string) {
+  const values = computed.match(/[\d.]+/g)?.map(Number) ?? [0, 0, 0];
+  const [r, g, b] = computed.startsWith("color(")
+    ? values.slice(0, 3).map((v) => Math.round(v * 255))
+    : values.slice(0, 3);
+  return `rgb(${r} ${g} ${b})`;
 }
 
 /**
- * Fixed reading ruler on the left edge. The orange line tracks scroll
- * progress down the ticks; longer ticks mark where each section starts.
+ * Fixed reading ruler on the left edge. Each long tick is a section; the
+ * orange line sits on a section's tick when that section reaches the top and
+ * glides between ticks in between. Only long ticks are clickable.
  */
 export function Ruler({ sectionIds }: { sectionIds: string[] }) {
+  const ticks = buildTicks(sectionIds);
   const ticksRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
-  const tickRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const majorsRef = useRef<Set<number>>(new Set());
-  const [majors, setMajors] = useState<number[]>([]);
+  const tickRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
-    const ticks = ticksRef.current;
+    const container = ticksRef.current;
     const line = lineRef.current;
-    if (!ticks || !line) return;
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!container || !line || !canvas || !context) return;
 
+    const count = tickCount(sectionIds.length);
+    const positions = Array.from({ length: count }, (_, i) => i);
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const lengths = TICK_INDEXES.map(() => LENGTH.minor);
+    const lengths = positions.map((i) =>
+      isLong(i) ? LENGTH.long : LENGTH.short,
+    );
+    let anchors: number[] = [];
+    let colors: string[] = [];
+    let dpr = 1;
     let hoverY: number | null = null;
+    let scrolling = false;
+    let scrollStrength = 0;
+    let idleTimer: ReturnType<typeof setTimeout> | undefined;
     let frame = 0;
 
-    const measure = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      if (max <= 0) return;
-      const found = sectionIds
-        .map((id) => document.getElementById(id))
-        .filter((el): el is HTMLElement => el !== null)
-        .map((el) => {
-          const top = el.getBoundingClientRect().top + window.scrollY - 96;
-          return Math.round(Math.min(1, Math.max(0, top / max)) * (TICKS - 1));
-        });
-      majorsRef.current = new Set([0, TICKS - 1, ...found]);
-      setMajors(found);
-      schedule();
+    /** Fractional tick position for the current scroll, between sections. */
+    const indicatorPosition = () => {
+      const y = window.scrollY;
+      if (anchors.length < 2 || y <= anchors[0]) return 0;
+      for (let k = 0; k < anchors.length - 1; k++) {
+        const from = anchors[k];
+        const to = anchors[k + 1];
+        if (y < to) {
+          const t = to > from ? (y - from) / (to - from) : 1;
+          return (k + t) * SPACING;
+        }
+      }
+      return count - 1;
+    };
+
+    /**
+     * Sizes the canvas to real screen pixels and centres the ruler on a top
+     * that is a whole number of screen pixels, so the grid never starts
+     * half a pixel off.
+     */
+    const place = () => {
+      dpr = window.devicePixelRatio || 1;
+      const height = count * ROW;
+      const top = Math.round(((window.innerHeight - height) / 2) * dpr) / dpr;
+      container.style.top = `${top}px`;
+      container.style.transform = "none";
+      canvas.width = Math.round(canvas.clientWidth * dpr);
+      canvas.height = Math.round(height * dpr);
+    };
+
+    const readColors = () => {
+      colors = positions.map((i) => {
+        const el = tickRefs.current[i];
+        return el ? toCanvasColor(getComputedStyle(el).color) : "rgb(0 0 0)";
+      });
     };
 
     const tick = () => {
       frame = 0;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = max > 0 ? window.scrollY / max : 0;
-      const rect = ticks.getBoundingClientRect();
-      // Centre of the first and last rows, so the line lands on a tick.
-      const top = rect.top + ROW / 2;
-      const indicatorY = top + progress * (TICKS - 1) * ROW;
-      line.style.transform = `translateY(${indicatorY}px)`;
+      const rect = container.getBoundingClientRect();
+      // Every tick line sits LINE_OFFSET px into its row.
+      const top = rect.top + LINE_OFFSET;
+      const indicatorY = top + indicatorPosition() * ROW;
+      line.style.transform = `translateY(${Math.round(indicatorY * dpr) / dpr}px)`;
 
       let moving = false;
-      for (const i of TICK_INDEXES) {
+
+      const strengthTarget = scrolling ? 1 : 0;
+      scrollStrength = reduceMotion
+        ? strengthTarget
+        : scrollStrength +
+          (strengthTarget - scrollStrength) *
+            (scrolling ? SCROLL_FADE.in : SCROLL_FADE.out);
+      if (Math.abs(strengthTarget - scrollStrength) < 0.002) {
+        scrollStrength = strengthTarget;
+      } else {
+        moving = true;
+      }
+
+      for (const i of positions) {
         const y = top + i * ROW;
-        const base = majorsRef.current.has(i) ? LENGTH.major : LENGTH.minor;
+        const base = isLong(i) ? LENGTH.long : LENGTH.short;
         const scale =
           1 +
           Math.max(
             hoverY === null ? 0 : bell(y - hoverY, HOVER),
-            bell(y - indicatorY, SCROLL),
+            scrollStrength * bell(y - indicatorY, SCROLL),
           );
         const target = base * scale;
         const next = reduceMotion
@@ -100,10 +199,19 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
         const settled = Math.abs(target - next) < 0.1;
         if (!settled) moving = true;
         lengths[i] = settled ? target : next;
+      }
 
-        tickRefs.current[i]?.style.setProperty(
-          "--length",
-          `${lengths[i].toFixed(2)}px`,
+      // Position, thickness and length all rounded to whole screen pixels,
+      // so identical ticks render identically.
+      const thickness = Math.max(1, Math.round(dpr));
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      for (const i of positions) {
+        context.fillStyle = colors[i];
+        context.fillRect(
+          0,
+          Math.round((i * ROW + LINE_OFFSET) * dpr),
+          Math.round(lengths[i] * dpr),
+          thickness,
         );
       }
 
@@ -114,6 +222,34 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
       if (!frame) frame = requestAnimationFrame(tick);
     };
 
+    const measure = () => {
+      place();
+      readColors();
+      anchors = sectionIds.map(sectionScrollTop);
+      schedule();
+    };
+
+    // The theme toggle swaps classes on <html>; tick colours follow it.
+    const themeObserver = new MutationObserver(() => {
+      readColors();
+      schedule();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style"],
+    });
+
+    // The swell shows while scrolling, then eases back once scrolling stops.
+    const onScroll = () => {
+      scrolling = true;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        scrolling = false;
+        schedule();
+      }, SCROLL_IDLE);
+      schedule();
+    };
+
     const onPointerMove = (event: PointerEvent) => {
       hoverY = event.clientY;
       schedule();
@@ -122,45 +258,58 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
       hoverY = null;
       schedule();
     };
-    const onResize = measure;
 
     measure();
-    ticks.addEventListener("pointermove", onPointerMove);
-    ticks.addEventListener("pointerleave", onPointerLeave);
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", onResize);
-    // Fonts shift layout after first paint, which moves the section offsets.
+    container.addEventListener("pointermove", onPointerMove);
+    container.addEventListener("pointerleave", onPointerLeave);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", measure);
+    window.addEventListener("load", measure);
+    // Fonts shift layout after first paint, which moves the sections.
     document.fonts?.ready.then(measure);
 
     return () => {
       cancelAnimationFrame(frame);
-      ticks.removeEventListener("pointermove", onPointerMove);
-      ticks.removeEventListener("pointerleave", onPointerLeave);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", onResize);
+      themeObserver.disconnect();
+      container.removeEventListener("pointermove", onPointerMove);
+      container.removeEventListener("pointerleave", onPointerLeave);
+      clearTimeout(idleTimer);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("load", measure);
     };
   }, [sectionIds]);
 
-  const jumpTo = (index: number) => {
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    window.scrollTo({ top: (index / (TICKS - 1)) * max });
+  const setRef = (position: number) => (el: HTMLElement | null) => {
+    tickRefs.current[position] = el;
   };
 
   return (
     <div className="ruler" aria-hidden="true">
       <div className="ruler-ticks" ref={ticksRef}>
-        {TICK_INDEXES.map((i) => (
-          <button
-            key={i}
-            ref={(el) => {
-              tickRefs.current[i] = el;
-            }}
-            type="button"
-            tabIndex={-1}
-            data-tone={toneOf(i, majors)}
-            onClick={() => jumpTo(i)}
-          />
-        ))}
+        <canvas className="ruler-canvas" ref={canvasRef} />
+        {ticks.map((tick) =>
+          tick.kind === "long" ? (
+            <button
+              key={tick.position}
+              ref={setRef(tick.position)}
+              type="button"
+              tabIndex={-1}
+              className="ruler-tick"
+              data-tone={tick.tone}
+              onClick={() =>
+                window.scrollTo({ top: sectionScrollTop(tick.section) })
+              }
+            />
+          ) : (
+            <span
+              key={tick.position}
+              ref={setRef(tick.position)}
+              className="ruler-tick"
+              data-tone={tick.tone}
+            />
+          ),
+        )}
       </div>
       <div className="ruler-line" ref={lineRef} style={{ top: 0 }}>
         <a className="ruler-badge" href="#contact" tabIndex={-1}>

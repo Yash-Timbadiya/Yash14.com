@@ -7,7 +7,9 @@ export type CareerEventMark = {
   date: string;
   /** Horizontal position on the timeline, as a CSS percentage. */
   left: string;
-  /** Height of the tick the dot sits on, in px. */
+  /** Index of the tick the dot sits on; CareerTicks updates its height. */
+  tick: number;
+  /** Resting height of that tick, in px. */
   tickHeight: number;
 };
 
@@ -36,6 +38,7 @@ export function CareerEvents({ events }: { events: CareerEventMark[] }) {
           key={event.label}
           type="button"
           className="career-dot"
+          data-tick={event.tick}
           style={
             {
               left: event.left,

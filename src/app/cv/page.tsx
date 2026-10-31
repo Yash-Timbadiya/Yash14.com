@@ -47,7 +47,9 @@ export const metadata: Metadata = {
 const CROSS_EVEN = ROLES.find((role) => role.id === "cross-even");
 const ENACTON = ROLES.find((role) => role.id === "enacton");
 
+// One long ruler tick per entry, top to bottom; "top" is the header.
 const SECTION_IDS = [
+  "top",
   "hello",
   "experience",
   "projects",

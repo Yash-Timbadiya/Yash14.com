@@ -644,28 +644,14 @@ html:has(.cv) {
   height: 1px;
 }
 
-.cv .career-ticks {
+/* Month ticks are painted by career-ticks.tsx; its script sets the width
+   and nudges `left` so the canvas lines up with the screen's pixels. */
+.cv .career-canvas {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
-  overflow: visible;
-  shape-rendering: crispEdges;
-}
-
-.cv .career-ticks line {
-  stroke: var(--line-strong);
-  stroke-width: 1px;
-  vector-effect: non-scaling-stroke;
-}
-
-.cv .career-ticks line[data-year] {
-  stroke: var(--heading);
-}
-
-/* Months still ahead fade back, so the past reads as solid. */
-.cv .career-ticks line[data-future] {
-  opacity: 0.4;
+  height: 128px;
+  pointer-events: none;
 }
 
 .cv .career-now {
@@ -703,25 +689,28 @@ html:has(.cv) {
 
 /* Event dots: a 5px orange dot centred on the top of its month tick, inside
    a 24px button so it's easy to hover or tap. When active the dot rises by
-   --lift while a hairline grows under it from the tick, and the label
-   appears above. */
+   --lift, its tick turns orange with a bar growing up to the dot, and the
+   label appears above. --lift is whatever brings the dot up to --event-bar
+   (set by career-line.tsx), so every event's bar ends at the same height. */
 .cv .career-dot {
-  --lift: 28px;
+  --lift: calc(var(--event-bar, 77px) - var(--tick-height) - var(--grow, 0px));
   position: absolute;
   bottom: calc(var(--tick-height) - 12px);
   z-index: 2;
   width: 24px;
   height: 24px;
-  margin-left: -11.5px;
+  /* Centred on x itself: the SVG ticks are stroked centred on x. */
+  margin-left: -12px;
   border-radius: 50%;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
+/* --grow is how much taller the magnifier has made this tick right now. */
 .cv .career-dot::before {
   content: "";
   position: absolute;
-  inset: 9.5px;
+  inset: calc(9.5px - var(--grow, 0px)) 9.5px calc(9.5px + var(--grow, 0px));
   z-index: 1;
   border-radius: 50%;
   background: var(--orange);
@@ -729,15 +718,18 @@ html:has(.cv) {
   transition: translate 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Starts at the tick top (the button's centre) and grows up with the dot. */
+/* One orange bar from the baseline, over the event's own tick, up to the
+   lifted dot. It grows from the bottom, so the tick fills first. */
 .cv .career-dot::after {
   content: "";
   position: absolute;
-  bottom: 12px;
+  bottom: calc(12px - var(--tick-height));
   left: 11.5px;
   width: 1px;
-  height: var(--lift);
+  height: calc(var(--tick-height) + var(--grow, 0px) + var(--lift));
   background: var(--orange);
+  /* Masks the grey tick underneath so no sliver of it shows beside the bar. */
+  box-shadow: 0 0 0 1px var(--card);
   scale: 1 0;
   transform-origin: bottom;
   transition: scale 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -745,7 +737,7 @@ html:has(.cv) {
 
 .cv .career-dot-label {
   position: absolute;
-  bottom: calc(12px + var(--lift) + 10px);
+  bottom: calc(12px + var(--grow, 0px) + var(--lift) + 10px);
   left: 50%;
   text-align: center;
   white-space: nowrap;
@@ -787,24 +779,23 @@ html:has(.cv) {
   translate: -50% 0;
 }
 
-/* Hover only where a real pointer exists, so taps don't leave it stuck. */
-@media (hover: hover) {
-  .cv .career-dot:hover {
-    z-index: 3;
-  }
+/* data-active: career-ticks.tsx sets it while the pointer is over this
+   event's candle (mouse and pen only, so a tap never leaves it stuck). */
+.cv .career-dot[data-active] {
+  z-index: 3;
+}
 
-  .cv .career-dot:hover::before {
-    translate: 0 calc(var(--lift) * -1);
-  }
+.cv .career-dot[data-active]::before {
+  translate: 0 calc(var(--lift) * -1);
+}
 
-  .cv .career-dot:hover::after {
-    scale: 1 1;
-  }
+.cv .career-dot[data-active]::after {
+  scale: 1 1;
+}
 
-  .cv .career-dot:hover .career-dot-label {
-    opacity: 1;
-    translate: -50% 0;
-  }
+.cv .career-dot[data-active] .career-dot-label {
+  opacity: 1;
+  translate: -50% 0;
 }
 
 .cv .career-dot:focus-visible {
@@ -844,7 +835,8 @@ html:has(.cv) {
   pointer-events: none;
 }
 
-/* Wide enough that the magnified ticks stay under the pointer. */
+/* Wide enough that the magnified ticks stay under the pointer. ruler.tsx
+   replaces the centring below with a top snapped to whole screen pixels. */
 .cv .ruler-ticks {
   position: absolute;
   left: 32px;
@@ -855,38 +847,43 @@ html:has(.cv) {
   pointer-events: auto;
 }
 
-/* Each tick is an 11px row (its hover target) with a 1px line drawn in the
-   middle; ruler.tsx animates --length every frame. Colour never changes on
-   hover, only length. */
-.cv .ruler-ticks button {
+/* The ticks are painted on this canvas, snapped to the screen's real pixel
+   grid, so every slim, mid and long tick has the same thickness at any zoom
+   or display scaling. Plain CSS lines land on fractional pixels and render
+   unevenly. */
+.cv .ruler-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 128px;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Invisible 11px rows: hover targets, and click targets for long ticks.
+   Their `color` only carries the tone for the canvas to read. */
+.cv .ruler-tick {
   --tone: 0%;
-  position: relative;
   display: block;
   width: 100%;
   height: 11px;
+  color: color-mix(in srgb, var(--heading) var(--tone), var(--line-strong));
+}
+
+.cv button.ruler-tick {
   cursor: pointer;
 }
 
-.cv .ruler-ticks button[data-tone="mid"] {
+.cv .ruler-tick[data-tone="mid"] {
   --tone: 35%;
 }
 
-.cv .ruler-ticks button[data-tone="major"] {
+.cv .ruler-tick[data-tone="major"] {
   --tone: 55%;
 }
 
-.cv .ruler-ticks button[data-tone="ink"] {
+.cv .ruler-tick[data-tone="ink"] {
   --tone: 100%;
-}
-
-.cv .ruler-ticks button::before {
-  content: "";
-  position: absolute;
-  top: 5px;
-  left: 0;
-  width: var(--length, 30px);
-  height: 1px;
-  background: color-mix(in srgb, var(--heading) var(--tone), var(--line-strong));
 }
 
 .cv .ruler-line {
