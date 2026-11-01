@@ -4,6 +4,7 @@ import { Ruler } from "@/features/cv/components/ruler";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { StackLogo } from "@/features/cv/components/stack-logos";
+import { BottomFade } from "@/features/cv/components/bottom-fade";
 import { CareerLine } from "@/features/cv/components/career-line";
 import { ProductRun } from "@/features/cv/components/product-run";
 import { WhatsAppLink } from "@/features/cv/components/whatsapp-link";
@@ -84,9 +85,6 @@ export default function CvPage() {
                   {item.label}
                 </a>
               ))}
-              <WhatsAppLink message={WHATSAPP_MESSAGES.contact}>
-                Contact
-              </WhatsAppLink>
             </nav>
             <div className="masthead-actions" data-print="hide">
               <ThemeToggle />
@@ -498,11 +496,8 @@ export default function CvPage() {
         </div>
       </main>
 
-      {/* Same soft blur the home page has, tinted to the sheet and the desk. */}
-      <div className="bottom-fade" aria-hidden="true">
-        <div className="bottom-fade-sheet" />
-      </div>
-      <ScrollToTop data-print="hide" />
+      <BottomFade />
+      <ScrollToTop className="cv-scroll-top" data-print="hide" />
     </>
   );
 }

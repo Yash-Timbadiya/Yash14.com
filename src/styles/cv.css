@@ -151,6 +151,19 @@ html:has(.cv) {
   color: var(--subtle);
 }
 
+/* The shared button's secondary fill matches the grey page, so it vanished
+   here. Ink on the page, orange on hover, like the CV's other actions. */
+.cv .cv-scroll-top {
+  background: var(--heading);
+  color: var(--sheet);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.12);
+}
+
+.cv .cv-scroll-top:hover {
+  background: var(--orange);
+  color: #fff;
+}
+
 /* Theme toggle, centred on the logo's row at the sheet's right edge. */
 .cv .masthead-actions {
   position: absolute;
@@ -1540,7 +1553,9 @@ html:has(.cv) {
 .cv .ruler-badge {
   position: absolute;
   top: 1px;
-  right: calc((100vw - var(--sheet-width)) / 2 - 48px);
+  /* Out on the desk past the sheet; on narrower windows it backs off so it
+     stays clear of the sheet. */
+  right: max(16px, min(145px, calc((100vw - var(--sheet-width)) / 2 - 124px)));
   padding: 2px 8px;
   background: var(--orange);
   color: #fff;
@@ -1582,6 +1597,11 @@ html:has(.cv) {
   height: 100%;
   margin: 0 auto;
   background: linear-gradient(to bottom, transparent, var(--sheet));
+  transition: opacity 200ms ease;
+}
+
+.cv .bottom-fade-sheet[data-hidden="true"] {
+  opacity: 0;
 }
 
 /* Smaller screens */

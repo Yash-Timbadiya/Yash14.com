@@ -59,6 +59,8 @@ export const NAV = [
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#skills" },
+  { label: "Education", href: "#education" },
+  { label: "Contact", href: "#contact" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -300,15 +302,7 @@ export const FAQ: { q: string; a: string }[] = [
     a: "Next.js and React with TypeScript on the front, Node.js with tRPC or Express on the back, and PostgreSQL through Drizzle or Prisma. Redis and BullMQ for background work.",
   },
   {
-    q: "Can I see your code?",
-    a: "Most client work is private, but Plura, Community and my portfolio are open source on GitHub.",
-  },
-  {
     q: "What do you do away from the keyboard?",
     a: "Chess, cricket, travelling and trekking, photo and video editing, and the occasional video game.",
-  },
-  {
-    q: "Can I get a PDF copy?",
-    a: "Yes. Use your browser's print dialog and choose Save as PDF; the page has a print layout built in.",
   },
 ];
