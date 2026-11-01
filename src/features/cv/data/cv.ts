@@ -1,5 +1,6 @@
 import type { Experience } from "@/features/portfolio/types/experiences";
 
+import { cdn } from "@/utils/cdn";
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
 import { USER } from "@/features/portfolio/data/user";
@@ -14,6 +15,12 @@ import { EXPERIENCES } from "@/features/portfolio/data/experiences";
  */
 
 export const CV_URL = "https://cv.yash14.com";
+
+/**
+ * The PDF resume on the CDN. CDN files are cached as immutable, so a new
+ * version goes up under a new file name rather than replacing this one.
+ */
+export const RESUME_PDF_URL = cdn("/resume/yash-timbadiya-resume-2026-11.pdf");
 
 export const withUtm = (href: string) => addQueryParams(href, UTM_PARAMS);
 
