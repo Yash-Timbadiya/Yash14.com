@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 
 import { Ruler } from "@/features/cv/components/ruler";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -69,6 +70,9 @@ const SECTION_IDS = [
   "contact",
   "faq",
 ];
+
+/** Split into letters so each can roll on hover, staggered by index. */
+const CTA_LABEL = "Get in touch";
 
 export default function CvPage() {
   return (
@@ -443,9 +447,23 @@ export default function CvPage() {
             </ol>
 
             <WhatsAppLink className="cta" message={WHATSAPP_MESSAGES.contact}>
-              <span className="cta-label">Get in touch</span>
+              <span className="cta-label" aria-label={CTA_LABEL}>
+                {Array.from(CTA_LABEL, (char, index) => (
+                  <span
+                    key={index}
+                    className="cta-char"
+                    style={{ "--i": index } as CSSProperties}
+                    aria-hidden="true"
+                  >
+                    {char}
+                  </span>
+                ))}
+              </span>
               <span className="cta-side">
-                <span className="cta-note">Available 2026</span>
+                <span className="cta-note">
+                  <span className="cta-dot" aria-hidden="true" />
+                  Available
+                </span>
                 <span className="cta-arrow">
                   <ArrowRightIcon />
                 </span>

@@ -1147,11 +1147,27 @@ html:has(.cv) {
   transform: scale(0.99);
 }
 
+/* On hover every letter rolls up and an identical copy, drawn as a text
+   shadow one line below, rolls in behind it, staggered left to right. */
 .cv .cta-label {
+  display: inline-flex;
+  overflow: hidden;
   font-size: 48px;
-  line-height: 1;
+  line-height: 1.15;
   font-weight: 500;
   letter-spacing: -0.04em;
+}
+
+.cv .cta-char {
+  display: inline-block;
+  white-space: pre;
+  text-shadow: 0 1.15em 0 currentColor;
+  transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i) * 18ms);
+}
+
+.cv .cta:hover .cta-char {
+  transform: translateY(-1.15em);
 }
 
 .cv .cta-side {
@@ -1161,11 +1177,40 @@ html:has(.cv) {
 }
 
 .cv .cta-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-size: 24px;
   line-height: 1;
   font-weight: 500;
   letter-spacing: -0.02em;
-  opacity: 0.85;
+}
+
+/* A solid white dot with a ring that pings out from it, like Tailwind's
+   animate-ping. */
+.cv .cta-dot {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.cv .cta-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: cta-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes cta-ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
 
 .cv .cta-arrow {
@@ -1176,11 +1221,30 @@ html:has(.cv) {
   border-radius: 50%;
   background: #fff;
   color: #000;
-  transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.cv .cta:hover .cta-arrow {
-  transform: translateX(4px);
+/* The circle stays put; only the arrow turns to point up and right. */
+.cv .cta-arrow svg {
+  transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.cv .cta:hover .cta-arrow svg {
+  transform: rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv .cta-char,
+  .cv .cta-arrow svg {
+    transition: none;
+  }
+
+  .cv .cta:hover .cta-char {
+    transform: none;
+  }
+
+  .cv .cta-dot::after {
+    animation: none;
+  }
 }
 
 .cv .cta-caption {
