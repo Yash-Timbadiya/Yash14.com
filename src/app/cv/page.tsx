@@ -76,7 +76,7 @@ export default function CvPage() {
       <main className="sheet" id="top">
         <div className="column">
           <header className="masthead">
-            <a className="logo" href="#top">
+            <a className="logo" href="#top" data-ruler-anchor>
               <span className="sr-only">{PROFILE.name}, back to top</span>
             </a>
             <nav className="nav" aria-label="Sections">

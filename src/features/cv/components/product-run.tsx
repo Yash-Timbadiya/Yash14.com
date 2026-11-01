@@ -5,8 +5,8 @@ import type { Product } from "@/features/cv/data/cv";
 import Image from "next/image";
 import { cdn } from "@/utils/cdn";
 import { withUtm } from "@/features/cv/data/cv";
-import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDownIcon } from "./illustrations";
+import { useEffect, useId, useRef, useState } from "react";
 
 /**
  * Grace period after the pointer leaves a product. Moving straight onto the

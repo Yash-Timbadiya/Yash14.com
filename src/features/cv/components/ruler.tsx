@@ -41,8 +41,11 @@ const SCROLL_FADE = { in: 0.25, out: 0.07 };
 /** Fraction of the remaining distance covered each frame; lower is softer. */
 const EASE = 0.2;
 
-/** Matches the page's scroll-padding-top, so a section lands below the edge. */
+/** Matches the page's scroll-padding-top, for targets without a heading. */
 const SECTION_OFFSET = 96;
+
+/** Space between a section heading's box and the orange line under it. */
+const HEADING_GAP = 14;
 
 const bell = (distance: number, { gain, reach }: typeof HOVER) =>
   gain * Math.exp(-(distance * distance) / (2 * reach * reach));
@@ -74,12 +77,27 @@ function buildTicks(sectionIds: string[]): Tick[] {
   });
 }
 
-/** Scroll position at which a section sits at the top of the viewport. */
-function sectionScrollTop(id: string) {
+/**
+ * Scroll position at which a section's heading sits just above the orange
+ * line, given where the line is drawn (viewport px) when it rests on that
+ * section's tick. Targets with neither a heading nor a marker land at the
+ * top instead.
+ */
+function sectionScrollTop(id: string, lineY: number) {
   const el = document.getElementById(id);
   if (!el) return 0;
   const max = document.documentElement.scrollHeight - window.innerHeight;
-  const top = el.getBoundingClientRect().top + window.scrollY - SECTION_OFFSET;
+  // An explicit marker wins (the logo dot for the top of the page), else the
+  // section's own heading. Scoped to direct children so #top, which wraps
+  // every section, doesn't pick up Hello's heading.
+  const heading =
+    el.querySelector("[data-ruler-anchor]") ??
+    el.querySelector(":scope > .section-title");
+  const top = heading
+    ? heading.getBoundingClientRect().bottom +
+      window.scrollY -
+      (lineY - HEADING_GAP)
+    : el.getBoundingClientRect().top + window.scrollY - SECTION_OFFSET;
   return Math.min(max, Math.max(0, top));
 }
 
@@ -94,8 +112,9 @@ function toCanvasColor(computed: string) {
 
 /**
  * Fixed reading ruler on the left edge. Each long tick is a section; the
- * orange line sits on a section's tick when that section reaches the top and
- * glides between ticks in between. Only long ticks are clickable.
+ * orange line sits on a section's tick when that section's heading rests
+ * just above the line, and glides between ticks in between. Only long ticks
+ * are clickable.
  */
 export function Ruler({ sectionIds }: { sectionIds: string[] }) {
   const ticks = buildTicks(sectionIds);
@@ -103,6 +122,8 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const tickRefs = useRef<(HTMLElement | null)[]>([]);
+  // Scroll targets per section, kept in sync by the effect's measure().
+  const anchorsRef = useRef<number[]>([]);
 
   useEffect(() => {
     const container = ticksRef.current;
@@ -120,6 +141,7 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
       isLong(i) ? LENGTH.long : LENGTH.short,
     );
     let anchors: number[] = [];
+    let rulerTop = 0;
     let colors: string[] = [];
     let dpr = 1;
     let hoverY: number | null = null;
@@ -152,6 +174,7 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
       dpr = window.devicePixelRatio || 1;
       const height = count * ROW;
       const top = Math.round(((window.innerHeight - height) / 2) * dpr) / dpr;
+      rulerTop = top;
       container.style.top = `${top}px`;
       container.style.transform = "none";
       canvas.width = Math.round(canvas.clientWidth * dpr);
@@ -229,7 +252,11 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
     const measure = () => {
       place();
       readColors();
-      anchors = sectionIds.map(sectionScrollTop);
+      // Where the line sits when it rests on each section's long tick.
+      anchors = sectionIds.map((id, index) =>
+        sectionScrollTop(id, rulerTop + LINE_OFFSET + index * SPACING * ROW),
+      );
+      anchorsRef.current = anchors;
       schedule();
     };
 
@@ -263,7 +290,27 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
       schedule();
     };
 
+    // Menu links and other in-page links to a section land on the same spot
+    // a ruler click does, heading resting on the line. When the ruler is
+    // hidden on narrow screens, the browser's own anchor scroll takes over.
+    const onLinkClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+      const link = (event.target as Element | null)?.closest<HTMLAnchorElement>(
+        'a[href^="#"]',
+      );
+      const index = link ? sectionIds.indexOf(link.hash.slice(1)) : -1;
+      if (!link || index < 0 || !container.offsetParent) return;
+      event.preventDefault();
+      measure();
+      window.scrollTo({ top: anchors[index] });
+      history.pushState(null, "", link.hash);
+    };
+
     measure();
+    document.addEventListener("click", onLinkClick);
     container.addEventListener("pointermove", onPointerMove);
     container.addEventListener("pointerleave", onPointerLeave);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -275,6 +322,7 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
     return () => {
       cancelAnimationFrame(frame);
       themeObserver.disconnect();
+      document.removeEventListener("click", onLinkClick);
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerleave", onPointerLeave);
       clearTimeout(idleTimer);
@@ -302,7 +350,9 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
               className="ruler-tick"
               data-tone={tick.tone}
               onClick={() =>
-                window.scrollTo({ top: sectionScrollTop(tick.section) })
+                window.scrollTo({
+                  top: anchorsRef.current[tick.position / SPACING] ?? 0,
+                })
               }
             />
           ) : (
