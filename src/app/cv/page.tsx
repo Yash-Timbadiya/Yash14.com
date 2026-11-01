@@ -5,6 +5,7 @@ import { YTMark } from "@/components/yt-mark";
 import { Ruler } from "@/features/cv/components/ruler";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { CvReveal } from "@/features/cv/components/cv-reveal";
 import { YTMarkCv } from "@/features/cv/components/yt-mark-cv";
 import { StackLogo } from "@/features/cv/components/stack-logos";
 import { BottomFade } from "@/features/cv/components/bottom-fade";
@@ -536,6 +537,7 @@ export default function CvPage() {
       </main>
 
       <BottomFade />
+      <CvReveal />
       <ScrollToTop className="cv-scroll-top" data-print="hide" />
     </>
   );

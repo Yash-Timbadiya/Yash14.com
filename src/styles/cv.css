@@ -109,6 +109,106 @@ html:has(.cv) {
   margin: 0 auto;
 }
 
+/* Load and scroll-in motion. Everything rises a few pixels out of a soft
+   blur with a strong ease-out. The header and intro run in CSS from first
+   paint, staggered top to bottom; sections below rise as they scroll in
+   (cv-reveal.tsx). Fill mode is backwards only, so once an animation ends
+   the element's own transforms and hover transitions take over again. */
+.cv {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes cv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+}
+
+.cv .logo,
+.cv .cv-mark,
+.cv .nav a,
+.cv .masthead-actions > *,
+.cv .hero > * {
+  animation: cv-rise 700ms var(--ease-out-strong) backwards;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
+.cv .cv-mark {
+  --rise-delay: 60ms;
+}
+
+.cv .nav a:nth-child(1) {
+  --rise-delay: 100ms;
+}
+.cv .nav a:nth-child(2) {
+  --rise-delay: 140ms;
+}
+.cv .nav a:nth-child(3) {
+  --rise-delay: 180ms;
+}
+.cv .nav a:nth-child(4) {
+  --rise-delay: 220ms;
+}
+.cv .nav a:nth-child(5) {
+  --rise-delay: 260ms;
+}
+.cv .nav a:nth-child(6) {
+  --rise-delay: 300ms;
+}
+.cv .nav a:nth-child(7) {
+  --rise-delay: 340ms;
+}
+.cv .nav a:nth-child(8) {
+  --rise-delay: 380ms;
+}
+
+.cv .masthead-actions > :nth-child(1) {
+  --rise-delay: 200ms;
+}
+.cv .masthead-actions > :nth-child(2) {
+  --rise-delay: 250ms;
+}
+.cv .masthead-actions > :nth-child(3) {
+  --rise-delay: 300ms;
+}
+
+.cv .hero > :nth-child(1) {
+  --rise-delay: 420ms;
+}
+.cv .hero > :nth-child(2) {
+  --rise-delay: 500ms;
+}
+
+.cv[data-reveal-ready] [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+}
+
+.cv [data-revealed="animate"] {
+  animation: cv-rise 800ms var(--ease-out-strong) backwards;
+  animation-delay: calc(var(--reveal-i, 0) * 70ms);
+}
+
+@keyframes cv-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion keeps a gentle fade but drops the movement and blur. */
+@media (prefers-reduced-motion: reduce) {
+  .cv .logo,
+  .cv .cv-mark,
+  .cv .nav a,
+  .cv .masthead-actions > *,
+  .cv .hero > *,
+  .cv [data-revealed="animate"] {
+    animation-name: cv-fade;
+    animation-duration: 300ms;
+  }
+}
+
 /* Header */
 
 .cv .masthead {
@@ -1969,6 +2069,13 @@ html[data-ruler-line="hidden"] .cv .ruler-line {
 /* Print: a clean paper copy without the interactive chrome. */
 
 @media print {
+  /* Sections not yet scrolled to are still hidden for their reveal. */
+  .cv[data-reveal-ready] [data-reveal]:not([data-revealed]),
+  .cv [data-revealed="animate"] {
+    opacity: 1;
+    animation: none;
+  }
+
   .cv {
     --page: #fff;
     --sheet: #fff;
