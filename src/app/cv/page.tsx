@@ -9,6 +9,7 @@ import { CareerLine } from "@/features/cv/components/career-line";
 import { ProductRun } from "@/features/cv/components/product-run";
 import { WhatsAppLink } from "@/features/cv/components/whatsapp-link";
 import { InlineMarkdown } from "@/features/cv/components/inline-markdown";
+import { RulerLineToggle } from "@/features/cv/components/ruler-line-toggle";
 import {
   ArrowRightIcon,
   ExternalIcon,
@@ -88,6 +89,7 @@ export default function CvPage() {
             </nav>
             <div className="masthead-actions" data-print="hide">
               <ThemeToggle />
+              <RulerLineToggle />
             </div>
           </header>
 
