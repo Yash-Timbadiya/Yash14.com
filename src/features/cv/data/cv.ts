@@ -28,6 +28,32 @@ export const PROFILE = {
   x: SOCIAL.x.href,
 };
 
+/** What a client gets, shown as the numbered grid in the Contact section. */
+export const PROMISES = [
+  {
+    title: "Proactive Problem Solving",
+    text: "Anticipating bottlenecks and identifying opportunities for optimization before issues arise.",
+  },
+  {
+    title: "Collaborative Design & Dev",
+    text: "A fluid and integrated workflow where designers and developers work in unison for seamless handoffs.",
+  },
+  {
+    title: "Value-Driven Metrics",
+    text: "Measuring success through business impact and real user engagement, not just feature delivery.",
+  },
+  {
+    title: "Long-Term Partnership",
+    text: "Post-launch support, continuous updates, and strategic advice to ensure sustained growth.",
+  },
+];
+
+/** Prefilled WhatsApp messages for the CV's contact links, one per intent. */
+export const WHATSAPP_MESSAGES = {
+  contact: `Hi ${USER.firstName}, I came across your CV and would love to talk about working together.`,
+  nextRole: `Hi ${USER.firstName}, I saw you're open to your next role. I'd love to tell you about a position on our team.`,
+};
+
 export const NAV = [
   { label: "Hello", href: "#hello" },
   { label: "Experience", href: "#experience" },
@@ -221,32 +247,35 @@ export const PROJECTS: Project[] = [
 export const SKILLS: { group: string; items: string[] }[] = [
   {
     group: "Languages",
-    items: ["TypeScript", "JavaScript", "Python", "PHP", "Java", "C++"],
+    items: ["TypeScript", "JavaScript", "Python"],
   },
   {
     group: "Frontend",
-    items: ["Next.js", "React", "Tailwind CSS", "GSAP", "Motion", "Figma"],
+    items: [
+      "Next.js",
+      "React",
+      "Tailwind CSS",
+      "Tanstack",
+      "GSAP",
+      "Motion",
+      "Figma",
+    ],
   },
   {
     group: "Backend",
-    items: ["Node.js", "Express", "tRPC", "Prisma", "Drizzle", "BullMQ"],
+    items: ["Node.js", "Express", "Nginx", "tRPC", "Prisma", "Drizzle"],
   },
   { group: "Data", items: ["PostgreSQL", "MySQL", "MongoDB", "Redis"] },
-  { group: "Cloud", items: ["AWS", "Google Cloud", "Vercel", "Docker", "Bun"] },
+  { group: "Cloud", items: ["AWS", "Google Cloud", "Vercel", "Docker"] },
 ];
 
 export const STACK_WORDMARKS = [
   "Next.js",
   "React",
   "TypeScript",
-  "Node.js",
+  "Tailwind CSS",
   "PostgreSQL",
 ];
-
-/** Grades the portfolio doesn't carry, keyed by education id. */
-const EDUCATION_NOTES: Record<string, string> = {
-  ppsu: "CGPA 7.91 / 10",
-};
 
 export const EDUCATION_ITEMS = EDUCATION.map((item) => ({
   id: item.id,
@@ -255,13 +284,12 @@ export const EDUCATION_ITEMS = EDUCATION.map((item) => ({
     .filter(Boolean)
     .join(", "),
   period: `${year(item.period.start)} - ${item.period.end ? year(item.period.end) : "Now"}`,
-  note: EDUCATION_NOTES[item.id],
 }));
 
 export const FAQ: { q: string; a: string }[] = [
   {
     q: "Are you open to new work?",
-    a: "Yes. I'm open to full-time roles and selected freelance projects where product quality and the small details matter.",
+    a: "Yes. I'm open to full-time roles and freelance projects where product quality and the small details matter.",
   },
   {
     q: "Do you work with international teams?",

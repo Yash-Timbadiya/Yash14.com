@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
+import { Ruler } from "@/features/cv/components/ruler";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollToTop } from "@/components/scroll-to-top";
-import { Ruler } from "@/features/cv/components/ruler";
-import { EmailLink } from "@/features/cv/components/email-link";
+import { StackLogo } from "@/features/cv/components/stack-logos";
 import { CareerLine } from "@/features/cv/components/career-line";
 import { ProductRun } from "@/features/cv/components/product-run";
-import { StackLogo } from "@/features/cv/components/stack-logos";
+import { WhatsAppLink } from "@/features/cv/components/whatsapp-link";
 import { InlineMarkdown } from "@/features/cv/components/inline-markdown";
 import {
   ArrowRightIcon,
@@ -24,7 +24,9 @@ import {
   PROJECTS,
   ROLES,
   SKILLS,
+  PROMISES,
   STACK_WORDMARKS,
+  WHATSAPP_MESSAGES,
   withUtm,
 } from "@/features/cv/data/cv";
 
@@ -60,6 +62,7 @@ const SECTION_IDS = [
   "experience",
   "projects",
   "skills",
+  "education",
   "contact",
   "faq",
 ];
@@ -81,7 +84,9 @@ export default function CvPage() {
                   {item.label}
                 </a>
               ))}
-              <EmailLink>Contact</EmailLink>
+              <WhatsAppLink message={WHATSAPP_MESSAGES.contact}>
+                Contact
+              </WhatsAppLink>
             </nav>
             <div className="masthead-actions" data-print="hide">
               <ThemeToggle />
@@ -212,7 +217,10 @@ export default function CvPage() {
                   </div>
                 </a>
               ))}
-              <div className="card">
+              <WhatsAppLink
+                className="card"
+                message={WHATSAPP_MESSAGES.nextRole}
+              >
                 <div className="card-art">
                   <Illustration name="open" />
                 </div>
@@ -220,7 +228,7 @@ export default function CvPage() {
                   <span className="mono">Next role</span>
                   <span className="mono">Open</span>
                 </div>
-              </div>
+              </WhatsAppLink>
             </div>
 
             {ROLES.map((role) => {
@@ -384,8 +392,17 @@ export default function CvPage() {
                 </div>
               ))}
             </dl>
+          </section>
 
-            <h3 className="skills-sub">Education</h3>
+          {/* Education */}
+          <section
+            className="section"
+            id="education"
+            aria-labelledby="education-title"
+          >
+            <h2 className="section-title" id="education-title" data-dot>
+              Education
+            </h2>
             <ul className="edu">
               {EDUCATION_ITEMS.map((item) => (
                 <li key={item.id} className="edu-item">
@@ -393,10 +410,7 @@ export default function CvPage() {
                     <p className="edu-school">{item.school}</p>
                     <p className="edu-degree">{item.degree}</p>
                   </div>
-                  <p className="edu-meta mono">
-                    <span>{item.period}</span>
-                    {item.note && <span>{item.note}</span>}
-                  </p>
+                  <p className="edu-meta mono">{item.period}</p>
                 </li>
               ))}
             </ul>
@@ -408,26 +422,25 @@ export default function CvPage() {
             id="contact"
             aria-labelledby="contact-title"
           >
-            <h2 className="section-title" id="contact-title">
+            <h2 className="section-title" id="contact-title" data-dot>
               Contact
             </h2>
             <div className="copy">
-              <p>Working with me means you&rsquo;ll get:</p>
+              <p>What you can count on when we work together.</p>
             </div>
-            <ul className="checks">
-              <li>
-                Production-ready Next.js, React and Node.js, typed end to end
-              </li>
-              <li>
-                Direct communication across <span className="dim">US</span>,{" "}
-                <span className="dim">European</span>, and{" "}
-                <span className="dim">Indian</span> hours
-              </li>
-              <li>Interfaces that are fast, accessible and pixel-perfect</li>
-              <li>Someone who sweats the details nobody asked about</li>
-            </ul>
+            <ol className="promises">
+              {PROMISES.map((promise, index) => (
+                <li key={promise.title} className="promise">
+                  <span className="promise-index mono">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <p className="promise-title">{promise.title}</p>
+                  <p className="promise-text">{promise.text}</p>
+                </li>
+              ))}
+            </ol>
 
-            <EmailLink className="cta">
+            <WhatsAppLink className="cta" message={WHATSAPP_MESSAGES.contact}>
               <span className="cta-label">Get in touch</span>
               <span className="cta-side">
                 <span className="cta-note">Available 2026</span>
@@ -435,7 +448,7 @@ export default function CvPage() {
                   <ArrowRightIcon />
                 </span>
               </span>
-            </EmailLink>
+            </WhatsAppLink>
             <p className="cta-caption">
               Based in {PROFILE.location} &middot; Also on{" "}
               <a

@@ -5,7 +5,7 @@ import type { RoastResult } from "@/features/roast/types";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
-import { decodePhoneNumber } from "@/utils/string";
+import { whatsappHref } from "@/utils/whatsapp";
 import { USER } from "@/features/portfolio/data/user";
 import { Separator } from "@/components/section-separator";
 import { useId, useRef, useState, useEffect } from "react";
@@ -275,17 +275,11 @@ function RoastReport({
   const [view, setView] = useRoastView();
   // A dead site has nothing but the roast view to show.
   const shownView: RoastView = result.dead ? "roast" : view;
-  // WhatsApp, not mailto: a mailto link does nothing on machines with no
-  // mail app set up, which is most desktop browsers.
-  const whatsappNumber = decodePhoneNumber(USER.phoneNumberB64).replace(
-    /\D/g,
-    "",
-  );
   // A plain hello, no scores or roast talk. Names the visitor's site unless
   // they roasted this one.
   const isOwnSite = result.domain === new URL(USER.website).hostname;
   const whatsappText = `Hi ${USER.firstName}, I came across your website and really liked your work. I'd love to work with you${isOwnSite ? "" : ` on ${result.domain}`}.`;
-  const fixHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
+  const fixHref = whatsappHref(whatsappText);
 
   return (
     <motion.section

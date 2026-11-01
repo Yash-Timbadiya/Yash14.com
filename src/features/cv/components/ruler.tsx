@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { WHATSAPP_MESSAGES } from "@/features/cv/data/cv";
+import { WhatsAppLink } from "@/features/cv/components/whatsapp-link";
 
 /** A long tick every SPACING rows; 6 short ticks sit between two long ones. */
 const SPACING = 7;
@@ -314,9 +316,13 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
         )}
       </div>
       <div className="ruler-line" ref={lineRef} style={{ top: 0 }}>
-        <a className="ruler-badge" href="#contact" tabIndex={-1}>
+        <WhatsAppLink
+          className="ruler-badge"
+          message={WHATSAPP_MESSAGES.contact}
+          tabIndex={-1}
+        >
           Get in touch
-        </a>
+        </WhatsAppLink>
       </div>
     </div>
   );

@@ -57,8 +57,13 @@ html:has(.cv) {
   background: var(--page);
   color: var(--text);
   font-family:
-    var(--cv-font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", sans-serif;
+    var(--cv-font-sans),
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    sans-serif;
   font-size: 16px;
   line-height: 24px;
   -webkit-font-smoothing: antialiased;
@@ -700,6 +705,17 @@ html:has(.cv) {
 
 .cv .tile:hover {
   color: var(--heading);
+  filter: none;
+}
+
+/* Logos with a --brand colour switch to it on hover; Next.js keeps the
+   heading colour so it stays legible in both themes. */
+.cv .tile-logo {
+  transition: color 200ms ease;
+}
+
+.cv .tile:hover .tile-logo {
+  color: var(--brand, var(--heading));
 }
 
 /* Logos keep their aspect ratio at the width set per logo in stack-logos.tsx. */
@@ -873,9 +889,43 @@ html:has(.cv) {
   width: 20px;
   height: 16px;
   background: var(--orange);
-  mask:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 8.5l5.5 6L18.5 1.5'/%3E%3C/svg%3E")
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 8.5l5.5 6L18.5 1.5'/%3E%3C/svg%3E")
     center / contain no-repeat;
+}
+
+/* Contact promises: a ruled 2x2 grid, mono index above a short title and a
+   one-line explanation, so the section reads like the rest of the sheet. */
+.cv .promises {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px 40px;
+  margin-top: 40px;
+}
+
+.cv .promise {
+  display: grid;
+  gap: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.cv .promise-index {
+  color: var(--orange);
+}
+
+.cv .promise-title {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--heading);
+}
+
+.cv .promise-text {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--subtle);
+  text-wrap: pretty;
 }
 
 .cv .chips {
@@ -894,7 +944,7 @@ html:has(.cv) {
 
 .cv .skills-row {
   display: grid;
-  grid-template-columns: 136px 1fr;
+  grid-template-columns: 120px 1fr;
   gap: 8px 24px;
   align-items: baseline;
   padding: 18px 0;
@@ -904,32 +954,21 @@ html:has(.cv) {
 .cv .skills-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .cv .skills-list li {
-  padding: 5px 14px;
+  padding: 4px 12px;
   border-radius: 999px;
   background: var(--card);
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 15px;
+  line-height: 22px;
   font-weight: 500;
-  color: var(--heading);
-}
-
-.cv .skills-sub {
-  margin-top: 56px;
-  margin-bottom: 4px;
-  font-size: 24px;
-  line-height: 32px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
   color: var(--heading);
 }
 
 .cv .edu-item {
   display: flex;
-  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px 24px;
@@ -958,6 +997,7 @@ html:has(.cv) {
 
 .cv .edu-meta {
   display: grid;
+  flex-shrink: 0;
   justify-items: end;
   padding-top: 5px;
 }
@@ -1604,6 +1644,11 @@ html:has(.cv) {
     vertical-align: 1px;
   }
 
+  .cv .promises {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
   .cv .checks li {
     padding-left: 28px;
     font-size: 18px;
@@ -1623,17 +1668,94 @@ html:has(.cv) {
     min-height: 260px;
   }
 
+  /* Five tiles on a three-column row: a six-track grid lets the last two
+     sit centred under the first three. */
   .cv .tiles {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .cv .tile {
+    grid-column: span 2;
+  }
+
+  .cv .tile:nth-child(4) {
+    grid-column: 2 / span 2;
   }
 
   .cv .skills-row {
     grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 16px 0;
   }
 
-  .cv .edu-meta {
-    justify-items: start;
+  .cv .skills-list li {
+    padding: 3px 10px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .cv .edu-item {
+    display: block;
+  }
+
+  .cv .edu-school {
+    font-size: 18px;
+    line-height: 26px;
+  }
+
+  .cv .edu-degree {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  /* Role header stacks: name, title, then dates and place on one line. */
+  .cv .role {
+    margin-top: 40px;
+    padding-top: 28px;
+  }
+
+  .cv .role-head {
+    display: block;
+  }
+
+  .cv .role-name {
+    font-size: 26px;
+    line-height: 32px;
+  }
+
+  .cv .role-title {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  .cv .edu-meta,
+  .cv .role-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
     padding-top: 0;
+    margin-top: 8px;
+  }
+
+  .cv .edu-meta span + span::before,
+  .cv .role-meta span + span::before {
+    content: "·";
+    margin-right: 8px;
+  }
+
+  .cv .role-summary {
+    margin-top: 16px;
+    font-size: 18px;
+    line-height: 28px;
+  }
+
+  .cv .role-checks li {
+    font-size: 16px;
+    line-height: 25px;
+  }
+
+  .cv .role-checks li::before {
+    top: 5px;
   }
 
   .cv .tile {
