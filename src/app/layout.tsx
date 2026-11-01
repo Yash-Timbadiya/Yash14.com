@@ -124,7 +124,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={fontVariables} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={fontVariables}
+      // The CV page sets scroll-behavior: smooth on <html> for in-page
+      // links; this lets Next turn it off during route changes.
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <meta
           name="dmca-site-verification"
