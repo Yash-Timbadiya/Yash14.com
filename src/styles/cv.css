@@ -109,6 +109,106 @@ html:has(.cv) {
   margin: 0 auto;
 }
 
+/* Load and scroll-in motion. Everything rises a few pixels out of a soft
+   blur with a strong ease-out. The header and intro run in CSS from first
+   paint, staggered top to bottom; sections below rise as they scroll in
+   (cv-reveal.tsx). Fill mode is backwards only, so once an animation ends
+   the element's own transforms and hover transitions take over again. */
+.cv {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes cv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+}
+
+.cv .logo,
+.cv .cv-mark,
+.cv .nav a,
+.cv .masthead-actions > *,
+.cv .hero > * {
+  animation: cv-rise 700ms var(--ease-out-strong) backwards;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
+.cv .cv-mark {
+  --rise-delay: 60ms;
+}
+
+.cv .nav a:nth-child(1) {
+  --rise-delay: 100ms;
+}
+.cv .nav a:nth-child(2) {
+  --rise-delay: 140ms;
+}
+.cv .nav a:nth-child(3) {
+  --rise-delay: 180ms;
+}
+.cv .nav a:nth-child(4) {
+  --rise-delay: 220ms;
+}
+.cv .nav a:nth-child(5) {
+  --rise-delay: 260ms;
+}
+.cv .nav a:nth-child(6) {
+  --rise-delay: 300ms;
+}
+.cv .nav a:nth-child(7) {
+  --rise-delay: 340ms;
+}
+.cv .nav a:nth-child(8) {
+  --rise-delay: 380ms;
+}
+
+.cv .masthead-actions > :nth-child(1) {
+  --rise-delay: 200ms;
+}
+.cv .masthead-actions > :nth-child(2) {
+  --rise-delay: 250ms;
+}
+.cv .masthead-actions > :nth-child(3) {
+  --rise-delay: 300ms;
+}
+
+.cv .hero > :nth-child(1) {
+  --rise-delay: 420ms;
+}
+.cv .hero > :nth-child(2) {
+  --rise-delay: 500ms;
+}
+
+.cv[data-reveal-ready] [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+}
+
+.cv [data-revealed="animate"] {
+  animation: cv-rise 800ms var(--ease-out-strong) backwards;
+  animation-delay: calc(var(--reveal-i, 0) * 70ms);
+}
+
+@keyframes cv-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion keeps a gentle fade but drops the movement and blur. */
+@media (prefers-reduced-motion: reduce) {
+  .cv .logo,
+  .cv .cv-mark,
+  .cv .nav a,
+  .cv .masthead-actions > *,
+  .cv .hero > *,
+  .cv [data-revealed="animate"] {
+    animation-name: cv-fade;
+    animation-duration: 300ms;
+  }
+}
+
 /* Header */
 
 .cv .masthead {
@@ -118,7 +218,41 @@ html:has(.cv) {
   gap: 16px;
 }
 
+/* Isometric YT mark in the masthead's left column (yt-mark-cv.tsx), centred
+   on the menu's height: positioned out of flow so the menu alone sets the
+   row, and the mark fits inside it, never hanging below "FAQ". It paints
+   its faces with --background, pointed at the sheet so they blend in. */
+.cv .cv-mark {
+  position: relative;
+  --background: var(--sheet);
+  --pattern: color-mix(in oklab, var(--text) 12%, var(--sheet));
+  --stroke: color-mix(in oklab, var(--text) 16%, var(--sheet));
+}
+
+.cv .yt-mark-cv {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.cv .yt-mark-cv-glow {
+  stop-color: color-mix(in oklab, var(--text) 75%, var(--sheet));
+}
+
+.cv .yt-mark-cv-glow-end {
+  stop-color: color-mix(in oklab, var(--text) 35%, var(--sheet));
+}
+
+/* Orange dot pinned in the sheet's top-left corner, back to top. */
 .cv .logo {
+  position: absolute;
+  top: 40px;
+  left: 40px;
   display: block;
   width: 20px;
   height: 20px;
@@ -1537,6 +1671,35 @@ html:has(.cv) {
   inset: 0;
   z-index: 10;
   pointer-events: none;
+  /* Hidden until ruler.tsx has measured the page with fonts loaded, so the
+     line fades in where it belongs instead of jumping there. */
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.cv .ruler[data-ready="true"] {
+  opacity: 1;
+}
+
+/* The YT mark in the empty desk at top left, back to the main site. */
+.cv .home-mark {
+  position: fixed;
+  top: 32px;
+  left: 32px;
+  z-index: 11;
+  display: block;
+  color: var(--heading);
+  transition: color 150ms ease;
+}
+
+.cv .home-mark svg {
+  display: block;
+  width: 36px;
+  height: auto;
+}
+
+.cv .home-mark:hover {
+  color: var(--orange);
 }
 
 /* Wide enough that the magnified ticks stay under the pointer. ruler.tsx
@@ -1645,7 +1808,8 @@ html[data-ruler-line="hidden"] .cv .ruler-line {
 
 @media (max-width: 1360px) {
   .cv .ruler,
-  .cv .ruler-line-toggle {
+  .cv .ruler-line-toggle,
+  .cv .home-mark {
     display: none;
   }
 }
@@ -1685,6 +1849,16 @@ html[data-ruler-line="hidden"] .cv .ruler-line {
 }
 
 @media (max-width: 760px) {
+  /* One column here, so the mark would only push the menu down. */
+  .cv .cv-mark {
+    display: none;
+  }
+
+  .cv .logo {
+    top: 12px;
+    left: var(--sheet-pad);
+  }
+
   .cv {
     --sheet-pad: 24px;
     --gutter: 0px;
@@ -1895,6 +2069,13 @@ html[data-ruler-line="hidden"] .cv .ruler-line {
 /* Print: a clean paper copy without the interactive chrome. */
 
 @media print {
+  /* Sections not yet scrolled to are still hidden for their reveal. */
+  .cv[data-reveal-ready] [data-reveal]:not([data-revealed]),
+  .cv [data-revealed="animate"] {
+    opacity: 1;
+    animation: none;
+  }
+
   .cv {
     --page: #fff;
     --sheet: #fff;

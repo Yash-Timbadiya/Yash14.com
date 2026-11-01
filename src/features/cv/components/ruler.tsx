@@ -38,6 +38,18 @@ const SCROLL_IDLE = 150;
  */
 const SCROLL_FADE = { in: 0.25, out: 0.07 };
 
+/**
+ * On load the magnifier sweeps the ruler once, top to bottom, as if a
+ * pointer were drawn down it. It starts and ends well past the ruler's ends
+ * (the bell is ~3 reaches wide, so 8 rows clears it) and its strength fades
+ * in and out over the first and last `fade` of the run, so the swell never
+ * pops on or snaps off.
+ */
+const INTRO = { duration: 1600, overshoot: 8, fade: 0.22 };
+
+const easeInOutSine = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
+
 /** Fraction of the remaining distance covered each frame; lower is softer. */
 const EASE = 0.2;
 
@@ -118,6 +130,7 @@ function toCanvasColor(computed: string) {
  */
 export function Ruler({ sectionIds }: { sectionIds: string[] }) {
   const ticks = buildTicks(sectionIds);
+  const rootRef = useRef<HTMLDivElement>(null);
   const ticksRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
@@ -149,6 +162,7 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
     let scrollStrength = 0;
     let idleTimer: ReturnType<typeof setTimeout> | undefined;
     let frame = 0;
+    let introStart: number | null = null;
 
     /** Fractional tick position for the current scroll, between sections. */
     const indicatorPosition = () => {
@@ -198,6 +212,22 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
 
       let moving = false;
 
+      let introY: number | null = null;
+      let introStrength = 0;
+      if (introStart !== null) {
+        const t = Math.min(
+          1,
+          (performance.now() - introStart) / INTRO.duration,
+        );
+        const span = (count - 1 + INTRO.overshoot * 2) * ROW;
+        introY = top - INTRO.overshoot * ROW + easeInOutSine(t) * span;
+        introStrength = smoothstep(
+          Math.min(1, t / INTRO.fade, (1 - t) / INTRO.fade),
+        );
+        if (t >= 1) introStart = null;
+        moving = true;
+      }
+
       const strengthTarget = scrolling ? 1 : 0;
       scrollStrength = reduceMotion
         ? strengthTarget
@@ -217,6 +247,7 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
           1 +
           Math.max(
             hoverY === null ? 0 : bell(y - hoverY, HOVER),
+            introY === null ? 0 : introStrength * bell(y - introY, HOVER),
             scrollStrength * bell(y - indicatorY, SCROLL),
           );
         const target = base * scale;
@@ -316,8 +347,24 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", measure);
     window.addEventListener("load", measure);
-    // Fonts shift layout after first paint, which moves the sections.
-    document.fonts?.ready.then(measure);
+    // Fonts shift layout after first paint, which would make the line jump
+    // to its real spot. The ruler stays hidden until they settle, then fades
+    // in once it has been drawn in place.
+    const reveal = () => {
+      measure();
+      requestAnimationFrame(() => {
+        if (rootRef.current) rootRef.current.dataset.ready = "true";
+        if (!reduceMotion) {
+          introStart = performance.now();
+          schedule();
+        }
+      });
+    };
+    if (document.fonts) {
+      document.fonts.ready.then(reveal);
+    } else {
+      reveal();
+    }
 
     return () => {
       cancelAnimationFrame(frame);
@@ -337,7 +384,7 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
   };
 
   return (
-    <div className="ruler" aria-hidden="true">
+    <div className="ruler" ref={rootRef} aria-hidden="true">
       <div className="ruler-ticks" ref={ticksRef}>
         <canvas className="ruler-canvas" ref={canvasRef} />
         {ticks.map((tick) =>

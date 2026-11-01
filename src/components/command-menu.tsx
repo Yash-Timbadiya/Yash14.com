@@ -59,6 +59,7 @@ import {
   MoonStarIcon,
   PaletteIcon,
   SquareDashedIcon,
+  FileUserIcon,
   SunMediumIcon,
   TextInitialIcon,
   TypeIcon,
@@ -91,6 +92,15 @@ const MENU_LINKS: CommandLinkItem[] = [
     icon: <YTMark />,
     shortcut: "GH",
     event: ANALYTICS_EVENTS.VIEW_HOME,
+  },
+  {
+    title: "CV",
+    href: "/cv",
+    kind: "page",
+    icon: <FileUserIcon />,
+    shortcut: "GC",
+    keywords: ["resume", "cv", "hire", "experience"],
+    event: ANALYTICS_EVENTS.VIEW_CV,
   },
   {
     title: "Brand",

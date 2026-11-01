@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 
+import { YTMark } from "@/components/yt-mark";
 import { Ruler } from "@/features/cv/components/ruler";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { CvReveal } from "@/features/cv/components/cv-reveal";
+import { YTMarkCv } from "@/features/cv/components/yt-mark-cv";
 import { StackLogo } from "@/features/cv/components/stack-logos";
 import { BottomFade } from "@/features/cv/components/bottom-fade";
 import { CareerLine } from "@/features/cv/components/career-line";
@@ -81,13 +84,24 @@ export default function CvPage() {
   return (
     <>
       <Ruler sectionIds={SECTION_IDS} />
+      <a
+        className="home-mark"
+        href="https://yash14.com"
+        aria-label={`${PROFILE.name}, main site`}
+        data-print="hide"
+      >
+        <YTMark />
+      </a>
 
       <main className="sheet" id="top">
+        <a className="logo" href="#top" data-ruler-anchor>
+          <span className="sr-only">{PROFILE.name}, back to top</span>
+        </a>
         <div className="column">
           <header className="masthead">
-            <a className="logo" href="#top" data-ruler-anchor>
-              <span className="sr-only">{PROFILE.name}, back to top</span>
-            </a>
+            <div className="cv-mark">
+              <YTMarkCv />
+            </div>
             <nav className="nav" aria-label="Sections">
               {NAV.map((item) => (
                 <a key={item.href} href={item.href}>
@@ -523,6 +537,7 @@ export default function CvPage() {
       </main>
 
       <BottomFade />
+      <CvReveal />
       <ScrollToTop className="cv-scroll-top" data-print="hide" />
     </>
   );

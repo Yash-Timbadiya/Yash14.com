@@ -16,6 +16,10 @@ const MAIN_HOST = [
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  // Next's gzip stream in dev piles up "drain" listeners across streamed
+  // responses (MaxListenersExceededWarning). Compression only matters for
+  // `next start`; Vercel compresses at its edge either way.
+  compress: process.env.NODE_ENV !== "development",
   // PostHog's API uses trailing slashes, which Next would otherwise redirect.
   skipTrailingSlashRedirect: true,
   env: {
