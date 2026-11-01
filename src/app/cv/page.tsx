@@ -54,7 +54,6 @@ export const metadata: Metadata = {
 };
 
 const CROSS_EVEN = ROLES.find((role) => role.id === "cross-even");
-const ENACTON = ROLES.find((role) => role.id === "enacton");
 
 /** Highlights shown per role before "Show more". */
 const VISIBLE_HIGHLIGHTS = 3;
@@ -71,8 +70,12 @@ const SECTION_IDS = [
   "faq",
 ];
 
-/** Split into letters so each can roll on hover, staggered by index. */
+/** Split into letters so each can roll on hover, staggered by position. */
 const CTA_LABEL = "Get in touch";
+const CTA_CHARS = Array.from(CTA_LABEL, (char, position) => ({
+  char,
+  position,
+}));
 
 export default function CvPage() {
   return (
@@ -447,12 +450,13 @@ export default function CvPage() {
             </ol>
 
             <WhatsAppLink className="cta" message={WHATSAPP_MESSAGES.contact}>
-              <span className="cta-label" aria-label={CTA_LABEL}>
-                {Array.from(CTA_LABEL, (char, index) => (
+              <span className="cta-label">
+                <span className="sr-only">{CTA_LABEL}</span>
+                {CTA_CHARS.map(({ char, position }) => (
                   <span
-                    key={index}
+                    key={position}
                     className="cta-char"
-                    style={{ "--i": index } as CSSProperties}
+                    style={{ "--i": position } as CSSProperties}
                     aria-hidden="true"
                   >
                     {char}
