@@ -10,8 +10,9 @@ export const dynamic = "force-static";
 const APP_DIR = path.join(process.cwd(), "src", "app");
 const PAGE_FILE = /^page\.(tsx|ts|jsx|js|mdx)$/;
 
-// Dev-only pages that 404 in production.
-const EXCLUDED_ROUTES = new Set(["/og"]);
+// Dev-only pages that 404 in production, and /cv, which redirects to its
+// own subdomain.
+const EXCLUDED_ROUTES = new Set(["/og", "/cv"]);
 
 // Dynamic ([slug]), parallel (@slot) and private (_folder) segments have no
 // single static URL, so a page under any of them is left out.

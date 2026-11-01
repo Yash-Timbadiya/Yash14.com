@@ -1,11 +1,11 @@
-# CDN Assets (Cloudflare R2) — Instructions
+# CDN Assets (Cloudflare R2) - Instructions
 
 How images, audio and downloads are served from Cloudflare R2 instead of Vercel's
 `public/` folder, and how to add, update or remove them.
 
 - **Bucket:** `yash14-assets` (Cloudflare R2, free tier: 10 GB storage, free egress)
 - **Public URL:** `https://assets.yash14.com` (R2 custom domain, cached by Cloudflare CDN)
-- **Local folder:** `cdn/` (gitignored — not committed, not deployed to Vercel)
+- **Local folder:** `cdn/` (gitignored - not committed, not deployed to Vercel)
 - **Upload command:** `pnpm cdn:upload`
 
 > The path inside `cdn/` becomes the URL path:
@@ -28,32 +28,32 @@ https://assets.yash14.com/...          ← served + cached by Cloudflare
 Next.js site on Vercel
 ```
 
-| File | Purpose |
-| --- | --- |
-| `src/utils/cdn.ts` | `cdn(path)` → full CDN URL. Use this everywhere instead of hardcoding the domain. |
-| `src/config.ts` | `config.cdn.url` — reads `NEXT_PUBLIC_CDN_URL`, defaults to `https://assets.yash14.com`. |
-| `next.config.ts` | `images.remotePatterns` allows `assets.yash14.com` for `next/image`. |
-| `src/scripts/upload-cdn.mjs` | Syncs `cdn/` → R2 (upload new/changed, delete removed). |
-| `src/scripts/r2-cors.json` | CORS policy for the bucket (needed for `fetch()`-loaded files like audio). |
-| `.gitignore` | Ignores `/cdn/`. |
+| File                         | Purpose                                                                                  |
+| ---------------------------- | ---------------------------------------------------------------------------------------- |
+| `src/utils/cdn.ts`           | `cdn(path)` → full CDN URL. Use this everywhere instead of hardcoding the domain.        |
+| `src/config.ts`              | `config.cdn.url` - reads `NEXT_PUBLIC_CDN_URL`, defaults to `https://assets.yash14.com`. |
+| `next.config.ts`             | `images.remotePatterns` allows `assets.yash14.com` for `next/image`.                     |
+| `src/scripts/upload-cdn.mjs` | Syncs `cdn/` → R2 (upload new/changed, delete removed).                                  |
+| `src/scripts/r2-cors.json`   | CORS policy for the bucket (needed for `fetch()`-loaded files like audio).               |
+| `.gitignore`                 | Ignores `/cdn/`.                                                                         |
 
 ### Files currently on the CDN
 
-| CDN path | Used in |
-| --- | --- |
-| `assets/yash.webp` | `USER.avatar` (`src/features/portfolio/data/user.ts`) — profile photo, vCard, JSON-LD |
-| `audio/yashtimbadiya.mp3` | `USER.namePronunciationUrl` — "pronounce my name" button |
-| `logo/crosseven.png` | `EXPERIENCES` (`src/features/portfolio/data/experiences.tsx`) |
-| `logo/enacton.png` | `EXPERIENCES` |
-| `assets/yash14-brand.zip` | `BRAND_ASSETS.url` (`src/config/site.ts`) — brand kit download |
-| `tech-stack-icons/*.svg`, `tech-stack-icons/*.png` | `TECH_STACK_BRAND_ICONS` (`src/features/portfolio/data/tech-stack-brand-icons.ts`) — original-colour logos for the Stack section's brand-colours toggle. `*-dark.*` files are the dark-mode variants. |
+| CDN path                                           | Used in                                                                                                                                                                                               |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `assets/yash.webp`                                 | `USER.avatar` (`src/features/portfolio/data/user.ts`) - profile photo, vCard, JSON-LD                                                                                                                 |
+| `audio/yashtimbadiya.mp3`                          | `USER.namePronunciationUrl` - "pronounce my name" button                                                                                                                                              |
+| `logo/crosseven.png`                               | `EXPERIENCES` (`src/features/portfolio/data/experiences.tsx`)                                                                                                                                         |
+| `logo/enacton.png`                                 | `EXPERIENCES`                                                                                                                                                                                         |
+| `assets/yash14-brand.zip`                          | `BRAND_ASSETS.url` (`src/config/site.ts`) - brand kit download                                                                                                                                        |
+| `tech-stack-icons/*.svg`, `tech-stack-icons/*.png` | `TECH_STACK_BRAND_ICONS` (`src/features/portfolio/data/tech-stack-brand-icons.ts`) - original-colour logos for the Stack section's brand-colours toggle. `*-dark.*` files are the dark-mode variants. |
 
 ### What must stay in `public/`
 
 Do **not** move these to the CDN:
 
-- `public/logo/favicon*`, `apple-touch-icon.png` — browsers and the web manifest expect them on the site's own domain.
-- `public/assets/yash14-brand/*.svg` — the `<a download>` attribute only works for same-origin files; on the CDN they'd open in a tab instead of downloading.
+- `public/logo/favicon*`, `apple-touch-icon.png` - browsers and the web manifest expect them on the site's own domain.
+- `public/assets/yash14-brand/*.svg` - the `<a download>` attribute only works for same-origin files; on the CDN they'd open in a tab instead of downloading.
 - `public/brand.md`.
 
 ---
@@ -71,12 +71,19 @@ Do **not** move these to the CDN:
    pnpm cdn:upload
    ```
 3. Use it in code:
+
    ```tsx
    import { cdn } from "@/utils/cdn";
 
-   <Image src={cdn("/projects/my-app.png")} alt="My App" width={800} height={450} />
+   <Image
+     src={cdn("/projects/my-app.png")}
+     alt="My App"
+     width={800}
+     height={450}
+   />;
    ```
-4. Commit + push (only the code changes — `cdn/` is not committed).
+
+4. Commit + push (only the code changes - `cdn/` is not committed).
 
 ### Change an existing file
 
@@ -103,17 +110,17 @@ Wrangler can't list the objects in a bucket, so the script keeps a manifest
 **in the bucket** at `.cdn-manifest.json` (file path → MD5 hash). On each run it
 compares that manifest with `cdn/`:
 
-| Change in `cdn/` | Result |
-| --- | --- |
-| New file | `+ upload` |
-| Same name, content changed | `~ update` |
-| Unchanged | skipped |
-| File deleted | listed, deleted from R2 after confirmation |
-| Nothing changed | `Everything is up to date.` |
+| Change in `cdn/`           | Result                                     |
+| -------------------------- | ------------------------------------------ |
+| New file                   | `+ upload`                                 |
+| Same name, content changed | `~ update`                                 |
+| Unchanged                  | skipped                                    |
+| File deleted               | listed, deleted from R2 after confirmation |
+| Nothing changed            | `Everything is up to date.`                |
 
 Notes:
 
-- Re-uploading the same name **overwrites** — R2 never creates duplicates.
+- Re-uploading the same name **overwrites** - R2 never creates duplicates.
 - The manifest lives in R2, so syncing works the same from any machine.
 - The manifest is publicly readable at `https://assets.yash14.com/.cdn-manifest.json`
   (it only contains file names and hashes).
@@ -134,15 +141,15 @@ Notes:
 
 All commands run from `portfolio/` in PowerShell (no bash needed).
 
-| Command | What it does |
-| --- | --- |
-| `pnpm cdn:login` | Log wrangler in to Cloudflare (browser opens). Needed once, or when the login expires. |
-| `pnpm cdn:upload` | Sync `cdn/` → R2. |
-| `pnpm cdn:upload --yes` | Same, without the delete confirmation. |
+| Command                 | What it does                                                                           |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| `pnpm cdn:login`        | Log wrangler in to Cloudflare (browser opens). Needed once, or when the login expires. |
+| `pnpm cdn:upload`       | Sync `cdn/` → R2.                                                                      |
+| `pnpm cdn:upload --yes` | Same, without the delete confirmation.                                                 |
 
 Use a different bucket with `$env:R2_BUCKET = "other-bucket"; pnpm cdn:upload`.
 
-Wrangler isn't a project dependency — it runs through `pnpm dlx`, with
+Wrangler isn't a project dependency - it runs through `pnpm dlx`, with
 `--allow-build=esbuild --allow-build=workerd` so pnpm doesn't prompt about build
 scripts. It's kept out of `devDependencies` so Vercel doesn't install it on every build.
 
@@ -161,22 +168,22 @@ wrangler r2 bucket cors list yash14-assets                 # show CORS rules
 
 Kept here in case the bucket ever needs to be recreated.
 
-1. **Create the bucket** — Cloudflare dashboard → R2 → Create bucket → `yash14-assets`.
-2. **Connect the domain** — bucket → Settings → Custom Domains → Add →
+1. **Create the bucket** - Cloudflare dashboard → R2 → Create bucket → `yash14-assets`.
+2. **Connect the domain** - bucket → Settings → Custom Domains → Add →
    `assets.yash14.com`. Because `yash14.com` is on Cloudflare DNS, the DNS record and
    SSL certificate are created automatically. Wait until Status is **Active**.
    Keep the `r2.dev` URL disabled (it's rate-limited, not for production).
-3. **Set CORS** — required for files the site loads with `fetch()` (the name
+3. **Set CORS** - required for files the site loads with `fetch()` (the name
    pronunciation audio uses the Web Audio API, which fetches the MP3). Images don't
    need it.
    ```powershell
    pnpm dlx --allow-build=esbuild --allow-build=workerd wrangler r2 bucket cors set yash14-assets --file src/scripts/r2-cors.json --force
    ```
    After changing CORS, [purge the cache](#purge-the-cloudflare-cache) for already
-   cached files — the Cloudflare edge keeps serving the old response without the
+   cached files - the Cloudflare edge keeps serving the old response without the
    `Access-Control-Allow-Origin` header until it's purged.
-4. **Log in and upload** — `pnpm cdn:login`, then `pnpm cdn:upload`.
-5. **Vercel (optional)** — Settings → Environment Variables →
+4. **Log in and upload** - `pnpm cdn:login`, then `pnpm cdn:upload`.
+5. **Vercel (optional)** - Settings → Environment Variables →
    `NEXT_PUBLIC_CDN_URL=https://assets.yash14.com`. Also add it to the local `.env`.
    The code already defaults to this value.
 

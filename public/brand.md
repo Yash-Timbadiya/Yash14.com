@@ -22,8 +22,8 @@ Maintain a clear space of 1/2 the height of the Mark on all sides of the logo, e
 
 The identity is monochrome. Use Ink on light surfaces and Paper on dark surfaces to keep the mark legible.
 
-- Ink — #09090B
-- Paper — #FFFFFF
+- Ink - #09090B
+- Paper - #FFFFFF
 
 ## Brand Assets
 

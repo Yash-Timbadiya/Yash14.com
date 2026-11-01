@@ -21,7 +21,7 @@ export type GaugeInsetProps = Omit<SVGProps<SVGGElement>, "transform"> &
  *
  * It draws in the host's coordinate system rather than its own viewport, so it
  * needs no `padding` or `fit`; `x`, `y` and `scale` place it, and everything
- * inside — strokes, ticks, text — shrinks with it. Its reference radius stays
+ * inside - strokes, ticks, text - shrinks with it. Its reference radius stays
  * the host's by default, which makes `scale` the only size to reason about.
  */
 export const GaugeInset = ({

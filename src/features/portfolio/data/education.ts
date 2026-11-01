@@ -15,8 +15,8 @@ export const EDUCATION: Education[] = [
 - Turned academic learning into production experience by starting professional full-stack development work before graduation.
 
 Selected projects:
-- [Plura](https://github.com/Yash-Timbadiya/Plura) — Built a multi-tenant SaaS platform with a drag-and-drop website and funnel builder, agency and sub-account management, Stripe subscriptions and Connect payments, dashboards, and a Kanban project board.
-- [Community](https://github.com/Yash-Timbadiya/Community) — Built a real-time community platform with customizable channels, direct messaging, file attachments, audio and video calls, roles, invitations, and responsive light and dark interfaces.
+- [Plura](https://github.com/Yash-Timbadiya/Plura) - Built a multi-tenant SaaS platform with a drag-and-drop website and funnel builder, agency and sub-account management, Stripe subscriptions and Connect payments, dashboards, and a Kanban project board.
+- [Community](https://github.com/Yash-Timbadiya/Community) - Built a real-time community platform with customizable channels, direct messaging, file attachments, audio and video calls, roles, invitations, and responsive light and dark interfaces.
 
 Achievements:
 - Built and shipped custom business websites and e-commerce experiences while completing the degree.
@@ -37,7 +37,7 @@ Achievements:
     id: "ashadeep-higher-secondary",
     school: "Ashadeep Higher Secondary School",
     degree: "Higher Secondary Education (Grades 11–12)",
-    fieldOfStudy: "Science — IIT-JEE Preparation",
+    fieldOfStudy: "Science - IIT-JEE Preparation",
     period: {
       start: "06.2019",
       end: "04.2021",

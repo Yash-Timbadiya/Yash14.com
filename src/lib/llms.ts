@@ -106,7 +106,7 @@ export function getEducationSummary() {
   return EDUCATION.map((item) => {
     const study = [item.degree, item.fieldOfStudy].filter(Boolean).join(", ");
 
-    return `- ${study ? `${study} — ` : ""}${item.school} (${formatPeriod(item.period)})`;
+    return `- ${study ? `${study} - ` : ""}${item.school} (${formatPeriod(item.period)})`;
   }).join("\n");
 }
 

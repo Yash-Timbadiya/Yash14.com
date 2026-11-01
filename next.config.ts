@@ -6,6 +6,13 @@ import {
   POSTHOG_PROXY_PATH,
 } from "./src/config/posthog";
 
+// The resume lives at /cv and is served on its own subdomain.
+const CV_ORIGIN = "https://cv.yash14.com";
+const CV_HOST = [{ type: "host" as const, value: String.raw`cv\..+` }];
+const MAIN_HOST = [
+  { type: "host" as const, value: String.raw`(www\.)?yash14\.com` },
+];
+
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
@@ -29,11 +36,35 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // One canonical address for the resume.
+      {
+        source: "/cv",
+        has: MAIN_HOST,
+        destination: CV_ORIGIN,
+        permanent: true,
+      },
+      // The subdomain only serves the resume; anything else belongs to the
+      // main site. Next assets, the PostHog proxy and files are left alone.
+      {
+        source: String.raw`/:path((?!_next|${POSTHOG_PROXY_PATH.slice(1)}|.*\.).+)`,
+        has: CV_HOST,
+        destination: "https://yash14.com/:path",
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return {
       // beforeFiles so this runs before prerendered pages are served;
       // afterFiles rewrites never fire for SSG pages on Vercel.
       beforeFiles: [
+        {
+          source: "/",
+          has: CV_HOST,
+          destination: "/cv",
+        },
         {
           source: "/index.md",
           destination: "/llms.txt",

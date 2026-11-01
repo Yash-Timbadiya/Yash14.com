@@ -9,7 +9,7 @@ import {
 
 const content = `# ${SITE_INFO.name}
 
-> A personal portfolio by ${USER.displayName} — a ${USER.jobTitle} based in ${USER.address}.
+> A personal portfolio by ${USER.displayName} - a ${USER.jobTitle} based in ${USER.address}.
 
 ${USER.about.trim()}
 
