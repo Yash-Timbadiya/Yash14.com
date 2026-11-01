@@ -19,6 +19,7 @@ export const ANALYTICS_EVENTS = {
 
   // Navigation
   VIEW_BRAND_GUIDELINES: "view_brand_guidelines",
+  VIEW_CV: "view_cv",
   VIEW_HOME: "view_home",
   VIEW_SECTION: "view_section",
   COPY_SECTION_LINK: "copy_section_link",

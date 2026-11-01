@@ -22,6 +22,7 @@ export function KeyboardShortcuts() {
   useHotkeys("g>h", () => navigate("/", "g>h"));
   useHotkeys("g>y", () => navigate("/brand-guidelines", "g>y"));
   useHotkeys("g>b", () => navigate("/bookmarks", "g>b"));
+  useHotkeys("g>c", () => navigate("/cv", "g>c"));
 
   return null;
 }

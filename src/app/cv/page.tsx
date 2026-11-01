@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 
+import { YTMark } from "@/components/yt-mark";
 import { Ruler } from "@/features/cv/components/ruler";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollToTop } from "@/components/scroll-to-top";
@@ -81,6 +82,14 @@ export default function CvPage() {
   return (
     <>
       <Ruler sectionIds={SECTION_IDS} />
+      <a
+        className="home-mark"
+        href="https://yash14.com"
+        aria-label={`${PROFILE.name}, main site`}
+        data-print="hide"
+      >
+        <YTMark />
+      </a>
 
       <main className="sheet" id="top">
         <div className="column">

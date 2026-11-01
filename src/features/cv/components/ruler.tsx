@@ -118,6 +118,7 @@ function toCanvasColor(computed: string) {
  */
 export function Ruler({ sectionIds }: { sectionIds: string[] }) {
   const ticks = buildTicks(sectionIds);
+  const rootRef = useRef<HTMLDivElement>(null);
   const ticksRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
@@ -316,8 +317,20 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", measure);
     window.addEventListener("load", measure);
-    // Fonts shift layout after first paint, which moves the sections.
-    document.fonts?.ready.then(measure);
+    // Fonts shift layout after first paint, which would make the line jump
+    // to its real spot. The ruler stays hidden until they settle, then fades
+    // in once it has been drawn in place.
+    const reveal = () => {
+      measure();
+      requestAnimationFrame(() => {
+        if (rootRef.current) rootRef.current.dataset.ready = "true";
+      });
+    };
+    if (document.fonts) {
+      document.fonts.ready.then(reveal);
+    } else {
+      reveal();
+    }
 
     return () => {
       cancelAnimationFrame(frame);
@@ -337,7 +350,7 @@ export function Ruler({ sectionIds }: { sectionIds: string[] }) {
   };
 
   return (
-    <div className="ruler" aria-hidden="true">
+    <div className="ruler" ref={rootRef} aria-hidden="true">
       <div className="ruler-ticks" ref={ticksRef}>
         <canvas className="ruler-canvas" ref={canvasRef} />
         {ticks.map((tick) =>

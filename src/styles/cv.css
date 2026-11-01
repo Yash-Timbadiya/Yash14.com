@@ -1537,6 +1537,35 @@ html:has(.cv) {
   inset: 0;
   z-index: 10;
   pointer-events: none;
+  /* Hidden until ruler.tsx has measured the page with fonts loaded, so the
+     line fades in where it belongs instead of jumping there. */
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.cv .ruler[data-ready="true"] {
+  opacity: 1;
+}
+
+/* The YT mark in the empty desk at top left, back to the main site. */
+.cv .home-mark {
+  position: fixed;
+  top: 32px;
+  left: 32px;
+  z-index: 11;
+  display: block;
+  color: var(--heading);
+  transition: color 150ms ease;
+}
+
+.cv .home-mark svg {
+  display: block;
+  width: 36px;
+  height: auto;
+}
+
+.cv .home-mark:hover {
+  color: var(--orange);
 }
 
 /* Wide enough that the magnified ticks stay under the pointer. ruler.tsx
@@ -1645,7 +1674,8 @@ html[data-ruler-line="hidden"] .cv .ruler-line {
 
 @media (max-width: 1360px) {
   .cv .ruler,
-  .cv .ruler-line-toggle {
+  .cv .ruler-line-toggle,
+  .cv .home-mark {
     display: none;
   }
 }

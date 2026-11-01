@@ -34,8 +34,8 @@ export const MAIN_NAV: NavItem<Route>[] = [
     href: "/bookmarks",
   },
   {
-    title: "Brand",
-    href: "/brand-guidelines",
+    title: "CV",
+    href: "/cv",
   },
 ];
 
