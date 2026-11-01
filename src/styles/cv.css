@@ -118,7 +118,41 @@ html:has(.cv) {
   gap: 16px;
 }
 
+/* Isometric YT mark in the masthead's left column (yt-mark-cv.tsx), centred
+   on the menu's height: positioned out of flow so the menu alone sets the
+   row, and the mark fits inside it, never hanging below "FAQ". It paints
+   its faces with --background, pointed at the sheet so they blend in. */
+.cv .cv-mark {
+  position: relative;
+  --background: var(--sheet);
+  --pattern: color-mix(in oklab, var(--text) 12%, var(--sheet));
+  --stroke: color-mix(in oklab, var(--text) 16%, var(--sheet));
+}
+
+.cv .yt-mark-cv {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.cv .yt-mark-cv-glow {
+  stop-color: color-mix(in oklab, var(--text) 75%, var(--sheet));
+}
+
+.cv .yt-mark-cv-glow-end {
+  stop-color: color-mix(in oklab, var(--text) 35%, var(--sheet));
+}
+
+/* Orange dot pinned in the sheet's top-left corner, back to top. */
 .cv .logo {
+  position: absolute;
+  top: 40px;
+  left: 40px;
   display: block;
   width: 20px;
   height: 20px;
@@ -1715,6 +1749,16 @@ html[data-ruler-line="hidden"] .cv .ruler-line {
 }
 
 @media (max-width: 760px) {
+  /* One column here, so the mark would only push the menu down. */
+  .cv .cv-mark {
+    display: none;
+  }
+
+  .cv .logo {
+    top: 12px;
+    left: var(--sheet-pad);
+  }
+
   .cv {
     --sheet-pad: 24px;
     --gutter: 0px;
