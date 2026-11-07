@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { Activity } from "@/features/portfolio/components/contribution-graph";
+import type { Activity } from "@/features/portfolio/types/contributions";
 
 import { config } from "@/config";
 import { unstable_cache } from "next/cache";

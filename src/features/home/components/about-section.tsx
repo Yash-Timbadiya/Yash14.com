@@ -1,5 +1,6 @@
-import type { Activity } from "@/features/portfolio/components/contribution-graph";
+import type { Activity } from "@/features/portfolio/types/contributions";
 
+import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import { HoverArrow } from "./hover-arrow";
 import { USER } from "@/features/portfolio/data/user";
@@ -14,6 +15,14 @@ import {
   ContributionField,
   ContributionFieldFallback,
 } from "./contribution-field";
+import {
+  BAND,
+  BRACKETS,
+  FEATURE_TEXT,
+  FRAME,
+  LINK,
+  STAR,
+} from "@/features/home/lib/styles";
 
 /** Splits a sentence into its lead and the rest, for the two-tone treatment. */
 function splitLead(text: string): [string, string] {
@@ -37,6 +46,13 @@ const COUNTRY = USER.address.split(", ").at(-1);
 
 const YEARS_OF_EXPERIENCE = /(\d+\+?) years/.exec(USER.about)?.[1] ?? "2+";
 
+/**
+ * Captions engraved into the panel: a light edge below and a dark edge above
+ * make the letters read as pressed into the surface.
+ */
+const ENGRAVED =
+  "pointer-events-none relative z-1 m-0 font-mono text-xs/4 whitespace-nowrap text-[color-mix(in_srgb,var(--ink)_34%,var(--paper))] select-none [text-shadow:0_1px_0_oklch(1_0_0/0.9),0_-1px_0_oklch(0_0_0/0.14)] dark:[text-shadow:0_1px_0_oklch(1_0_0/0.07),0_-1px_0_oklch(0_0_0/0.7)]";
+
 const STAT_CLASS =
   "flex flex-col gap-3 border-line p-6 not-first:border-l max-lg:nth-[3]:border-l-0 max-lg:nth-[n+3]:border-t lg:px-7 lg:py-9";
 
@@ -51,9 +67,11 @@ function Stat({
 }) {
   return (
     <div className={STAT_CLASS}>
-      <dd className="home-stat-value">{value}</dd>
+      <dd className="text-[clamp(2.5rem,4vw,3.25rem)]/none font-medium tracking-[-0.028em] text-heat tabular-nums">
+        {value}
+      </dd>
       <dt className="text-[0.9375rem]">{title}</dt>
-      <dd className="-mt-2 text-[0.8125rem] text-(color:--ink-56)">{detail}</dd>
+      <dd className="-mt-2 text-[0.8125rem] text-ink/56">{detail}</dd>
     </div>
   );
 }
@@ -88,21 +106,21 @@ export function AboutSection() {
         label="About me"
         title={
           <>
-            Hello, I&rsquo;m <span className="home-heat">{USER.firstName}</span>
+            Hello, I&rsquo;m <span className="text-heat">{USER.firstName}</span>
           </>
         }
         description={`${USER.flipSentences[1]} and ${USER.flipSentences[2]} from ${COUNTRY}.`}
       />
 
-      <div className="home-band">
-        <div className="home-frame grid lg:grid-cols-2">
-          <span className="home-star max-lg:hidden" aria-hidden />
+      <div className={BAND}>
+        <div className={cn(FRAME, "grid lg:grid-cols-2")}>
+          <span className={cn(STAR, "max-lg:hidden")} aria-hidden />
           {ABOUT_PARAGRAPHS.map(([lead, rest], index) => (
             <article
               key={lead}
               className="flex flex-col gap-5 px-6 py-10 not-first:border-line max-lg:not-first:border-t lg:px-14 lg:py-14 lg:not-first:border-l"
             >
-              <p className="flex items-center gap-2.5 text-[0.8125rem] text-(color:--ink-72)">
+              <p className="flex items-center gap-2.5 text-[0.8125rem] text-ink/72">
                 {index === 0 ? (
                   <IconBolt className="size-4" aria-hidden />
                 ) : (
@@ -110,11 +128,11 @@ export function AboutSection() {
                 )}
                 {index === 0 ? "Who I am" : "What I focus on"}
               </p>
-              <p className="home-feature-text">
+              <p className={FEATURE_TEXT}>
                 <strong>{lead}</strong> {rest}
               </p>
               <a
-                className="home-link mt-auto w-fit"
+                className={cn(LINK, "mt-auto w-fit text-[0.875rem]")}
                 href={index === 0 ? "/cv" : SOCIAL.github.href}
                 target={index === 0 ? undefined : "_blank"}
                 rel={index === 0 ? undefined : "noopener"}
@@ -127,8 +145,13 @@ export function AboutSection() {
         </div>
       </div>
 
-      <div className="home-band">
-        <div className="home-frame grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <div className={BAND}>
+        <div
+          className={cn(
+            FRAME,
+            "grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]",
+          )}
+        >
           <div className="min-w-0 lg:border-r lg:border-line">
             <h3 className="sr-only">GitHub Contributions</h3>
             <Suspense fallback={<ContributionFieldFallback />}>
@@ -137,23 +160,33 @@ export function AboutSection() {
           </div>
 
           <figure className="relative flex min-w-0 flex-col overflow-clip max-lg:border-t max-lg:border-line">
-            <figcaption className="home-engraved flex h-12 items-center justify-end px-5">
-              <span className="home-brackets">
-                [ <span className="home-heat">FIG_001</span> ]
+            <figcaption
+              className={cn(
+                ENGRAVED,
+                "flex h-12 items-center justify-end px-5",
+              )}
+            >
+              <span className={BRACKETS}>
+                [ <span className="text-heat">FIG_001</span> ]
               </span>
             </figcaption>
-            <div className="home-mark @container my-auto px-4 py-6">
+            <div className="@container my-auto px-4 py-6 [&_svg]:[--yt-side:var(--paper)] [&_svg]:[--yt-top:var(--paper)] dark:[&_svg]:[--pattern:color-mix(in_srgb,var(--ink)_16%,var(--paper))] dark:[&_svg]:[--stroke:color-mix(in_srgb,var(--ink)_28%,var(--paper))]">
               <YTMarkIsometric defaultCarModel="f1" />
             </div>
-            <p className="home-engraved flex h-11 items-center justify-start px-5">
+            <p
+              className={cn(
+                ENGRAVED,
+                "flex h-11 items-center justify-start px-5",
+              )}
+            >
               Click the mark
             </p>
           </figure>
         </div>
       </div>
 
-      <div className="home-band">
-        <dl className="home-frame grid grid-cols-2 lg:grid-cols-4">
+      <div className={BAND}>
+        <dl className={cn(FRAME, "grid grid-cols-2 lg:grid-cols-4")}>
           <Stat
             value={YEARS_OF_EXPERIENCE}
             title="Years of experience"

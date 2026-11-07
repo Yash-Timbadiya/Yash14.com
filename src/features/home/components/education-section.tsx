@@ -1,19 +1,40 @@
 import type { Education } from "@/features/portfolio/types/education";
 
+import { cn } from "@/lib/utils";
 import { ShowMore } from "./show-more";
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
+import { ExternalArrow } from "./hover-arrow";
+import { IconSchoolFilled } from "@tabler/icons-react";
 import { TrackedLink } from "@/components/tracked-link";
 import { SectionHead, SectionIndex } from "./section-intro";
 import { EDUCATION } from "@/features/portfolio/data/education";
 import { MarkdownLinkPreview } from "@/components/markdown-link-preview";
-import { IconArrowUpRight, IconSchoolFilled } from "@tabler/icons-react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   parseDescription,
   parseLinkedItems,
   toMarkdownList,
 } from "@/features/home/lib/parse-description";
+import {
+  BAND,
+  CHIP,
+  FEATURE_TEXT,
+  FRAME,
+  MONO_LABEL,
+  PROSE,
+  ROW_ARROW,
+  ROW_LINK,
+  ROW_SOFT,
+} from "@/features/home/lib/styles";
+
+/**
+ * One school on the timeline. On wide screens a dashed rail runs down the
+ * middle column (fading out after the last school) with a ring level with the
+ * end year.
+ */
+const TIMELINE_STEP =
+  "relative grid grid-cols-[minmax(0,1fr)] gap-4 pb-12 last:pb-0 lg:grid-cols-[9rem_2.5rem_minmax(0,1fr)] lg:gap-0 lg:before:absolute lg:before:top-2 lg:before:-bottom-2 lg:before:left-[calc(9rem+1.25rem-0.5px)] lg:before:w-px lg:before:bg-[linear-gradient(var(--line)_50%,transparent_50%)] lg:before:bg-size-[1px_6px] lg:last:before:bottom-auto lg:last:before:h-full lg:last:before:mask-[linear-gradient(black_60%,transparent)] lg:after:absolute lg:after:top-[0.4rem] lg:after:left-[calc(9rem+1.25rem-5px)] lg:after:size-2.5 lg:after:rounded-full lg:after:border-2 lg:after:border-heat lg:after:bg-paper";
 
 export function EducationSection() {
   return (
@@ -25,23 +46,30 @@ export function EducationSection() {
         label="Education"
         title={
           <>
-            Where my journey <span className="home-heat">started</span>
+            Where my journey <span className="text-heat">started</span>
           </>
         }
         description="From IIT-JEE preparation to a B.Tech in Information Technology."
       />
 
-      <div className="home-band">
-        <ol className="home-frame home-edu-timeline">
+      <div className={BAND}>
+        <ol className={cn(FRAME, "px-6 py-10 lg:p-14")}>
           {EDUCATION.map((item) => (
-            <li key={item.id} className="home-edu-step">
-              <div className="home-edu-years">
-                <span>{yearOf(item.period.end)}</span>
-                <span>{yearOf(item.period.start)}</span>
-                <span className="home-mono-label">{duration(item.period)}</span>
+            <li key={item.id} className={TIMELINE_STEP}>
+              {/* Wide screens stack end over start beside the rail; narrow
+                  ones read the range left to right: start, then end. */}
+              <div className="flex items-baseline gap-2 font-mono text-[0.875rem] text-ink/40 lg:flex-col lg:items-end lg:gap-1 lg:pr-1 lg:text-[1.5rem]/[1.1] lg:tracking-[-0.02em]">
+                <span className="text-heat">{yearOf(item.period.end)}</span>
+                <span className="max-lg:order-first">
+                  {yearOf(item.period.start)}
+                  <span className="lg:hidden">{" —"}</span>
+                </span>
+                <span className={cn(MONO_LABEL, "lg:mt-2")}>
+                  {duration(item.period)}
+                </span>
               </div>
-              <div className="home-edu-body">
-                <h3 className="home-feature-text">
+              <div className="flex min-w-0 flex-col gap-5 lg:col-start-3">
+                <h3 className={FEATURE_TEXT}>
                   <strong>{item.school}.</strong>{" "}
                   {[item.degree, item.fieldOfStudy].filter(Boolean).join(", ")}.
                 </h3>
@@ -82,7 +110,7 @@ function Skills({ skills }: { skills?: string[] }) {
   return (
     <ul className="flex flex-wrap gap-1.5">
       {skills.map((skill) => (
-        <li key={skill} className="home-chip">
+        <li key={skill} className={CHIP}>
           {skill}
         </li>
       ))}
@@ -104,7 +132,7 @@ export function EducationNotes({ item }: { item: Education }) {
   return (
     <div>
       {summary && summary.items.length > 0 && (
-        <div className="home-prose">
+        <div className={PROSE}>
           <MarkdownLinkPreview eventProperties={eventProperties}>
             {toMarkdownList(summary.items.slice(0, 1))}
           </MarkdownLinkPreview>
@@ -120,7 +148,7 @@ export function EducationNotes({ item }: { item: Education }) {
         >
           <div className="pt-2">
             {hiddenBullets.length > 0 && (
-              <div className="home-prose">
+              <div className={PROSE}>
                 <MarkdownLinkPreview eventProperties={eventProperties}>
                   {toMarkdownList(hiddenBullets)}
                 </MarkdownLinkPreview>
@@ -133,7 +161,7 @@ export function EducationNotes({ item }: { item: Education }) {
               return (
                 <div key={section.heading} className="mt-6">
                   {section.heading && (
-                    <p className="home-mono-label mb-3">{section.heading}</p>
+                    <p className={cn(MONO_LABEL, "mb-3")}>{section.heading}</p>
                   )}
 
                   {linked ? (
@@ -141,7 +169,11 @@ export function EducationNotes({ item }: { item: Education }) {
                       {linked.map((project) => (
                         <li key={project.url}>
                           <TrackedLink
-                            className="home-row-link home-row-soft grid-cols-[minmax(0,1fr)_0.875rem] gap-x-6 px-3 py-3"
+                            className={cn(
+                              ROW_LINK,
+                              ROW_SOFT,
+                              "grid-cols-[minmax(0,1fr)_0.875rem] gap-x-6 px-3 py-3",
+                            )}
                             href={addQueryParams(project.url, UTM_PARAMS)}
                             target="_blank"
                             rel="noopener"
@@ -155,12 +187,12 @@ export function EducationNotes({ item }: { item: Education }) {
                               <span className="block text-sm font-medium">
                                 {project.name}
                               </span>
-                              <span className="mt-1 block text-[0.8125rem]/normal text-pretty text-(color:--ink-72)">
+                              <span className="mt-1 block text-[0.8125rem]/normal text-pretty text-ink/72">
                                 {project.description}
                               </span>
                             </span>
-                            <IconArrowUpRight
-                              className="home-row-arrow self-start"
+                            <ExternalArrow
+                              className={cn(ROW_ARROW, "self-start")}
                               aria-hidden
                             />
                           </TrackedLink>
@@ -168,7 +200,7 @@ export function EducationNotes({ item }: { item: Education }) {
                       ))}
                     </ul>
                   ) : (
-                    <div className="home-prose">
+                    <div className={PROSE}>
                       <MarkdownLinkPreview eventProperties={eventProperties}>
                         {toMarkdownList(section.items)}
                       </MarkdownLinkPreview>

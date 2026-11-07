@@ -5,10 +5,10 @@ import { trackEvent } from "@/lib/analytics";
 import { YTMark } from "@/components/yt-mark";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
-export function SiteHeaderLogo({ href = "/" }: { href?: "/" | "/home" }) {
+export function SiteHeaderLogo() {
   return (
     <Link
-      href={href}
+      href="/"
       aria-label="Home"
       onClick={() =>
         trackEvent(ANALYTICS_EVENTS.LOGO_CLICK, {

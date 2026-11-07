@@ -40,8 +40,13 @@ export function ProfileJson() {
   return (
     <code className="block min-w-max">
       {lines.map((line, index) => (
-        <span className="home-json-line" key={`${index}-${line.trim()}`}>
-          <span aria-hidden>{index + 1}</span>
+        <span
+          className="grid grid-cols-[3rem_1fr] whitespace-pre"
+          key={`${index}-${line.trim()}`}
+        >
+          <span className="pr-5 text-right text-ink/24 select-none" aria-hidden>
+            {index + 1}
+          </span>
           <JsonLine line={line} />
         </span>
       ))}
@@ -53,7 +58,7 @@ function JsonLine({ line }: { line: string }) {
   const match = /^(\s*)"([^"]+)":\s(.*)$/.exec(line);
 
   if (!match) {
-    return <span className="text-(--ink-40)">{line}</span>;
+    return <span className="text-ink/40">{line}</span>;
   }
 
   const [, indent, key, value] = match;
@@ -62,12 +67,10 @@ function JsonLine({ line }: { line: string }) {
   return (
     <span>
       {indent}
-      <span className="text-(--ink-40)">"</span>
+      <span className="text-ink/40">"</span>
       <span>{key}</span>
-      <span className="text-(--ink-40)">": </span>
-      <span className={isString ? "home-heat" : "text-(--ink-40)"}>
-        {value}
-      </span>
+      <span className="text-ink/40">": </span>
+      <span className={isString ? "text-heat" : "text-ink/40"}>{value}</span>
     </span>
   );
 }

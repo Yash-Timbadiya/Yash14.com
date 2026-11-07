@@ -1,7 +1,9 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BTN, BTN_HEAT } from "@/features/home/lib/styles";
 import { AnimatedFlameIcon } from "@/features/roast/components/animated-flame-icon";
 
 const EXAMPLES = [
@@ -57,7 +59,7 @@ export function RoastCard() {
 
   return (
     <form
-      className="home-roast"
+      className="relative z-3 mx-auto w-full max-w-[34.5rem] overflow-hidden rounded-[1.25rem] border border-hairline-strong bg-surface shadow-lift"
       onSubmit={(event) => {
         event.preventDefault();
         const url = value.trim();
@@ -74,15 +76,16 @@ export function RoastCard() {
         onChange={(event) => setValue(event.target.value)}
         placeholder={`Roast ${placeholder}`}
         aria-label="Website to roast"
+        className="h-14 w-full border-b border-hairline bg-transparent px-4 text-[0.9375rem] outline-none placeholder:text-ink/40"
       />
       <div className="flex items-center justify-between gap-3 p-2.5 pl-4">
         <span className="flex items-center gap-2 text-[0.8125rem] text-muted-foreground">
-          <AnimatedFlameIcon className="size-4.5 shrink-0 text-(color:--heat)" />
+          <AnimatedFlameIcon className="size-4.5 shrink-0 text-heat" />
           Roast My Site
         </span>
         <button
           type="submit"
-          className="home-btn home-btn-heat h-9! rounded-lg! px-3.5!"
+          className={cn(BTN, BTN_HEAT, "h-9 rounded-lg px-3.5")}
         >
           Roast
         </button>

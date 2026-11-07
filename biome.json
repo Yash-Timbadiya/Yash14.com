@@ -12,9 +12,7 @@
       "!node_modules",
       "!.next",
       "!dist",
-      "!build",
-      "!src/styles/gradient-border-plugin.css",
-      "!src/styles/screen-line-color.css"
+      "!build"
     ]
   },
   "formatter": {

@@ -185,10 +185,11 @@ Maintain a clear space of 1/2 the height of the Mark on all sides of the logo, e
 
 ${heading(level, "Color")}
 
-The identity is monochrome. Use Ink on light surfaces and Paper on dark surfaces to keep the mark legible.
+Heat carries the identity; Ink and Paper give it a calm, neutral stage. Use the mark in Heat or Ink on Paper, or in Paper on Ink.
 
-- Ink: #09090B
-- Paper: #FFFFFF
+- Heat: #FF5400 (rgb(255, 84, 0))
+- Ink: #262626 (rgb(38, 38, 38))
+- Paper: #F9F9F9 (rgb(249, 249, 249))
 
 ${heading(level, "Downloads")}
 

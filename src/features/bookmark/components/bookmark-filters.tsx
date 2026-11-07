@@ -80,7 +80,7 @@ function FilterTab({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className="border-r border-line p-4 font-mono text-[.8125rem]/4 font-medium tracking-wide text-muted-foreground uppercase transition-[color,background-color] ease-out hover:bg-accent-muted aria-pressed:bg-accent-muted aria-pressed:text-foreground"
+      className="h-12 border-r border-hairline px-5 font-mono text-xs/4 tracking-normal text-ink/56 uppercase transition-[color,background-color,box-shadow] duration-150 hover:bg-ink/4 hover:text-ink aria-pressed:bg-heat/8 aria-pressed:text-heat aria-pressed:shadow-[inset_0_-2px_0_var(--heat)]"
     >
       {children}
     </button>

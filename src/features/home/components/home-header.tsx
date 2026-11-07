@@ -1,5 +1,7 @@
+import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { MAIN_NAV } from "@/config/site";
+import { FRAME } from "@/features/home/lib/styles";
 import { NavDesktop } from "@/components/nav-desktop";
 import { Separator } from "@/components/ui/separator";
 import { USER } from "@/features/portfolio/data/user";
@@ -17,16 +19,16 @@ const BrandContextMenu = dynamic(
 const CommandMenu = dynamic(() => import("@/components/command-menu"));
 
 const SECTION_LINKS = [
-  { title: "Hello", href: "#hello" },
-  { title: "Stack", href: "#stack" },
-  { title: "Experience", href: "#experience" },
-  { title: "Education", href: "#education" },
+  { title: "Hello", href: "/#hello" },
+  { title: "Stack", href: "/#stack" },
+  { title: "Experience", href: "/#experience" },
+  { title: "Education", href: "/#education" },
 ];
 
 export function AnnouncementBar() {
   return (
-    <div className="home-frame p-3 pb-2.5">
-      <p className="home-announce">
+    <div className={cn(FRAME, "p-3 pb-2.5")}>
+      <p className="flex min-h-10 flex-wrap items-center justify-center gap-x-1.5 rounded-[0.625rem] bg-heat px-4 py-2 text-center text-[0.875rem] font-medium text-on-heat [&_a]:underline [&_a]:underline-offset-2">
         Open to my next role.
         <TrackedLink
           href="/cv"
@@ -42,11 +44,16 @@ export function AnnouncementBar() {
 
 export function HomeHeader() {
   return (
-    <header className="home-header">
-      <div className="home-frame flex h-14 items-center gap-3 px-4 lg:h-18 lg:px-10">
+    <header className="sticky top-0 z-50 border-y border-hairline bg-paper [&_nav]:gap-1 [&_nav_a]:rounded-lg [&_nav_a]:px-2 [&_nav_a]:py-1.5 [&_nav_a]:text-[0.875rem] [&_nav_a]:font-normal [&_nav_a]:tracking-normal [&_nav_a]:text-ink [&_nav_a]:transition-[background-color] [&_nav_a]:duration-150 [&_nav_a:hover]:bg-ink/4">
+      <div
+        className={cn(
+          FRAME,
+          "flex h-14 items-center gap-3 px-4 lg:h-18 lg:px-10",
+        )}
+      >
         <BrandContextMenu section={ANALYTICS_SECTIONS.HEADER}>
-          <span className="text-(--heat) [&_svg]:h-7">
-            <SiteHeaderLogo href="/home" />
+          <span className="text-heat [&_svg]:h-7">
+            <SiteHeaderLogo />
           </span>
         </BrandContextMenu>
         <span className="text-[1.0625rem] font-medium tracking-[-0.016em] max-sm:hidden">

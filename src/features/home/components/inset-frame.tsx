@@ -1,12 +1,22 @@
 import { cn } from "@/lib/utils";
 
-const EDGES = ["top", "bottom", "left", "right"] as const;
-const CORNERS = [
-  "top-left",
-  "top-right",
-  "bottom-left",
-  "bottom-right",
-] as const;
+/** Where each dashed guide sits; `--inset` is the gap set on the wrapper. */
+const EDGES = {
+  top: "top-(--inset) left-0 h-px w-full",
+  bottom: "bottom-(--inset) left-0 h-px w-full",
+  left: "top-0 left-(--inset) h-full w-px",
+  right: "top-0 right-(--inset) h-full w-px",
+} as const;
+
+/** Each cross is centred on a corner of the card. */
+const CORNERS = {
+  "top-left": "top-[calc(var(--inset)-5px)] left-[calc(var(--inset)-5px)]",
+  "top-right": "top-[calc(var(--inset)-5px)] right-[calc(var(--inset)-5px)]",
+  "bottom-left":
+    "bottom-[calc(var(--inset)-5px)] left-[calc(var(--inset)-5px)]",
+  "bottom-right":
+    "right-[calc(var(--inset)-5px)] bottom-[calc(var(--inset)-5px)]",
+} as const;
 
 /**
  * Sits a card inside the frame with room around it, and runs dashed guide
@@ -20,14 +30,21 @@ export function InsetFrame({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn("home-inset", className)}>
-      {EDGES.map((edge) => {
+    <div
+      className={cn(
+        "relative p-(--inset) [--inset:1rem] md:[--inset:2rem]",
+        className,
+      )}
+    >
+      {Object.entries(EDGES).map(([edge, position]) => {
         const horizontal = edge === "top" || edge === "bottom";
         return (
           <svg
             key={edge}
-            className="home-inset-line"
-            data-edge={edge}
+            className={cn(
+              "pointer-events-none absolute overflow-visible stroke-hairline-strong [stroke-dasharray:3_3]",
+              position,
+            )}
             aria-hidden="true"
           >
             <line
@@ -40,11 +57,13 @@ export function InsetFrame({
         );
       })}
 
-      {CORNERS.map((corner) => (
+      {Object.entries(CORNERS).map(([corner, position]) => (
         <svg
           key={corner}
-          className="home-inset-cross"
-          data-corner={corner}
+          className={cn(
+            "pointer-events-none absolute z-2 size-[11px] stroke-ink/40 stroke-1",
+            position,
+          )}
           viewBox="0 0 11 11"
           aria-hidden="true"
         >
@@ -52,7 +71,7 @@ export function InsetFrame({
         </svg>
       ))}
 
-      <div className="home-inset-card">{children}</div>
+      <div className="relative z-1 border border-hairline">{children}</div>
     </div>
   );
 }

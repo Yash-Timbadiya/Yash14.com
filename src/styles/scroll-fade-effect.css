@@ -79,33 +79,3 @@
     calc(100% - var(--scroll-buffer)) 100%;
   animation-fill-mode: both;
 }
-
-@utility scroll-fade-effect-x {
-  --mask-width: 64px;
-  --mask-offset-left: 0px;
-  --mask-offset-right: 0px;
-  --scroll-buffer: 2rem;
-
-  mask-image:
-    linear-gradient(to left, transparent, black 90%),
-    linear-gradient(to right, transparent 0%, black 100%),
-    linear-gradient(black, black);
-
-  mask-size:
-    var(--left-mask-width) 100%,
-    var(--right-mask-width) 100%,
-    100% 100%;
-  mask-repeat: no-repeat, no-repeat, no-repeat;
-  mask-position:
-    var(--mask-offset-left) 0,
-    calc(100% - var(--mask-offset-right)) 0,
-    0 0;
-  mask-composite: exclude;
-
-  animation-name: show-left-mask, hide-right-mask;
-  animation-timeline: scroll(self inline), scroll(self inline);
-  animation-range:
-    0 var(--scroll-buffer),
-    calc(100% - var(--scroll-buffer)) 100%;
-  animation-fill-mode: both;
-}

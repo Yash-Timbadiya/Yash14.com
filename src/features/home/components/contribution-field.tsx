@@ -1,13 +1,15 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import type { Activity } from "@/features/portfolio/components/contribution-graph";
+import type { Activity } from "@/features/portfolio/types/contributions";
 
+import { cn } from "@/lib/utils";
 import { use, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { trackEvent } from "@/lib/analytics";
 import { GITHUB_USERNAME } from "@/config/site";
 import { IconReload } from "@tabler/icons-react";
+import { MONO_LABEL } from "@/features/home/lib/styles";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 const WEEKS = 53;
@@ -15,6 +17,10 @@ const DAYS_PER_WEEK = 7;
 const CELL = 10;
 const INSET = 1;
 const LEVELS = [0, 1, 2, 3, 4];
+
+/** The accent palette for the graph; important so it beats `.contribution-levels` in globals.css. */
+const FIELD_LEVELS =
+  "[--level-0:color-mix(in_srgb,var(--ink)_4%,transparent)]! [--level-1:color-mix(in_srgb,var(--heat)_22%,transparent)]! [--level-2:color-mix(in_srgb,var(--heat)_46%,transparent)]! [--level-3:color-mix(in_srgb,var(--heat)_72%,transparent)]! [--level-4:var(--heat)]! [&_rect]:[rx:1.5px]";
 
 type Week = (Activity | null)[];
 type HoveredDay = { count: number; date: string; x: number; y: number };
@@ -51,13 +57,13 @@ export function ContributionField({
       <FieldBar>
         <span className="text-[0.8125rem] tabular-nums">
           {data.length > 0 ? total.toLocaleString("en") : "No"}{" "}
-          <span className="text-(color:--ink-56)">contributions</span>
+          <span className="text-ink/56">contributions</span>
         </span>
         <button
           type="button"
           aria-label="Replay the animation"
           title="Replay"
-          className="home-field-replay"
+          className="grid size-7 cursor-pointer place-items-center rounded-lg border border-line text-ink/56 transition-[color,background-color] duration-150 ease-[ease] hover:bg-ink/4 hover:text-ink [&_svg]:size-3.5 [&_svg]:transition-[rotate] [&_svg]:duration-400 [&_svg]:ease-snappy hover:[&_svg]:rotate-180"
           onClick={() => {
             setHovered(null);
             setReplay((count) => count + 1);
@@ -74,7 +80,7 @@ export function ContributionField({
             {months.map(({ label, week }) => (
               <span
                 key={`${label}-${week}`}
-                className="home-mono-label absolute top-0"
+                className={cn(MONO_LABEL, "absolute top-0")}
                 style={{ left: `${(week / WEEKS) * 100}%` }}
               >
                 {label}
@@ -110,7 +116,7 @@ export function ContributionField({
       </div>
 
       <div className="flex h-11 items-center justify-between gap-4 border-t border-line px-5">
-        <p className="text-[0.8125rem] text-(color:--ink-56)">
+        <p className="text-[0.8125rem] text-ink/56">
           {data.length > 0
             ? "In the past 365 days."
             : "Contributions are unavailable right now."}
@@ -122,7 +128,10 @@ export function ContributionField({
               key={level}
               aria-pressed={selectedLevel === level}
               aria-label={`Highlight days with contribution level ${level}`}
-              className="contribution-levels home-field block cursor-pointer outline-offset-1 aria-pressed:outline-2 aria-pressed:outline-ring"
+              className={cn(
+                "contribution-levels block cursor-pointer outline-offset-1 aria-pressed:outline-2 aria-pressed:outline-ring",
+                FIELD_LEVELS,
+              )}
               onClick={() => {
                 trackEvent(
                   selectedLevel === level
@@ -160,7 +169,7 @@ export function ContributionField({
 function FieldBar({ children }: { children?: React.ReactNode }) {
   return (
     <div className="flex h-12 items-center justify-between gap-4 border-b border-line px-5">
-      <span className="truncate text-[0.8125rem] text-(color:--ink-56)">
+      <span className="truncate text-[0.8125rem] text-ink/56">
         github.com/<span className="text-foreground">{GITHUB_USERNAME}</span>
       </span>
       <div className="flex items-center gap-3">{children}</div>
@@ -199,7 +208,10 @@ function FieldSvg({
 }) {
   return (
     <svg
-      className="contribution-levels home-field block h-auto w-full overflow-visible"
+      className={cn(
+        "contribution-levels block h-auto w-full overflow-visible",
+        FIELD_LEVELS,
+      )}
       data-selected-level={selectedLevel ?? undefined}
       viewBox={`0 0 ${WEEKS * CELL} ${DAYS_PER_WEEK * CELL}`}
       role="img"
@@ -219,7 +231,7 @@ function FieldSvg({
               y={dayIndex * CELL + INSET}
               width={CELL - INSET * 2}
               height={CELL - INSET * 2}
-              className={day ? undefined : "home-field-empty"}
+              className={day ? undefined : "fill-transparent"}
               data-level={day?.level}
               data-date={day?.date}
               data-count={day?.count}
@@ -230,7 +242,7 @@ function FieldSvg({
 
       {hovered && (
         <rect
-          className="home-field-cursor"
+          className="pointer-events-none fill-transparent stroke-ink stroke-1 [vector-effect:non-scaling-stroke]"
           x={hovered.x}
           y={hovered.y}
           width={CELL}

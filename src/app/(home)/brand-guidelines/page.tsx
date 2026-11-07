@@ -1,18 +1,17 @@
-import type React from "react";
 import type { Metadata } from "next";
-import type { TOCItemType } from "@/components/toc";
+import type { BrandColor } from "./color-swatch";
 
+import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
+import { ColorSwatch } from "./color-swatch";
 import { YTMark } from "@/components/yt-mark";
-import { Button } from "@/components/ui/button";
-import { TOCMinimap } from "@/components/toc-minimap";
 import { YTWordmark } from "@/components/yt-wordmark";
 import { USER } from "@/features/portfolio/data/user";
 import { TrackedLink } from "@/components/tracked-link";
 import { BRAND_ASSETS, SITE_INFO } from "@/config/site";
 import { CopyBrandSvgButton } from "./copy-brand-svg-button";
-import { ArrowLeftIcon, Download, LinkIcon } from "lucide-react";
-import { DocPageRoot } from "@/features/doc/components/doc-page-root";
+import { PageHeader } from "@/features/home/components/page-header";
+import { IconDownload, IconPaletteFilled } from "@tabler/icons-react";
 import { DocShareMenu } from "@/features/doc/components/doc-share-menu";
 import {
   YTMarkClearSpace,
@@ -25,28 +24,24 @@ import {
   ANALYTICS_SOURCES,
 } from "@/lib/analytics-events";
 import {
-  DocContainer,
-  DocGrid,
-  DocLeftCol,
-  DocRightCol,
-} from "@/features/doc/components/doc-layout";
-import {
-  Panel,
-  PanelContent,
-  PanelDescription,
-  PanelHeader,
-  PanelTitle,
-} from "@/features/portfolio/components/panel";
+  BAND,
+  BTN,
+  BTN_HEAT,
+  BTN_SOFT,
+  FRAME,
+  MONO_LABEL,
+} from "@/features/home/lib/styles";
 
 const BrandContextMenu = dynamic(() =>
   import("@/components/brand-context-menu").then((mod) => mod.BrandContextMenu),
 );
 
+const SECTION = ANALYTICS_SECTIONS.BRAND_GUIDELINES;
 const MARK_ASSET = "/assets/yash14-brand/yash14-mark.svg";
 const LOGOTYPE_ASSET = "/assets/yash14-brand/yash14-logotype.svg";
 
-const PAGE_TITLE = "YT Brand";
-const PAGE_DESCRIPTION = `Key elements of the ${USER.displayName} visual identity, including the mark, logotype, clear space, and color.`;
+const PAGE_TITLE = "Brand";
+const PAGE_DESCRIPTION = `Logos, clear space and colors of the ${USER.displayName} identity, ready to download.`;
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -72,273 +67,279 @@ export const metadata: Metadata = {
   },
 };
 
-const TOC_ITEMS: TOCItemType[] = [
-  { title: "Mark", url: "#mark", depth: 2 },
-  { title: "Logotype", url: "#logotype", depth: 2 },
-  { title: "Clear Space", url: "#clear-space", depth: 2 },
-  { title: "Color", url: "#color", depth: 2 },
+const SECTIONS = [
+  { id: "mark", title: "Mark" },
+  { id: "logotype", title: "Logotype" },
+  { id: "clear-space", title: "Clear space" },
+  { id: "color", title: "Color" },
+] as const;
+
+/** How the logos sit on each brand color. Fixed values, so they read the same in either theme. */
+const TILES = [
+  { name: "Heat on Paper", className: "bg-[#f9f9f9] text-[#ff5400]" },
+  { name: "Ink on Paper", className: "bg-[#f9f9f9] text-[#262626]" },
+  { name: "Paper on Ink", className: "bg-[#262626] text-[#f9f9f9]" },
+] as const;
+
+const COLORS: BrandColor[] = [
+  {
+    name: "Heat",
+    description:
+      "The signature accent. Use it for the mark, highlights and the one action that matters on a screen.",
+    hex: "#FF5400",
+    rgb: "rgb(255, 84, 0)",
+    hsl: "hsl(20, 100%, 50%)",
+    sampleClassName: "bg-[#ff5400] text-white",
+  },
+  {
+    name: "Ink",
+    description:
+      "Text and the monochrome mark. Use it on light surfaces to keep everything legible.",
+    hex: "#262626",
+    rgb: "rgb(38, 38, 38)",
+    hsl: "hsl(0, 0%, 15%)",
+    sampleClassName: "bg-[#262626] text-[#f9f9f9]",
+  },
+  {
+    name: "Paper",
+    description:
+      "The quiet backdrop. Use it behind the mark and on dark surfaces for the reversed logo.",
+    hex: "#F9F9F9",
+    rgb: "rgb(249, 249, 249)",
+    hsl: "hsl(0, 0%, 98%)",
+    sampleClassName:
+      "bg-[#f9f9f9] text-[#262626] shadow-[inset_0_-1px_0_var(--hairline)]",
+  },
 ];
 
 export default function BrandPage() {
   return (
-    <DocPageRoot>
-      <DocContainer>
-        {/* Top spacer */}
-        <div className="h-12" />
-
-        <div className="screen-line-bottom h-px" />
-
-        {/* Page toolbar */}
-        <div className="flex items-center justify-between p-2 pl-4">
-          <Button
-            className="h-7 gap-2 border-none px-0 text-muted-foreground hover:text-foreground hover:no-underline"
-            variant="link"
-            size="sm"
-            asChild
-          >
-            <TrackedLink
-              href="/"
-              event={ANALYTICS_EVENTS.VIEW_HOME}
-              eventProperties={{
-                section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
-                source: ANALYTICS_SOURCES.TOOLBAR,
-              }}
-            >
-              <ArrowLeftIcon />
-              Home
-            </TrackedLink>
-          </Button>
-
-          <div className="flex items-center gap-2">
+    <>
+      <PageHeader
+        section={SECTION}
+        seed={83}
+        icon={<IconPaletteFilled aria-hidden />}
+        label="Press & Brand"
+        title={
+          <>
+            Brand <span className="text-heat">assets</span>
+          </>
+        }
+        description={PAGE_DESCRIPTION}
+        actions={
+          <>
             <LLMCopyButtonWithViewOptions
               markdownUrl="/brand.md"
-              section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}
+              section={SECTION}
             />
             <DocShareMenu
               title={PAGE_TITLE}
               url="/brand-guidelines"
-              section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}
+              section={SECTION}
             />
-          </div>
+          </>
+        }
+      >
+        <div className="mt-8 flex flex-col items-center gap-5">
+          <TrackedLink
+            className={cn(BTN, BTN_HEAT)}
+            href={BRAND_ASSETS.url}
+            download
+            event={ANALYTICS_EVENTS.DOWNLOAD_BRAND_ASSETS}
+            eventProperties={{
+              section: SECTION,
+              source: ANALYTICS_SOURCES.ASSET_BUTTONS,
+              url: BRAND_ASSETS.url,
+            }}
+          >
+            <IconDownload aria-hidden />
+            Download all brand assets
+          </TrackedLink>
+          <nav
+            aria-label="On this page"
+            className={cn(
+              MONO_LABEL,
+              "flex flex-wrap justify-center gap-x-1 uppercase",
+            )}
+          >
+            {SECTIONS.map((section) => (
+              <a
+                key={section.id}
+                href={`#${section.id}`}
+                className="rounded-md px-2 py-1 transition-colors hover:bg-ink/4 hover:text-ink"
+              >
+                {section.title}
+              </a>
+            ))}
+          </nav>
         </div>
+      </PageHeader>
 
-        <div className="screen-line-top screen-line-bottom py-px">
-          <div className="h-4" />
+      <BrandSection
+        index={1}
+        id="mark"
+        title="Mark"
+        description="The YT mark on its own. Use it where space is square or tight: avatars, favicons and small placements. Do not stretch, rotate or recolor it beyond the tiles shown."
+      >
+        <LogoTiles>
+          <YTMark className="h-14 w-auto" />
+        </LogoTiles>
+        <AssetActions
+          type="mark"
+          href={MARK_ASSET}
+          event={ANALYTICS_EVENTS.DOWNLOAD_MARK_SVG}
+        />
+      </BrandSection>
+
+      <BrandSection
+        index={2}
+        id="logotype"
+        title="Logotype"
+        description="The primary logo for most placements, with the name set beside the mark. Keep its proportions and give it room to breathe."
+      >
+        <LogoTiles>
+          <YTWordmark className="h-7 w-auto max-w-full" />
+        </LogoTiles>
+        <AssetActions
+          type="logotype"
+          href={LOGOTYPE_ASSET}
+          event={ANALYTICS_EVENTS.DOWNLOAD_LOGOTYPE_SVG}
+        />
+      </BrandSection>
+
+      <BrandSection
+        index={3}
+        id="clear-space"
+        title="Clear space"
+        description="Keep a clear space of half the mark's height on every side, except where the logo stays clearly recognizable and legible."
+      >
+        {/* Heights rounded to whole pixels (from each viewBox) so the
+            hairlines stay on the pixel grid. */}
+        <div className="@container flex flex-col items-center justify-center gap-10 px-6 py-12 lg:px-12">
+          <YTMarkClearSpace className="h-auto w-1/2 text-ink supports-[height:round(1px,1px)]:h-[round(down,calc(50cqw*530/660),1px)] sm:w-1/3 sm:supports-[height:round(1px,1px)]:h-[round(down,calc(33.3333cqw*530/660),1px)]" />
+          <YTWordmarkClearSpace className="h-auto w-full text-ink supports-[height:round(1px,1px)]:h-[round(down,calc(100cqw*1050/5875),1px)]" />
         </div>
+      </BrandSection>
 
-        <h1
-          data-slot="doc-title"
-          className="screen-line-bottom overflow-x-clip px-4 text-4xl font-medium tracking-tight text-balance"
-        >
-          {PAGE_TITLE}
-        </h1>
-      </DocContainer>
-
-      <DocGrid>
-        <DocLeftCol />
-
-        <div className="mx-auto w-full md:max-w-4xl">
-          {/* Intro */}
-          <Panel className="screen-line-top-none">
-            <PanelDescription className="px-4">
-              {PAGE_DESCRIPTION} Right-click any logo on this page to copy it as
-              SVG or download the full brand assets pack.
-            </PanelDescription>
-          </Panel>
-
-          {/* Mark */}
-          <Panel className="screen-line-top-none">
-            <PanelHeader>
-              <AnchorHeading id="mark">Mark</AnchorHeading>
-            </PanelHeader>
-
-            <BrandContextMenu section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}>
-              <PanelContent className="flex items-center justify-center py-16">
-                <YTMark className="h-16 w-auto text-foreground sm:h-20" />
-              </PanelContent>
-            </BrandContextMenu>
-
-            <div className="screen-line-top flex flex-wrap justify-center gap-2 p-4">
-              <Button asChild variant="outline" size="sm">
-                <TrackedLink
-                  href={MARK_ASSET}
-                  download
-                  event={ANALYTICS_EVENTS.DOWNLOAD_MARK_SVG}
-                  eventProperties={{
-                    section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
-                    source: ANALYTICS_SOURCES.ASSET_BUTTONS,
-                    url: MARK_ASSET,
-                  }}
-                >
-                  <Download />
-                  Download Mark
-                </TrackedLink>
-              </Button>
-              <CopyBrandSvgButton type="mark" />
-            </div>
-          </Panel>
-
-          {/* Logotype */}
-          <Panel className="screen-line-top-none">
-            <PanelHeader>
-              <AnchorHeading id="logotype">Logotype</AnchorHeading>
-            </PanelHeader>
-
-            <BrandContextMenu section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}>
-              <PanelContent className="flex items-center justify-center px-8 py-16">
-                <YTWordmark className="h-8 w-auto text-foreground sm:h-10" />
-              </PanelContent>
-            </BrandContextMenu>
-
-            <div className="screen-line-top flex flex-wrap justify-center gap-2 p-4">
-              <Button asChild variant="outline" size="sm">
-                <TrackedLink
-                  href={LOGOTYPE_ASSET}
-                  download
-                  event={ANALYTICS_EVENTS.DOWNLOAD_LOGOTYPE_SVG}
-                  eventProperties={{
-                    section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
-                    source: ANALYTICS_SOURCES.ASSET_BUTTONS,
-                    url: LOGOTYPE_ASSET,
-                  }}
-                >
-                  <Download />
-                  Download Logotype
-                </TrackedLink>
-              </Button>
-              <CopyBrandSvgButton type="logotype" />
-            </div>
-          </Panel>
-
-          {/* Clear Space */}
-          <Panel className="screen-line-top-none">
-            <PanelHeader>
-              <AnchorHeading id="clear-space">Clear Space</AnchorHeading>
-            </PanelHeader>
-
-            <PanelDescription className="px-4">
-              Maintain a clear space of 1/2 the height of the Mark on all sides
-              of the logo, except in limited cases where the logo remains
-              clearly recognizable and legible.
-            </PanelDescription>
-
-            {/* Heights rounded to whole pixels (from each viewBox) so the
-                hairlines below stay on the pixel grid. */}
-            <PanelContent className="@container screen-line-top flex flex-col items-center justify-center gap-8 px-4 py-16">
-              <YTMarkClearSpace className="h-auto w-1/2 text-foreground supports-[height:round(1px,1px)]:h-[round(down,calc(50cqw*530/660),1px)] sm:w-1/3 sm:supports-[height:round(1px,1px)]:h-[round(down,calc(33.3333cqw*530/660),1px)]" />
-              <YTWordmarkClearSpace className="h-auto w-full text-foreground supports-[height:round(1px,1px)]:h-[round(down,calc(100cqw*1050/5875),1px)]" />
-            </PanelContent>
-          </Panel>
-
-          {/* Color */}
-          <Panel className="screen-line-top-none">
-            <PanelHeader>
-              <AnchorHeading id="color">Color</AnchorHeading>
-            </PanelHeader>
-
-            <PanelDescription className="px-4">
-              The identity is monochrome. Use Ink on light surfaces and Paper on
-              dark surfaces to keep the mark legible.
-            </PanelDescription>
-
-            <PanelContent className="grid grid-cols-1 gap-px p-0 sm:grid-cols-2">
-              <ColorSwatch name="Ink" hex="#09090B" className="bg-[#09090B]" />
-              <ColorSwatch name="Paper" hex="#FFFFFF" className="bg-white" />
-            </PanelContent>
-          </Panel>
-
-          {/* Download all */}
-          <Panel className="screen-line-top-none">
-            <PanelContent className="flex flex-col items-center gap-4 py-10 text-center">
-              <p className="text-balance text-muted-foreground">
-                Download the complete brand assets pack including the mark,
-                logotype, and icon in SVG.
-              </p>
-              <Button asChild>
-                <TrackedLink
-                  href={BRAND_ASSETS.url}
-                  download
-                  event={ANALYTICS_EVENTS.DOWNLOAD_BRAND_ASSETS}
-                  eventProperties={{
-                    section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
-                    source: ANALYTICS_SOURCES.ASSET_BUTTONS,
-                    url: BRAND_ASSETS.url,
-                  }}
-                >
-                  <Download />
-                  Download Brand Assets
-                </TrackedLink>
-              </Button>
-            </PanelContent>
-          </Panel>
-
-          {/* Bottom separator, matches the home page */}
-          <div className="stripe-divider h-8 w-full border-x border-line" />
+      <BrandSection
+        index={4}
+        id="color"
+        title="Color"
+        description="Heat carries the identity; Ink and Paper give it a calm, neutral stage. Click any value to copy it."
+      >
+        <div className="grid divide-hairline max-md:divide-y md:grid-cols-3 md:divide-x">
+          {COLORS.map((color) => (
+            <ColorSwatch key={color.name} color={color} />
+          ))}
         </div>
-
-        <DocRightCol>
-          <div className="sticky top-[calc(var(--doc-cols-top,0)+(--spacing(3)))] translate-x-2 opacity-0 in-data-doc-cols-ready:opacity-100">
-            <TOCMinimap
-              items={TOC_ITEMS}
-              section={ANALYTICS_SECTIONS.BRAND_GUIDELINES}
-            />
-          </div>
-        </DocRightCol>
-      </DocGrid>
-    </DocPageRoot>
+      </BrandSection>
+    </>
   );
 }
 
-function AnchorHeading({
+/** A numbered section: its title and guidance on the left, the assets on the right. */
+function BrandSection({
+  index,
   id,
+  title,
+  description,
   children,
 }: {
+  index: number;
   id: string;
+  title: string;
+  description: string;
   children: React.ReactNode;
 }) {
   return (
-    <PanelTitle id={id} className="scroll-mt-20">
-      <TrackedLink
-        href={`#${id}`}
-        className="group/anchor inline-flex items-center gap-2 no-underline"
-        event={ANALYTICS_EVENTS.VIEW_SECTION}
-        eventProperties={{
-          section: ANALYTICS_SECTIONS.BRAND_GUIDELINES,
-          source: ANALYTICS_SOURCES.HEADING,
-          target: id,
-        }}
-      >
-        {children}
-        <LinkIcon
-          className="size-5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/panel-title:opacity-100"
-          aria-hidden
-        />
-      </TrackedLink>
-    </PanelTitle>
+    <section id={id} className="scroll-mt-24" aria-labelledby={`${id}-title`}>
+      <div className={BAND}>
+        <div
+          className={cn(
+            FRAME,
+            "grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]",
+          )}
+        >
+          <div className="flex flex-col gap-3 px-6 py-8 max-lg:border-b max-lg:border-hairline lg:border-r lg:border-hairline lg:px-10 lg:py-12">
+            <span className={cn(MONO_LABEL, "text-ink/24")}>
+              [{" "}
+              <span className="text-heat">
+                {String(index).padStart(2, "0")}
+              </span>{" "}
+              ]
+            </span>
+            <h2
+              id={`${id}-title`}
+              className="text-[1.5rem]/tight font-medium tracking-[-0.016em]"
+            >
+              {title}
+            </h2>
+            <p className="text-[0.9375rem]/[1.6] text-pretty text-ink/72">
+              {description}
+            </p>
+          </div>
+          <div className="flex min-w-0 flex-col">{children}</div>
+        </div>
+      </div>
+    </section>
   );
 }
 
-function ColorSwatch({
-  name,
-  hex,
-  className,
+/** The logo on each brand color; right-click any tile to copy or download. */
+function LogoTiles({ children }: { children: React.ReactNode }) {
+  return (
+    <BrandContextMenu section={SECTION}>
+      <ul className="grid flex-1 divide-hairline max-sm:divide-y sm:grid-cols-3 sm:divide-x">
+        {TILES.map((tile) => (
+          <li
+            key={tile.name}
+            className={cn(
+              "relative flex min-h-48 items-center justify-center px-8 py-12",
+              tile.className,
+            )}
+          >
+            <span className="absolute top-3 left-4 font-mono text-[0.6875rem] tracking-normal uppercase opacity-60">
+              {tile.name}
+            </span>
+            {children}
+          </li>
+        ))}
+      </ul>
+    </BrandContextMenu>
+  );
+}
+
+function AssetActions({
+  type,
+  href,
+  event,
 }: {
-  name: string;
-  hex: string;
-  className?: string;
+  type: "mark" | "logotype";
+  href: string;
+  event:
+    | typeof ANALYTICS_EVENTS.DOWNLOAD_MARK_SVG
+    | typeof ANALYTICS_EVENTS.DOWNLOAD_LOGOTYPE_SVG;
 }) {
   return (
-    <div className="flex items-center gap-4 bg-background p-4">
-      <div
-        className={`size-12 shrink-0 rounded-lg border border-line ${className ?? ""}`}
-        aria-hidden
-      />
-      <div className="flex flex-col">
-        <span className="font-medium">{name}</span>
-        <span className="font-mono text-sm text-muted-foreground tabular-nums">
-          {hex}
-        </span>
-      </div>
+    <div className="flex flex-wrap items-center gap-2 border-t border-hairline px-4 py-3 lg:px-6">
+      <TrackedLink
+        className={cn(BTN, BTN_SOFT, "h-9 px-3")}
+        href={href}
+        download
+        event={event}
+        eventProperties={{
+          section: SECTION,
+          source: ANALYTICS_SOURCES.ASSET_BUTTONS,
+          url: href,
+        }}
+      >
+        <IconDownload aria-hidden />
+        SVG
+      </TrackedLink>
+      <CopyBrandSvgButton type={type} />
+      <span className={cn(MONO_LABEL, "ml-auto max-sm:hidden")}>
+        Right-click a tile for more
+      </span>
     </div>
   );
 }

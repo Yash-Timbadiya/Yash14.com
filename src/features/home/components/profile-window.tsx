@@ -1,9 +1,11 @@
+import { cn } from "@/lib/utils";
 import { urlToName } from "@/utils/url";
 import { ProfileJson } from "./profile-json";
 import { YTMark } from "@/components/yt-mark";
 import { LinkIcon, MapPinIcon } from "lucide-react";
 import { USER } from "@/features/portfolio/data/user";
 import { TrackedLink } from "@/components/tracked-link";
+import { BRACKETS, BTN, BTN_HEAT } from "@/features/home/lib/styles";
 import { getGenderIcon } from "@/features/portfolio/components/overview";
 import { JobItem } from "@/features/portfolio/components/overview/job-item";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
@@ -27,25 +29,35 @@ const LOCATION_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${enco
 /** A browser window: tab strip, address bar, then the profile beside its JSON. */
 export function ProfileWindow() {
   return (
-    <div className="home-browser-outer mt-12 lg:mt-16">
-      <div className="home-browser">
-        <div className="home-chrome-strip">
-          <WindowDots />
-          <div className="home-chrome-tab">
-            <YTMark className="h-3 shrink-0 text-(--heat)" aria-hidden />
+    <div className="mt-12 rounded-t-3xl border border-b-0 border-hairline px-1.5 pt-1.5 lg:mt-16">
+      <div className="rounded-t-[1.125rem] border border-b-0 border-hairline bg-paper">
+        <div className="flex h-12 items-end gap-4 pl-5">
+          <WindowDots className="self-center" />
+          {/* The tab's concave corners run its outline into the strip's
+              bottom rule. */}
+          <div className="relative z-1 -mb-px flex h-10 w-60 min-w-0 items-center gap-2.5 rounded-t-[0.875rem] border border-hairline border-b-surface bg-surface px-3.5 text-[0.8125rem] [--flare:0.75rem] before:absolute before:right-full before:-bottom-px before:size-(--flare) before:bg-[radial-gradient(circle_at_0_0,transparent_calc(var(--flare)-1px),var(--hairline)_calc(var(--flare)-1px),var(--hairline)_var(--flare),var(--surface)_var(--flare))] after:absolute after:-bottom-px after:left-full after:size-(--flare) after:bg-[radial-gradient(circle_at_100%_0,transparent_calc(var(--flare)-1px),var(--hairline)_calc(var(--flare)-1px),var(--hairline)_var(--flare),var(--surface)_var(--flare))]">
+            <YTMark className="h-3 shrink-0 text-heat" aria-hidden />
             <span className="truncate">{USER.displayName}</span>
           </div>
         </div>
 
-        <div className="home-chrome-page">
-          <div className="home-chrome-inset">
+        {/* Sits on the window's own side borders, so its top edge curves into
+            them instead of drawing a second line beside them. The inset's
+            radius is the page's minus the gap and border, so the corners run
+            parallel. */}
+        <div className="-mx-px overflow-hidden rounded-t-[1.125rem] border border-b-0 border-hairline bg-surface px-1.5 pt-1.5">
+          <div className="overflow-hidden rounded-t-[calc(1.125rem-0.375rem-1px)] border border-b-0 border-hairline">
             <div className="flex h-14 items-center gap-3 border-b border-line pr-2.5 pl-3 lg:pr-4 lg:pl-5">
-              <span className="home-chrome-address">
+              <span className="flex h-9 w-[min(100%,26rem)] min-w-0 items-center gap-2 rounded-full border border-hairline bg-paper px-3 text-[0.8125rem] text-ink/72 [&_svg]:text-ink/40">
                 <IconLock className="size-3.5 shrink-0" aria-hidden />
                 <span className="truncate">{urlToName(USER.website)}</span>
               </span>
               <TrackedLink
-                className="home-btn home-btn-heat ml-auto h-8! shrink-0 gap-1.5! rounded-lg! px-3! text-[13px]!"
+                className={cn(
+                  BTN,
+                  BTN_HEAT,
+                  "ml-auto h-8 shrink-0 gap-1.5 rounded-lg px-3 text-[13px]",
+                )}
                 href="/vcard"
                 download=""
                 event={ANALYTICS_EVENTS.DOWNLOAD_VCARD}
@@ -61,17 +73,17 @@ export function ProfileWindow() {
                 <ProfileDetails />
               </div>
 
-              <div className="home-chrome-pane">
+              <div className="relative min-w-0 border-t border-hairline lg:mr-6 lg:border-x lg:border-t-0">
                 <div className="flex h-12 items-center justify-between border-b border-line px-5">
                   <WindowDots />
-                  <span className="home-brackets text-(--ink-40)">
-                    [ <span className="home-heat">.JSON</span> ]
+                  <span className={BRACKETS}>
+                    [ <span className="text-heat">.JSON</span> ]
                   </span>
                 </div>
-                <div className="home-json">
+                <div className="overflow-x-auto pt-4 pb-5 font-mono text-[0.8125rem]/[1.125rem] tracking-normal">
                   <ProfileJson />
                 </div>
-                <span className="home-status-chip absolute right-4 bottom-4">
+                <span className="absolute right-4 bottom-4 inline-flex h-[1.875rem] items-center gap-2 rounded-full border border-hairline bg-surface pr-3 pl-[0.4375rem] font-mono text-[0.75rem] tracking-normal max-sm:hidden [&_svg]:size-[1.0625rem] [&_svg]:shrink-0 [&_svg]:text-heat">
                   <IconCircleCheckFilled aria-hidden />
                   Decoded in your browser
                 </span>
@@ -84,9 +96,15 @@ export function ProfileWindow() {
   );
 }
 
-function WindowDots() {
+function WindowDots({ className }: { className?: string }) {
   return (
-    <div className="home-dots" aria-hidden>
+    <div
+      className={cn(
+        "flex gap-2 *:size-3 *:rounded-full *:border *:border-hairline-strong",
+        className,
+      )}
+      aria-hidden
+    >
       <span />
       <span />
       <span />
@@ -96,7 +114,7 @@ function WindowDots() {
 
 function ProfileDetails() {
   return (
-    <dl className="home-fields">
+    <dl className="flex flex-col gap-3">
       {USER.jobs.map((job) => (
         <SpecRow key={job.company} label="Role">
           <JobItem
@@ -181,9 +199,11 @@ function SpecRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="home-spec-row">
-      <dt>{label}</dt>
-      <dd className="min-w-0">{children}</dd>
+    <div className="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-x-4 text-[0.8125rem] max-sm:grid-cols-[minmax(0,1fr)] max-sm:gap-y-1 [&_[data-slot=intro-item]]:gap-2.5 [&_[data-slot=intro-item]]:text-[0.8125rem] [&_[data-slot=intro-item]]:tracking-normal">
+      <dt className="justify-self-start rounded-md bg-ink/6 px-2 py-1 font-mono text-[0.75rem]/4 whitespace-nowrap text-ink/56">
+        {label}
+      </dt>
+      <dd className="flex min-h-8 min-w-0 items-center">{children}</dd>
     </div>
   );
 }

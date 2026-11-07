@@ -5,16 +5,14 @@ import { absoluteUrl } from "@/lib/utils";
 import { JsonLdScript } from "@/lib/json-ld";
 import { personJsonLd } from "@/config/json-ld";
 import { USER } from "@/features/portfolio/data/user";
-import { Separator } from "@/components/section-separator";
-import { Hello } from "@/features/portfolio/components/hello";
-import { Overview } from "@/features/portfolio/components/overview";
-import { Bookmarks } from "@/features/portfolio/components/bookmarks";
-import { Education } from "@/features/portfolio/components/education";
-import { TechStack } from "@/features/portfolio/components/tech-stack";
-import { Experiences } from "@/features/portfolio/components/experiences";
-import { SocialLinks } from "@/features/portfolio/components/social-links";
-import { ProfileHeader } from "@/features/portfolio/components/profile-header";
-import { GitHubContributions } from "@/features/portfolio/components/github-contributions";
+import { HomeHero } from "@/features/home/components/home-hero";
+import { CtaSection } from "@/features/home/components/cta-section";
+import { AboutSection } from "@/features/home/components/about-section";
+import { StackSection } from "@/features/home/components/stack-section";
+import { ProductsStrip } from "@/features/home/components/products-strip";
+import { BookmarksSection } from "@/features/home/components/bookmarks-section";
+import { EducationSection } from "@/features/home/components/education-section";
+import { ExperienceSection } from "@/features/home/components/experience-section";
 
 export const metadata: Metadata = {
   alternates: {
@@ -29,33 +27,14 @@ export default function HomePage() {
   return (
     <>
       <JsonLdScript data={getProfilePageJsonLd()} />
-
-      <div className="[--separator-height:--spacing(8)] **:data-[slot=panel]:scroll-mt-[calc(var(--header-height)+var(--separator-height))]">
-        <div className="mx-auto md:max-w-4xl">
-          <ProfileHeader />
-          <Separator />
-
-          <Overview />
-          <SocialLinks />
-          <GitHubContributions />
-          <Separator />
-
-          <Hello />
-          <Separator />
-
-          <TechStack />
-          <Separator />
-
-          <Experiences />
-          <Separator />
-
-          <Education />
-          <Separator />
-
-          <Bookmarks />
-          <Separator />
-        </div>
-      </div>
+      <HomeHero />
+      <ProductsStrip />
+      <AboutSection />
+      <StackSection />
+      <ExperienceSection />
+      <EducationSection />
+      <BookmarksSection />
+      <CtaSection />
     </>
   );
 }

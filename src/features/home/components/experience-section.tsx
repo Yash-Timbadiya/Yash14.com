@@ -2,18 +2,26 @@ import type { Experience } from "@/features/portfolio/types/experiences";
 
 import { cn } from "@/lib/utils";
 import { ShowMore } from "./show-more";
-import { HoverArrow } from "./hover-arrow";
 import { StatusIcon } from "./status-icon";
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
 import { TrackedLink } from "@/components/tracked-link";
+import { ExternalArrow, HoverArrow } from "./hover-arrow";
+import { IconBriefcaseFilled } from "@tabler/icons-react";
 import { ExperienceExplorer } from "./experience-explorer";
 import { SectionHead, SectionIndex } from "./section-intro";
 import { EXPERIENCES } from "@/features/portfolio/data/experiences";
+import { formatDuration } from "@/features/home/lib/format-duration";
 import { MarkdownLinkPreview } from "@/components/markdown-link-preview";
-import { IconArrowUpRight, IconBriefcaseFilled } from "@tabler/icons-react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
-import { formatDuration } from "@/features/portfolio/components/experiences/experience-position-item";
+import {
+  CHIP,
+  LINK,
+  MONO_LABEL,
+  PROSE,
+  ROW_ARROW,
+  ROW_LINK,
+} from "@/features/home/lib/styles";
 import {
   parseDescription,
   parseLinkedItems,
@@ -45,7 +53,7 @@ export function ExperienceSection() {
         title={
           <>
             My work is split across{" "}
-            <span className="home-heat">{count} places</span>
+            <span className="text-heat">{count} places</span>
           </>
         }
         description="Telehealth platforms, SaaS products and marketing sites, shipped to production."
@@ -61,14 +69,14 @@ function CompanyTab({ experience }: { experience: Experience }) {
 
   return (
     <>
-      <span className="home-usecase-name">
+      <span className="flex items-center gap-2.5 text-[1.0625rem] font-medium tracking-[-0.012em] group-aria-pressed/tab:text-(color:--tab-accent)">
         <CompanyLogo experience={experience} />
         {experience.companyName}
       </span>
-      <span className="text-[0.8125rem]/normal text-(color:--ink-72)">
+      <span className="text-[0.8125rem]/normal text-ink/72">
         {position.title}
       </span>
-      <span className="home-mono-label tabular-nums">
+      <span className={cn(MONO_LABEL, "tabular-nums")}>
         {start} — {end ?? "Present"}
       </span>
     </>
@@ -105,7 +113,12 @@ function CompanyPanel({ experience }: { experience: Experience }) {
                 <StatusIcon ongoing={!end} />
                 {position.title}
               </h3>
-              <p className="home-mono-label flex flex-wrap items-center gap-x-2 tabular-nums">
+              <p
+                className={cn(
+                  MONO_LABEL,
+                  "flex flex-wrap items-center gap-x-2 tabular-nums",
+                )}
+              >
                 {place && <span>{place} ·</span>}
                 {duration && <span>{duration} ·</span>}
                 {position.employmentType && (
@@ -114,7 +127,7 @@ function CompanyPanel({ experience }: { experience: Experience }) {
               </p>
             </header>
 
-            <div className="home-prose px-6 py-6 lg:px-8">
+            <div className={cn(PROSE, "px-6 py-6 lg:px-8")}>
               {visible.length > 0 && (
                 <MarkdownLinkPreview eventProperties={eventProperties}>
                   {toMarkdownList(visible)}
@@ -143,14 +156,22 @@ function CompanyPanel({ experience }: { experience: Experience }) {
 
               return (
                 <div key={section.heading} className="border-t border-line">
-                  <p className="home-mono-label border-b border-line px-6 py-3 lg:px-8">
+                  <p
+                    className={cn(
+                      MONO_LABEL,
+                      "border-b border-line px-6 py-3 lg:px-8",
+                    )}
+                  >
                     {section.heading}
                   </p>
                   <ul>
                     {linked.map((item) => (
                       <li key={item.url}>
                         <TrackedLink
-                          className="home-row-link grid-cols-[minmax(0,1fr)_0.875rem] items-center gap-x-6 px-6 py-3.5 sm:grid-cols-[minmax(0,10.5rem)_minmax(0,1fr)_0.875rem] lg:px-8"
+                          className={cn(
+                            ROW_LINK,
+                            "grid-cols-[minmax(0,1fr)_0.875rem] items-center gap-x-6 px-6 py-3.5 sm:grid-cols-[minmax(0,10.5rem)_minmax(0,1fr)_0.875rem] lg:px-8",
+                          )}
                           href={addQueryParams(item.url, UTM_PARAMS)}
                           target="_blank"
                           rel="noopener"
@@ -163,13 +184,10 @@ function CompanyPanel({ experience }: { experience: Experience }) {
                           <span className="text-sm font-medium">
                             {item.name}
                           </span>
-                          <span className="text-[0.8125rem]/normal text-pretty text-(color:--ink-72) max-sm:col-start-1 max-sm:row-start-2 max-sm:mt-0.5">
+                          <span className="text-[0.8125rem]/normal text-pretty text-ink/72 max-sm:col-start-1 max-sm:row-start-2 max-sm:mt-0.5">
                             {item.description}
                           </span>
-                          <IconArrowUpRight
-                            className="home-row-arrow"
-                            aria-hidden
-                          />
+                          <ExternalArrow className={ROW_ARROW} aria-hidden />
                         </TrackedLink>
                       </li>
                     ))}
@@ -187,7 +205,7 @@ function CompanyPanel({ experience }: { experience: Experience }) {
               {position.skills && position.skills.length > 0 && (
                 <ul className="flex flex-wrap gap-1.5">
                   {position.skills.map((skill) => (
-                    <li key={skill} className="home-chip">
+                    <li key={skill} className={CHIP}>
                       {skill}
                     </li>
                   ))}
@@ -195,7 +213,7 @@ function CompanyPanel({ experience }: { experience: Experience }) {
               )}
               {experience.companyWebsite && (
                 <TrackedLink
-                  className="home-link shrink-0"
+                  className={cn(LINK, "shrink-0 text-[0.875rem]")}
                   href={addQueryParams(experience.companyWebsite, UTM_PARAMS)}
                   target="_blank"
                   rel="noopener"
@@ -236,7 +254,7 @@ function CompanyLogo({ experience }: { experience: Experience }) {
   }
 
   return (
-    <span className="text-(color:--ink-56) [&_svg]:size-6" aria-hidden>
+    <span className="text-ink/56 [&_svg]:size-6" aria-hidden>
       {experience.companyIcon}
     </span>
   );

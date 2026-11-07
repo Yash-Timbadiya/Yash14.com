@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { AsciiField } from "./ascii-field";
 import { addQueryParams } from "@/utils/url";
 import { YTMark } from "@/components/yt-mark";
 import packageJson from "../../../../package.json";
 import { USER } from "@/features/portfolio/data/user";
 import { TrackedLink } from "@/components/tracked-link";
+import { ChevronRight, ExternalArrow } from "./hover-arrow";
 import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { SiteFooterLinks } from "@/components/site-footer-links";
 import { SOURCE_CODE_GITHUB_URL, UTM_PARAMS } from "@/config/site";
@@ -16,9 +18,16 @@ import {
   SOCIAL_REDIRECT_EVENTS,
 } from "@/features/portfolio/data/social-links";
 import {
-  IconArrowUpRight,
+  BAND,
+  FRAME,
+  GAP,
+  MONO_LABEL,
+  ROW_ARROW,
+  ROW_LINK,
+  STAR,
+} from "@/features/home/lib/styles";
+import {
   IconBookmarkFilled,
-  IconChevronRight,
   IconCode,
   IconFileTextFilled,
   IconFlameFilled,
@@ -49,30 +58,38 @@ const SITE_LINKS = [
   },
 ] as const;
 
-const FOOTER_ROW =
-  "home-row-link h-full grid-cols-[1.25rem_minmax(0,1fr)_0.875rem] items-center gap-x-3 px-6 py-4.5 lg:px-7 [&_svg:not(.home-row-arrow)]:size-5 [&_svg:not(.home-row-arrow)]:text-(color:--ink-56)";
+/** The leading icon is the row's first child; the trailing arrow keeps its own size. */
+const FOOTER_ROW = cn(
+  ROW_LINK,
+  "h-full grid-cols-[1.25rem_minmax(0,1fr)_0.875rem] items-center gap-x-3 px-6 py-4.5 lg:px-7 [&>svg:first-child]:size-5 [&>svg:first-child]:text-ink/56",
+);
 
 export function HomeFooter() {
   return (
-    <footer className="home-footer">
-      <div className="home-band">
-        <div className="home-frame home-gap" />
+    <footer className="[&_dl]:bg-hairline">
+      <div className={BAND}>
+        <div className={cn(FRAME, GAP)} />
       </div>
-      <div className="home-band">
-        <div className="home-frame grid h-16 lg:h-22 lg:grid-cols-2">
-          <p className="home-mono-label flex items-center px-6 uppercase lg:px-10">
+      <div className={BAND}>
+        <div className={cn(FRAME, "grid h-16 lg:h-22 lg:grid-cols-2")}>
+          <p
+            className={cn(
+              MONO_LABEL,
+              "flex items-center px-6 uppercase lg:px-10",
+            )}
+          >
             Footer
           </p>
           <div className="border-l border-line max-lg:hidden" />
         </div>
       </div>
 
-      <div className="home-band">
-        <div className="home-frame grid lg:grid-cols-2">
-          <span className="home-star max-lg:hidden" aria-hidden />
+      <div className={BAND}>
+        <div className={cn(FRAME, "grid lg:grid-cols-2")}>
+          <span className={cn(STAR, "max-lg:hidden")} aria-hidden />
           <div className="relative min-h-72 overflow-hidden border-line px-6 pt-10 max-lg:border-b lg:border-r lg:px-14 lg:pt-14">
             <div className="flex items-center gap-2.5">
-              <YTMark className="h-7 text-(color:--heat)" />
+              <YTMark className="h-7 text-heat" />
               <span className="text-[1.0625rem] font-medium tracking-[-0.016em]">
                 {USER.displayName}
               </span>
@@ -83,7 +100,7 @@ export function HomeFooter() {
             <AsciiField
               variant="terrain"
               seed={9}
-              className="absolute inset-x-0 bottom-0 h-36 w-full text-(color:--heat) mask-[linear-gradient(to_top,black_30%,transparent)]"
+              className="absolute inset-x-0 bottom-0 h-36 w-full text-heat mask-[linear-gradient(to_top,black_30%,transparent)]"
             />
           </div>
 
@@ -108,7 +125,7 @@ export function HomeFooter() {
                   <span className="truncate text-sm" title={item.handle}>
                     {item.title}
                   </span>
-                  <IconArrowUpRight className="home-row-arrow" aria-hidden />
+                  <ExternalArrow className={ROW_ARROW} />
                 </TrackedLink>
               </li>
             ))}
@@ -121,7 +138,7 @@ export function HomeFooter() {
               >
                 <IconCode aria-hidden />
                 <span className="truncate text-sm">Source code</span>
-                <IconArrowUpRight className="home-row-arrow" aria-hidden />
+                <ExternalArrow className={ROW_ARROW} />
               </a>
             </li>
             {SITE_LINKS.map((link) => {
@@ -135,7 +152,7 @@ export function HomeFooter() {
                   <Link className={FOOTER_ROW} href={link.href}>
                     <Icon aria-hidden />
                     <span className="truncate text-sm">{link.title}</span>
-                    <IconChevronRight className="home-row-arrow" aria-hidden />
+                    <ChevronRight className={ROW_ARROW} />
                   </Link>
                 </li>
               );
@@ -144,20 +161,20 @@ export function HomeFooter() {
         </div>
       </div>
 
-      <div className="home-band">
-        <div className="home-frame">
+      <div className={BAND}>
+        <div className={FRAME}>
           <SiteFooterDetails typeface="Inter" inspiredBy={INSPIRED_BY} />
         </div>
       </div>
 
-      <div className="home-band">
-        <div className="home-frame flex justify-center">
+      <div className={BAND}>
+        <div className={cn(FRAME, "flex justify-center")}>
           <SiteFooterLinks />
         </div>
       </div>
 
-      <div className="home-band border-b-0">
-        <div className="home-frame px-4 pb-16 sm:pb-0">
+      <div className={cn(BAND, "border-b-0")}>
+        <div className={cn(FRAME, "px-4 pb-16 sm:pb-0")}>
           <SiteFooterInteractiveLogotype text="YASH 14" />
         </div>
       </div>

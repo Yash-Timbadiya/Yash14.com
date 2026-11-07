@@ -1,21 +1,17 @@
 import type { Metadata } from "next";
 import type { WebApplication, WithContext } from "schema-dts";
 
+import { cn } from "@/lib/utils";
 import { SITE_INFO } from "@/config/site";
 import { absoluteUrl } from "@/lib/utils";
 import { JsonLdScript } from "@/lib/json-ld";
-import { ArrowLeftIcon } from "lucide-react";
 import { JSON_LD_ID } from "@/config/json-ld";
-import { Button } from "@/components/ui/button";
-import { TrackedLink } from "@/components/tracked-link";
+import { BAND, FRAME } from "@/features/home/lib/styles";
+import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { RoastApp } from "@/features/roast/components/roast-app";
-import { DocContainer } from "@/features/doc/components/doc-layout";
+import { PageHeader } from "@/features/home/components/page-header";
 import { DocShareMenu } from "@/features/doc/components/doc-share-menu";
-import {
-  ANALYTICS_EVENTS,
-  ANALYTICS_SECTIONS,
-  ANALYTICS_SOURCES,
-} from "@/lib/analytics-events";
+import { AnimatedFlameIcon } from "@/features/roast/components/animated-flame-icon";
 
 const PAGE_TITLE = "Roast My Site";
 const PAGE_DESCRIPTION =
@@ -48,62 +44,32 @@ export default function RoastPage() {
     <>
       <JsonLdScript data={getWebApplicationJsonLd()} />
 
-      <DocContainer>
-        {/* Top spacer */}
-        <div className="h-12" />
-
-        <div className="screen-line-bottom h-px" />
-
-        {/* Page toolbar */}
-        <div className="flex items-center justify-between p-2 pl-4">
-          <Button
-            className="h-7 gap-2 border-none px-0 text-muted-foreground hover:text-foreground hover:no-underline"
-            variant="link"
-            size="sm"
-            asChild
-          >
-            <TrackedLink
-              href="/"
-              event={ANALYTICS_EVENTS.VIEW_HOME}
-              eventProperties={{
-                section: ANALYTICS_SECTIONS.ROAST_PAGE,
-                source: ANALYTICS_SOURCES.TOOLBAR,
-              }}
-            >
-              <ArrowLeftIcon />
-              Home
-            </TrackedLink>
-          </Button>
-
+      <PageHeader
+        section={ANALYTICS_SECTIONS.ROAST_PAGE}
+        seed={37}
+        icon={<AnimatedFlameIcon className="size-4.5 text-heat" />}
+        label={PAGE_TITLE}
+        title={
+          <>
+            Get your site <span className="text-heat">roasted</span>
+          </>
+        }
+        description={PAGE_DESCRIPTION}
+        actions={
           <DocShareMenu
             title={PAGE_TITLE}
             url="/roast"
             section={ANALYTICS_SECTIONS.ROAST_PAGE}
           />
-        </div>
+        }
+      />
 
-        <div className="screen-line-top screen-line-bottom py-px">
-          <div className="h-4" />
-        </div>
-
-        <h1 className="screen-line-bottom px-4 text-4xl font-medium tracking-tight text-balance">
-          {PAGE_TITLE}
-        </h1>
-
-        <p className="screen-line-bottom p-4 text-balance text-muted-foreground">
-          {PAGE_DESCRIPTION}
-        </p>
-
-        <div className="h-4" />
-
-        {/* Keeps the footer off the input while the page is just the form. */}
-        <div className="screen-line-top screen-line-bottom min-h-[50svh]">
+      {/* Keeps the footer off the input while the page is just the form. */}
+      <div className={BAND}>
+        <div className={cn(FRAME, "min-h-[50svh]")}>
           <RoastApp />
         </div>
-
-        {/* Bottom separator, matches the home page */}
-        <div className="stripe-divider h-8 w-full" />
-      </DocContainer>
+      </div>
     </>
   );
 }

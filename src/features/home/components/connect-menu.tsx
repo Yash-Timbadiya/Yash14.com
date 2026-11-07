@@ -3,7 +3,7 @@
 import { UTM_PARAMS } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
-import { IconChevronDown } from "@tabler/icons-react";
+import { DisclosureChevron } from "./hover-arrow";
 import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { SOCIAL_ICONS } from "@/features/portfolio/components/social-link-icons";
 import {
@@ -22,13 +22,19 @@ export function ConnectMenu({ className }: { className?: string }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button type="button" className={className}>
-          <span className="home-stack-icons" aria-hidden>
+          {/* Stacked avatars, each ringed in the page color. */}
+          <span className="inline-flex" aria-hidden>
             {SOCIAL_LINKS.map((item) => (
-              <span key={item.name}>{SOCIAL_ICONS[item.name]}</span>
+              <span
+                key={item.name}
+                className="-ml-2 grid size-[1.625rem] place-items-center rounded-full border-2 border-paper bg-ink text-paper first:ml-0 [&_svg]:size-[0.8125rem]! [&_svg]:fill-current"
+              >
+                {SOCIAL_ICONS[item.name]}
+              </span>
             ))}
           </span>
           Connect with me
-          <IconChevronDown className="text-(color:--ink-56)" aria-hidden />
+          <DisclosureChevron className="h-1.5! w-[0.6rem]! text-ink/56" />
         </button>
       </DropdownMenuTrigger>
 

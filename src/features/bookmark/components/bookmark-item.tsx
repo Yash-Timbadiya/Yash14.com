@@ -6,21 +6,31 @@ import { format } from "date-fns";
 import { UTM_PARAMS } from "@/config/site";
 import { BookmarkCategory } from "../types";
 import { addQueryParams } from "@/utils/url";
-import { IconTile } from "@/components/ui/icon-tile";
-import { Separator } from "@/components/ui/separator";
 import { TrackedLink } from "@/components/tracked-link";
 import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
+import { ExternalArrow } from "@/features/home/components/hover-arrow";
+import { MONO_LABEL, ROW_ARROW, ROW_LINK } from "@/features/home/lib/styles";
 import {
-  ArrowUpRightIcon,
-  BookOpenIcon,
-  ComponentIcon,
-  EllipsisIcon,
-  FileTextIcon,
-  GraduationCapIcon,
-  LayoutGridIcon,
-  NewspaperIcon,
-} from "lucide-react";
+  IconArticleFilled,
+  IconBookFilled,
+  IconDotsFilled,
+  IconFileTextFilled,
+  IconLayoutGridFilled,
+  IconSchoolFilled,
+  IconStackFilled,
+} from "@tabler/icons-react";
 
+const CATEGORY_ICONS: Record<BookmarkCategory, React.ReactNode> = {
+  [BookmarkCategory.ARTICLE]: <IconArticleFilled />,
+  [BookmarkCategory.COURSE]: <IconSchoolFilled />,
+  [BookmarkCategory.BOOK]: <IconBookFilled />,
+  [BookmarkCategory.REFERENCE]: <IconFileTextFilled />,
+  [BookmarkCategory.UI_LIBRARY]: <IconStackFilled />,
+  [BookmarkCategory.SOFTWARE]: <IconLayoutGridFilled />,
+  [BookmarkCategory.OTHER]: <IconDotsFilled />,
+};
+
+/** One bookmark as a ruled row: icon, title, why, then author · category · date. */
 export function BookmarkItem({
   className,
   bookmark,
@@ -28,105 +38,55 @@ export function BookmarkItem({
 }: {
   className?: string;
   bookmark: Bookmark;
-  /** Where the card is rendered, sent with its click event. */
+  /** Where the row is rendered, sent with its click event. */
   section: AnalyticsSection;
 }) {
-  const hasWhy = Boolean(bookmark.why);
-
   return (
-    <div
+    <TrackedLink
       className={cn(
-        "relative flex pr-2 transition-colors ease-out hover:bg-accent-muted",
-        hasWhy ? "items-start" : "items-center",
+        ROW_LINK,
+        "grid-cols-[1rem_minmax(0,1fr)_0.875rem] items-start gap-x-3.5 px-6 py-5 lg:pr-10 lg:pl-14",
         className,
       )}
+      href={addQueryParams(bookmark.url, UTM_PARAMS)}
+      target="_blank"
+      rel="noopener noreferrer"
+      event={ANALYTICS_EVENTS.BOOKMARK_CLICK}
+      eventProperties={{
+        section,
+        title: bookmark.title,
+        url: bookmark.url,
+        category: bookmark.category,
+      }}
     >
-      <IconTile className={cn("mx-4", hasWhy && "mt-3.75")}>
+      <span className="mt-0.5 text-ink/40 [&_svg]:size-4">
         {bookmark.icon ?? CATEGORY_ICONS[bookmark.category]}
-      </IconTile>
+      </span>
 
-      <div className="flex-1 space-y-1 border-l border-dashed border-line p-4 pr-2">
-        <h3 className="leading-snug font-medium text-balance">
-          <TrackedLink
-            href={addQueryParams(bookmark.url, UTM_PARAMS)}
-            target="_blank"
-            rel="noopener noreferrer"
-            event={ANALYTICS_EVENTS.BOOKMARK_CLICK}
-            eventProperties={{
-              section,
-              title: bookmark.title,
-              url: bookmark.url,
-              category: bookmark.category,
-            }}
-          >
-            <span className="absolute inset-0" aria-hidden />
-            {bookmark.title}
-          </TrackedLink>
-        </h3>
-
-        <dl className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-          {bookmark.author && (
-            <>
-              <div>
-                <dt className="sr-only">Author</dt>
-                <dd>{bookmark.author}</dd>
-              </div>
-
-              <MetaSeparator />
-            </>
-          )}
-
-          <div>
-            <dt className="sr-only">Category</dt>
-            <dd>{bookmark.category}</dd>
-          </div>
-
-          <MetaSeparator />
-
-          <div>
-            <dt className="sr-only">Bookmarked on</dt>
-            <dd>
-              <time dateTime={new Date(bookmark.bookmarkedAt).toISOString()}>
-                {format(new Date(bookmark.bookmarkedAt), "d MMM yyyy")}
-              </time>
-            </dd>
-          </div>
-        </dl>
-
+      <span className="min-w-0">
+        <span className="block text-[0.9375rem] font-medium text-balance">
+          {bookmark.title}
+        </span>
         {bookmark.why && (
-          <p className="mt-4 border-t border-dashed border-line pt-4 text-sm text-pretty text-foreground">
+          <span className="mt-1 block text-[0.8125rem]/normal text-pretty text-ink/72">
             {bookmark.why}
-          </p>
+          </span>
         )}
-      </div>
+        <span
+          className={cn(
+            MONO_LABEL,
+            "mt-1.5 flex flex-wrap gap-x-2 *:not-first:before:mr-2 *:not-first:before:content-['·']",
+          )}
+        >
+          {bookmark.author && <span>{bookmark.author}</span>}
+          <span>{bookmark.category}</span>
+          <time dateTime={new Date(bookmark.bookmarkedAt).toISOString()}>
+            {format(new Date(bookmark.bookmarkedAt), "d MMM yyyy")}
+          </time>
+        </span>
+      </span>
 
-      <ArrowUpRightIcon
-        className={cn(
-          "size-4 shrink-0 text-muted-foreground",
-          hasWhy && "mt-4.75",
-        )}
-        aria-hidden
-      />
-    </div>
+      <ExternalArrow className={cn(ROW_ARROW, "mt-1")} />
+    </TrackedLink>
   );
 }
-
-function MetaSeparator() {
-  return (
-    <Separator
-      className="data-vertical:h-4 data-vertical:self-center"
-      orientation="vertical"
-      aria-hidden
-    />
-  );
-}
-
-const CATEGORY_ICONS: Record<BookmarkCategory, React.ReactNode> = {
-  [BookmarkCategory.ARTICLE]: <NewspaperIcon strokeWidth={1.5} />,
-  [BookmarkCategory.COURSE]: <GraduationCapIcon strokeWidth={1.5} />,
-  [BookmarkCategory.BOOK]: <BookOpenIcon strokeWidth={1.5} />,
-  [BookmarkCategory.REFERENCE]: <FileTextIcon strokeWidth={1.5} />,
-  [BookmarkCategory.UI_LIBRARY]: <ComponentIcon strokeWidth={1.5} />,
-  [BookmarkCategory.SOFTWARE]: <LayoutGridIcon strokeWidth={1.5} />,
-  [BookmarkCategory.OTHER]: <EllipsisIcon strokeWidth={1.5} />,
-};
