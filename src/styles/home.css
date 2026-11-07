@@ -687,14 +687,192 @@ html.dark:has(.home) {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  height: 2rem;
-  padding-inline: 0.75rem;
+  height: 1.875rem;
+  padding: 0 0.75rem 0 0.4375rem;
   border: 1px solid var(--hairline);
   border-radius: 9999px;
   background-color: var(--surface);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0;
+}
+
+.home-status-chip svg {
+  flex-shrink: 0;
+  width: 1.0625rem;
+  height: 1.0625rem;
+  color: var(--heat);
+}
+
+/* Browser variant of the profile window */
+.home-chrome-strip {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  height: 3rem;
+  padding-left: 1.25rem;
+}
+
+/* The page's own top edge is the strip's bottom rule, so the chrome shares one colour. */
+.home-browser:has(> .home-chrome-strip) {
+  overflow: visible;
+  background-color: var(--paper);
+}
+
+.home-chrome-strip > .home-dots {
+  align-self: center;
+}
+
+.home-chrome-tab {
+  --flare: 0.75rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 15rem;
+  min-width: 0;
+  height: 2.5rem;
+  margin-bottom: -1px;
+  padding-inline: 0.875rem;
+  border: 1px solid var(--hairline);
+  border-bottom-color: var(--surface);
+  border-radius: 0.875rem 0.875rem 0 0;
+  background-color: var(--surface);
+  font-size: 0.8125rem;
+}
+
+/* Concave corners that run the tab's outline into the strip's bottom rule. */
+.home-chrome-tab::before,
+.home-chrome-tab::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  width: var(--flare);
+  height: var(--flare);
+  background: radial-gradient(
+    circle at var(--flare-at) 0,
+    transparent calc(var(--flare) - 1px),
+    var(--hairline) calc(var(--flare) - 1px),
+    var(--hairline) var(--flare),
+    var(--surface) var(--flare)
+  );
+}
+
+.home-chrome-tab::before {
+  --flare-at: 0;
+  right: 100%;
+}
+
+.home-chrome-tab::after {
+  --flare-at: 100%;
+  left: 100%;
+}
+
+/* Sits on the window's own side borders, so its top edge curves into them
+   instead of drawing a second line beside them. */
+.home-chrome-page {
+  --page-radius: 1.125rem;
+  --page-gap: 0.375rem;
+  padding: var(--page-gap) var(--page-gap) 0;
+  margin-inline: -1px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-bottom: 0;
+  border-radius: var(--page-radius) var(--page-radius) 0 0;
+  background-color: var(--surface);
+}
+
+/* Inset by the gap and the page border, so its corners run parallel to the page's. */
+.home-chrome-inset {
+  --inset-radius: calc(var(--page-radius) - var(--page-gap) - 1px);
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-bottom: 0;
+  border-radius: var(--inset-radius) var(--inset-radius) 0 0;
+}
+
+.home-chrome-address {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  width: min(100%, 26rem);
+  height: 2.25rem;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 9999px;
+  background-color: var(--paper);
+  color: var(--ink-72);
+  font-size: 0.8125rem;
+}
+
+.home-chrome-address svg {
+  color: var(--ink-40);
+}
+
+.home-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home-fields .home-spec-row {
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  column-gap: 0.875rem;
+  min-height: 0;
+  padding-inline: 0;
+  border-bottom: 0;
+}
+
+.home-fields .home-spec-row > dt {
+  justify-self: end;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  background-color: var(--ink-6);
+  color: var(--ink-56);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  white-space: nowrap;
+}
+
+.home-fields .home-spec-row > dd {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 2.5rem;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 39.999rem) {
+  .home-fields .home-spec-row {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.375rem;
+  }
+
+  .home-fields .home-spec-row > dt {
+    justify-self: start;
+  }
+}
+
+.home-chrome-pane {
+  position: relative;
+  min-width: 0;
+  /* Room for the status chip, so it never sits on the JSON. */
+  padding-bottom: 3.5rem;
+  border-top: 1px solid var(--hairline);
+}
+
+@media (min-width: 64rem) {
+  .home-chrome-pane {
+    margin-right: 1.5rem;
+    border-top: 0;
+    border-inline: 1px solid var(--hairline);
+  }
 }
 
 @media (max-width: 39.999rem) {

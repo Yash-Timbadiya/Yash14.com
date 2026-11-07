@@ -53,7 +53,7 @@ function JsonLine({ line }: { line: string }) {
   const match = /^(\s*)"([^"]+)":\s(.*)$/.exec(line);
 
   if (!match) {
-    return <span className="text-(color:--ink-40)">{line}</span>;
+    return <span className="text-(--ink-40)">{line}</span>;
   }
 
   const [, indent, key, value] = match;
@@ -62,10 +62,10 @@ function JsonLine({ line }: { line: string }) {
   return (
     <span>
       {indent}
-      <span className="text-(color:--ink-40)">"</span>
+      <span className="text-(--ink-40)">"</span>
       <span>{key}</span>
-      <span className="text-(color:--ink-40)">": </span>
-      <span className={isString ? "home-heat" : "text-(color:--ink-40)"}>
+      <span className="text-(--ink-40)">": </span>
+      <span className={isString ? "home-heat" : "text-(--ink-40)"}>
         {value}
       </span>
     </span>

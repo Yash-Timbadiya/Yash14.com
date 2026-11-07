@@ -24,9 +24,9 @@ export const USER: User = {
   jobs: [
     {
       title: "Full Stack Developer",
-      company: "EnactOn",
-      website: "https://www.enacton.com/?atp=yash14",
-      experienceId: "enacton",
+      company: "Cross Even",
+      website: "https://crosseven.com/?atp=yash14",
+      experienceId: "cross-even",
     },
   ],
   about: `

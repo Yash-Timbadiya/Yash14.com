@@ -26,9 +26,15 @@ import {
 type PhoneItemProps = {
   phoneNumberB64: string;
   icon?: React.ReactNode;
+  /** Turn off when another copy on the page already owns the shortcut. */
+  shortcuts?: boolean;
 };
 
-export function PhoneItem({ phoneNumberB64, icon }: PhoneItemProps) {
+export function PhoneItem({
+  phoneNumberB64,
+  icon,
+  shortcuts = true,
+}: PhoneItemProps) {
   const id = useId();
   const isClient = useIsClient();
   const phoneNumberDecoded = decodePhoneNumber(phoneNumberB64);
@@ -36,20 +42,24 @@ export function PhoneItem({ phoneNumberB64, icon }: PhoneItemProps) {
 
   const { success } = useTiks();
 
-  useHotkeys("shift+p", () => {
-    trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
-      section: ANALYTICS_SECTIONS.KEYBOARD,
-      shortcut: "shift+p",
-      action: "copy_phone_number",
-    });
-    trackEvent(ANALYTICS_EVENTS.PHONE_NUMBER_COPY, {
-      section: ANALYTICS_SECTIONS.OVERVIEW,
-      method: ANALYTICS_METHODS.SHORTCUT,
-    });
-    copyText(phoneNumberDecoded);
-    success();
-    toast.success("Phone number copied");
-  });
+  useHotkeys(
+    "shift+p",
+    () => {
+      trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
+        section: ANALYTICS_SECTIONS.KEYBOARD,
+        shortcut: "shift+p",
+        action: "copy_phone_number",
+      });
+      trackEvent(ANALYTICS_EVENTS.PHONE_NUMBER_COPY, {
+        section: ANALYTICS_SECTIONS.OVERVIEW,
+        method: ANALYTICS_METHODS.SHORTCUT,
+      });
+      copyText(phoneNumberDecoded);
+      success();
+      toast.success("Phone number copied");
+    },
+    { enabled: shortcuts },
+  );
 
   return (
     <IntroItem className="group">

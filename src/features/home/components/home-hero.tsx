@@ -1,40 +1,16 @@
 import type { CSSProperties } from "react";
 
-import { urlToName } from "@/utils/url";
 import { HeroCells } from "./hero-cells";
 import { RoastCard } from "./roast-card";
 import { SparkIcon } from "./spark-icon";
 import { SITE_INFO } from "@/config/site";
 import { AsciiField } from "./ascii-field";
 import { ConnectMenu } from "./connect-menu";
-import { ProfileJson } from "./profile-json";
 import { USER } from "@/features/portfolio/data/user";
-import { TrackedLink } from "@/components/tracked-link";
+import { ProfileBrowser, ProfileWindow } from "./profile-window";
 import { WhatsAppLink } from "@/features/cv/components/whatsapp-link";
-import { JobItem } from "@/features/portfolio/components/overview/job-item";
 import { VerifiedIcon } from "@/features/portfolio/components/verified-icon";
-import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
-import { EmailItem } from "@/features/portfolio/components/overview/email-item";
-import { PhoneItem } from "@/features/portfolio/components/overview/phone-item";
 import { PronounceMyName } from "@/features/portfolio/components/pronounce-my-name";
-import { CurrentLocalTimeItem } from "@/features/portfolio/components/overview/current-local-time-item";
-import {
-  IntroItem,
-  IntroItemContent,
-  IntroItemIcon,
-  IntroItemLink,
-} from "@/features/portfolio/components/overview/intro-item";
-import {
-  IconBriefcaseFilled,
-  IconDownload,
-  IconLink,
-  IconMailFilled,
-  IconMapPinFilled,
-  IconPhoneFilled,
-  IconUserFilled,
-} from "@tabler/icons-react";
-
-const LOCATION_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(USER.address)}`;
 
 const WHATSAPP_MESSAGE = `Hi ${USER.firstName}, I came across your portfolio and would love to talk about working together.`;
 
@@ -101,7 +77,7 @@ export function HomeHero() {
             <a className="flex items-center gap-1.5" href="#hello">
               <span>{USER.displayName}</span>
               <VerifiedIcon
-                className="size-4 select-none text-(color:--heat)"
+                className="size-4 select-none text-(--heat)"
                 aria-hidden
               />
             </a>
@@ -150,161 +126,15 @@ export function HomeHero() {
             <RoastCard />
           </div>
 
-          <div className="home-browser-outer mt-12 lg:mt-16">
-            <div className="home-browser">
-              <div className="grid lg:grid-cols-2">
-                <div className="min-w-0 lg:border-r lg:border-line">
-                  <div className="flex h-12 items-center gap-4 border-b border-line pr-2 pl-5">
-                    <div className="home-dots" aria-hidden>
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <span className="truncate text-[0.8125rem] text-(color:--ink-56)">
-                      {urlToName(USER.website)}
-                      <span className="text-foreground">/me</span>
-                    </span>
-                    <TrackedLink
-                      className="ml-auto flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[0.8125rem] hover:bg-(--ink-4)"
-                      href="/vcard"
-                      download=""
-                      event={ANALYTICS_EVENTS.DOWNLOAD_VCARD}
-                      eventProperties={{
-                        section: ANALYTICS_SECTIONS.OVERVIEW,
-                      }}
-                    >
-                      <IconDownload className="size-3.5" aria-hidden />
-                      vCard
-                    </TrackedLink>
-                  </div>
+          <ProfileWindow />
+        </div>
+      </div>
 
-                  <dl>
-                    {USER.jobs.map((job) => (
-                      <SpecRow key={job.company} label="Role">
-                        <JobItem
-                          title={job.title}
-                          company={job.company}
-                          website={job.website}
-                          experienceId={job.experienceId}
-                          icon={<IconBriefcaseFilled />}
-                        />
-                      </SpecRow>
-                    ))}
-
-                    <SpecRow label="Location">
-                      <IntroItem>
-                        <IntroItemIcon>
-                          <IconMapPinFilled />
-                        </IntroItemIcon>
-                        <IntroItemContent>
-                          <IntroItemLink
-                            href={LOCATION_MAP_URL}
-                            aria-label={`Location: ${USER.address}`}
-                            event={ANALYTICS_EVENTS.VIEW_LOCATION_MAP}
-                            eventProperties={{
-                              section: ANALYTICS_SECTIONS.OVERVIEW,
-                              url: LOCATION_MAP_URL,
-                            }}
-                          >
-                            {USER.address}
-                          </IntroItemLink>
-                        </IntroItemContent>
-                      </IntroItem>
-                    </SpecRow>
-
-                    <SpecRow label="Local time">
-                      <CurrentLocalTimeItem timeZone={USER.timeZone} />
-                    </SpecRow>
-
-                    <SpecRow label="Phone">
-                      <PhoneItem
-                        phoneNumberB64={USER.phoneNumberB64}
-                        icon={<IconPhoneFilled />}
-                      />
-                    </SpecRow>
-
-                    <SpecRow label="Email">
-                      <EmailItem
-                        emailB64={USER.emailB64}
-                        icon={<IconMailFilled />}
-                      />
-                    </SpecRow>
-
-                    <SpecRow label="Website">
-                      <IntroItem>
-                        <IntroItemIcon>
-                          <IconLink />
-                        </IntroItemIcon>
-                        <IntroItemContent>
-                          <IntroItemLink
-                            href={USER.website}
-                            aria-label={`Personal website: ${urlToName(USER.website)}`}
-                            event={ANALYTICS_EVENTS.REDIRECT_TO_WEBSITE}
-                            eventProperties={{
-                              section: ANALYTICS_SECTIONS.OVERVIEW,
-                              url: USER.website,
-                            }}
-                          >
-                            {urlToName(USER.website)}
-                          </IntroItemLink>
-                        </IntroItemContent>
-                      </IntroItem>
-                    </SpecRow>
-
-                    <SpecRow label="Pronouns">
-                      <IntroItem>
-                        <IntroItemIcon>
-                          <IconUserFilled />
-                        </IntroItemIcon>
-                        <IntroItemContent
-                          aria-label={`Pronouns: ${USER.pronouns}`}
-                        >
-                          {USER.pronouns}
-                        </IntroItemContent>
-                      </IntroItem>
-                    </SpecRow>
-                  </dl>
-                </div>
-
-                <div className="relative min-w-0 max-lg:border-t max-lg:border-line">
-                  <div className="flex h-12 items-center justify-between border-b border-line px-5">
-                    <div className="home-dots" aria-hidden>
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <span className="home-brackets text-(color:--ink-40)">
-                      [ <span className="home-heat">.JSON</span> ]
-                    </span>
-                  </div>
-                  <div className="home-json">
-                    <ProfileJson />
-                  </div>
-                  <span className="home-status-chip absolute right-4 bottom-4">
-                    <span className="size-1.5 rounded-full bg-(--heat)" />
-                    Decoded in your browser
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className="home-band">
+        <div className="home-frame px-2.5 lg:px-6">
+          <ProfileBrowser />
         </div>
       </div>
     </section>
-  );
-}
-
-function SpecRow({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="home-spec-row">
-      <dt>{label}</dt>
-      <dd className="min-w-0">{children}</dd>
-    </div>
   );
 }
