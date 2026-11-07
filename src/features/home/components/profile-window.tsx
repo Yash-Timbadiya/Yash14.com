@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { urlToName } from "@/utils/url";
 import { ProfileJson } from "./profile-json";
 import { YTMark } from "@/components/yt-mark";
@@ -10,6 +9,11 @@ import { JobItem } from "@/features/portfolio/components/overview/job-item";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { EmailItem } from "@/features/portfolio/components/overview/email-item";
 import { PhoneItem } from "@/features/portfolio/components/overview/phone-item";
+import {
+  IconCircleCheckFilled,
+  IconDownload,
+  IconLock,
+} from "@tabler/icons-react";
 import { CurrentLocalTimeItem } from "@/features/portfolio/components/overview/current-local-time-item";
 import {
   IntroItem,
@@ -17,71 +21,11 @@ import {
   IntroItemIcon,
   IntroItemLink,
 } from "@/features/portfolio/components/overview/intro-item";
-import {
-  IconBriefcaseFilled,
-  IconCircleCheckFilled,
-  IconDownload,
-  IconLink,
-  IconLock,
-  IconMailFilled,
-  IconMapPinFilled,
-  IconPhoneFilled,
-  IconUserFilled,
-} from "@tabler/icons-react";
 
 const LOCATION_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(USER.address)}`;
 
-type DetailIcons = Record<
-  "job" | "location" | "phone" | "email" | "website" | "pronouns",
-  React.ReactNode
->;
-
-const FILLED_ICONS: DetailIcons = {
-  job: <IconBriefcaseFilled />,
-  location: <IconMapPinFilled />,
-  phone: <IconPhoneFilled />,
-  email: <IconMailFilled />,
-  website: <IconLink />,
-  pronouns: <IconUserFilled />,
-};
-
-/** The outline set from `/`; job, phone and email fall back to their own defaults. */
-const SITE_ICONS: DetailIcons = {
-  job: undefined,
-  location: <MapPinIcon />,
-  phone: undefined,
-  email: undefined,
-  website: <LinkIcon />,
-  pronouns: getGenderIcon(USER.gender),
-};
-
-/** Two side-by-side panes: profile rows and the same profile as JSON. */
+/** A browser window: tab strip, address bar, then the profile beside its JSON. */
 export function ProfileWindow() {
-  return (
-    <div className="home-browser-outer mt-12 lg:mt-16">
-      <div className="home-browser">
-        <div className="grid lg:grid-cols-2">
-          <div className="min-w-0 lg:border-r lg:border-line">
-            <div className="flex h-12 items-center gap-4 border-b border-line pr-2 pl-5">
-              <WindowDots />
-              <span className="truncate text-[0.8125rem] text-(--ink-56)">
-                {urlToName(USER.website)}
-                <span className="text-foreground">/me</span>
-              </span>
-              <VCardLink />
-            </div>
-            <ProfileDetails />
-          </div>
-
-          <JsonPane className="relative min-w-0 max-lg:border-t max-lg:border-line" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** A full browser: tab strip, address bar, then the page split into two sections. */
-export function ProfileBrowser() {
   return (
     <div className="home-browser-outer mt-12 lg:mt-16">
       <div className="home-browser">
@@ -100,19 +44,38 @@ export function ProfileBrowser() {
                 <IconLock className="size-3.5 shrink-0" aria-hidden />
                 <span className="truncate">{urlToName(USER.website)}</span>
               </span>
-              <VCardLink className="home-btn home-btn-heat h-8! gap-1.5! rounded-lg! px-3! text-[13px]!" />
+              <TrackedLink
+                className="home-btn home-btn-heat ml-auto h-8! shrink-0 gap-1.5! rounded-lg! px-3! text-[13px]!"
+                href="/vcard"
+                download=""
+                event={ANALYTICS_EVENTS.DOWNLOAD_VCARD}
+                eventProperties={{ section: ANALYTICS_SECTIONS.OVERVIEW }}
+              >
+                <IconDownload className="size-3.5" aria-hidden />
+                vCard
+              </TrackedLink>
             </div>
 
             <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
               <div className="min-w-0 px-4 py-6 lg:px-8 lg:py-10">
-                <ProfileDetails
-                  className="home-fields"
-                  icons={SITE_ICONS}
-                  shortcuts={false}
-                />
+                <ProfileDetails />
               </div>
 
-              <JsonPane className="home-chrome-pane" />
+              <div className="home-chrome-pane">
+                <div className="flex h-12 items-center justify-between border-b border-line px-5">
+                  <WindowDots />
+                  <span className="home-brackets text-(--ink-40)">
+                    [ <span className="home-heat">.JSON</span> ]
+                  </span>
+                </div>
+                <div className="home-json">
+                  <ProfileJson />
+                </div>
+                <span className="home-status-chip absolute right-4 bottom-4">
+                  <IconCircleCheckFilled aria-hidden />
+                  Decoded in your browser
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -131,71 +94,24 @@ function WindowDots() {
   );
 }
 
-function VCardLink({ className }: { className?: string }) {
+function ProfileDetails() {
   return (
-    <TrackedLink
-      className={cn(
-        "ml-auto flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[0.8125rem] hover:bg-(--ink-4)",
-        className,
-      )}
-      href="/vcard"
-      download=""
-      event={ANALYTICS_EVENTS.DOWNLOAD_VCARD}
-      eventProperties={{
-        section: ANALYTICS_SECTIONS.OVERVIEW,
-      }}
-    >
-      <IconDownload className="size-3.5" aria-hidden />
-      vCard
-    </TrackedLink>
-  );
-}
-
-function JsonPane({ className }: { className: string }) {
-  return (
-    <div className={className}>
-      <div className="flex h-12 items-center justify-between border-b border-line px-5">
-        <WindowDots />
-        <span className="home-brackets text-(--ink-40)">
-          [ <span className="home-heat">.JSON</span> ]
-        </span>
-      </div>
-      <div className="home-json">
-        <ProfileJson />
-      </div>
-      <span className="home-status-chip absolute right-4 bottom-4">
-        <IconCircleCheckFilled aria-hidden />
-        Decoded in your browser
-      </span>
-    </div>
-  );
-}
-
-function ProfileDetails({
-  className,
-  icons = FILLED_ICONS,
-  shortcuts = true,
-}: {
-  className?: string;
-  icons?: DetailIcons;
-  shortcuts?: boolean;
-}) {
-  return (
-    <dl className={className}>
+    <dl className="home-fields">
       {USER.jobs.map((job) => (
         <SpecRow key={job.company} label="Role">
           <JobItem
             title={job.title}
             company={job.company}
             website={job.website}
-            icon={icons.job}
           />
         </SpecRow>
       ))}
 
       <SpecRow label="Location">
         <IntroItem>
-          <IntroItemIcon>{icons.location}</IntroItemIcon>
+          <IntroItemIcon>
+            <MapPinIcon />
+          </IntroItemIcon>
           <IntroItemContent>
             <IntroItemLink
               href={LOCATION_MAP_URL}
@@ -217,24 +133,18 @@ function ProfileDetails({
       </SpecRow>
 
       <SpecRow label="Phone">
-        <PhoneItem
-          phoneNumberB64={USER.phoneNumberB64}
-          icon={icons.phone}
-          shortcuts={shortcuts}
-        />
+        <PhoneItem phoneNumberB64={USER.phoneNumberB64} />
       </SpecRow>
 
       <SpecRow label="Email">
-        <EmailItem
-          emailB64={USER.emailB64}
-          icon={icons.email}
-          shortcuts={shortcuts}
-        />
+        <EmailItem emailB64={USER.emailB64} />
       </SpecRow>
 
       <SpecRow label="Website">
         <IntroItem>
-          <IntroItemIcon>{icons.website}</IntroItemIcon>
+          <IntroItemIcon>
+            <LinkIcon />
+          </IntroItemIcon>
           <IntroItemContent>
             <IntroItemLink
               href={USER.website}
@@ -253,7 +163,7 @@ function ProfileDetails({
 
       <SpecRow label="Pronouns">
         <IntroItem>
-          <IntroItemIcon>{icons.pronouns}</IntroItemIcon>
+          <IntroItemIcon>{getGenderIcon(USER.gender)}</IntroItemIcon>
           <IntroItemContent aria-label={`Pronouns: ${USER.pronouns}`}>
             {USER.pronouns}
           </IntroItemContent>

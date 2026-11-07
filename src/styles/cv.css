@@ -483,7 +483,7 @@ html:has(.cv) {
   transition: transform 600ms cubic-bezier(0.34, 1.36, 0.64, 1);
 }
 
-/* Cross Even: the heartbeat traces itself, the back sheet slides out and
+/* CrossEven: the heartbeat traces itself, the back sheet slides out and
    the plus badge pops. */
 .cv .pulse-trace {
   stroke-dasharray: 1 1;

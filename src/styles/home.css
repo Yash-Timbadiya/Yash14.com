@@ -594,11 +594,10 @@ html.dark:has(.home) {
 }
 
 .home-browser {
-  overflow: hidden;
   border: 1px solid var(--hairline);
   border-bottom: 0;
   border-radius: 1.125rem 1.125rem 0 0;
-  background-color: var(--surface);
+  background-color: var(--paper);
 }
 
 .home-dots {
@@ -613,58 +612,10 @@ html.dark:has(.home) {
   border-radius: 9999px;
 }
 
-.home-spec-row {
-  display: grid;
-  grid-template-columns: 5.75rem minmax(0, 1fr);
-  align-items: center;
-  min-height: 2.75rem;
-  padding-inline: 1.25rem;
-  border-bottom: 1px solid var(--hairline);
-  font-size: 0.8125rem;
-}
-
-.home-spec-row:last-child {
-  border-bottom: 0;
-}
-
-.home-spec-row > dt {
-  color: var(--ink-56);
-}
-
 .home-spec-row [data-slot="intro-item"] {
   gap: 0.625rem;
   font-size: 0.8125rem;
   letter-spacing: 0;
-}
-
-/* The browser variant keeps the boxed icons from `/`, so only the plain rows strip them. */
-dl:not(.home-fields) > .home-spec-row [data-slot="intro-item-icon"] {
-  width: 1rem;
-  height: 1rem;
-  border: 0;
-  background: none;
-  box-shadow: none;
-}
-
-dl:not(.home-fields) > .home-spec-row [data-slot="intro-item-icon"] svg {
-  width: 0.9375rem;
-  height: 0.9375rem;
-  color: var(--ink-40);
-}
-
-/* The live clock reads as a filled dial with cut-out hands. */
-dl:not(.home-fields) > .home-spec-row [data-slot="intro-item-icon"] svg circle {
-  fill: currentColor;
-}
-
-dl:not(.home-fields)
-  > .home-spec-row
-  [data-slot="intro-item-icon"]
-  svg
-  circle
-  + path {
-  stroke: var(--surface);
-  stroke-width: 2.5;
 }
 
 .home-json {
@@ -717,12 +668,6 @@ dl:not(.home-fields)
   gap: 1rem;
   height: 3rem;
   padding-left: 1.25rem;
-}
-
-/* The page's own top edge is the strip's bottom rule, so the chrome shares one colour. */
-.home-browser:has(> .home-chrome-strip) {
-  overflow: visible;
-  background-color: var(--paper);
 }
 
 .home-chrome-strip > .home-dots {
@@ -823,15 +768,15 @@ dl:not(.home-fields)
   gap: 0.75rem;
 }
 
-.home-fields .home-spec-row {
+.home-spec-row {
+  display: grid;
   grid-template-columns: 6rem minmax(0, 1fr);
+  align-items: center;
   column-gap: 1rem;
-  min-height: 0;
-  padding-inline: 0;
-  border-bottom: 0;
+  font-size: 0.8125rem;
 }
 
-.home-fields .home-spec-row > dt {
+.home-spec-row > dt {
   justify-self: start;
   padding: 0.25rem 0.5rem;
   border-radius: 0.375rem;
@@ -843,14 +788,14 @@ dl:not(.home-fields)
   white-space: nowrap;
 }
 
-.home-fields .home-spec-row > dd {
+.home-spec-row > dd {
   display: flex;
   align-items: center;
   min-height: 2rem;
 }
 
 @media (max-width: 39.999rem) {
-  .home-fields .home-spec-row {
+  .home-spec-row {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 0.25rem;
   }
@@ -859,8 +804,6 @@ dl:not(.home-fields)
 .home-chrome-pane {
   position: relative;
   min-width: 0;
-  /* Room for the status chip, so it never sits on the JSON. */
-  padding-bottom: 3.5rem;
   border-top: 1px solid var(--hairline);
 }
 

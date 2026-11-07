@@ -6,8 +6,8 @@ import { SparkIcon } from "./spark-icon";
 import { SITE_INFO } from "@/config/site";
 import { AsciiField } from "./ascii-field";
 import { ConnectMenu } from "./connect-menu";
+import { ProfileWindow } from "./profile-window";
 import { USER } from "@/features/portfolio/data/user";
-import { ProfileBrowser, ProfileWindow } from "./profile-window";
 import { WhatsAppLink } from "@/features/cv/components/whatsapp-link";
 import { VerifiedIcon } from "@/features/portfolio/components/verified-icon";
 import { PronounceMyName } from "@/features/portfolio/components/pronounce-my-name";
@@ -127,12 +127,6 @@ export function HomeHero() {
           </div>
 
           <ProfileWindow />
-        </div>
-      </div>
-
-      <div className="home-band">
-        <div className="home-frame px-2.5 lg:px-6">
-          <ProfileBrowser />
         </div>
       </div>
     </section>

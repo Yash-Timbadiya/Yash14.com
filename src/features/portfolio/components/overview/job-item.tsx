@@ -18,7 +18,6 @@ type JobItemProps = {
   company: string;
   website: string;
   experienceId?: string;
-  icon?: React.ReactNode;
 };
 
 export function JobItem({
@@ -26,11 +25,10 @@ export function JobItem({
   company,
   website,
   experienceId,
-  icon,
 }: JobItemProps) {
   return (
     <IntroItem className="sm:col-span-2">
-      <IntroItemIcon>{icon ?? getJobIcon(title)}</IntroItemIcon>
+      <IntroItemIcon>{getJobIcon(title)}</IntroItemIcon>
 
       <IntroItemContent>
         {title} <span aria-hidden="true">@</span>

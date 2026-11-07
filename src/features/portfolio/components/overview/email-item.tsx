@@ -25,44 +25,35 @@ import {
 
 type EmailItemProps = {
   emailB64: string;
-  icon?: React.ReactNode;
-  /** Turn off when another copy on the page already owns the shortcut. */
-  shortcuts?: boolean;
 };
 
-export function EmailItem({
-  emailB64,
-  icon,
-  shortcuts = true,
-}: EmailItemProps) {
+export function EmailItem({ emailB64 }: EmailItemProps) {
   const id = useId();
   const isClient = useIsClient();
   const emailDecoded = decodeEmail(emailB64);
 
   const { success } = useTiks();
 
-  useHotkeys(
-    "shift+e",
-    () => {
-      trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
-        section: ANALYTICS_SECTIONS.KEYBOARD,
-        shortcut: "shift+e",
-        action: "copy_email",
-      });
-      trackEvent(ANALYTICS_EVENTS.EMAIL_COPY, {
-        section: ANALYTICS_SECTIONS.OVERVIEW,
-        method: ANALYTICS_METHODS.SHORTCUT,
-      });
-      copyText(emailDecoded);
-      success();
-      toast.success("Email copied");
-    },
-    { enabled: shortcuts },
-  );
+  useHotkeys("shift+e", () => {
+    trackEvent(ANALYTICS_EVENTS.SHORTCUT_USED, {
+      section: ANALYTICS_SECTIONS.KEYBOARD,
+      shortcut: "shift+e",
+      action: "copy_email",
+    });
+    trackEvent(ANALYTICS_EVENTS.EMAIL_COPY, {
+      section: ANALYTICS_SECTIONS.OVERVIEW,
+      method: ANALYTICS_METHODS.SHORTCUT,
+    });
+    copyText(emailDecoded);
+    success();
+    toast.success("Email copied");
+  });
 
   return (
     <IntroItem className="group">
-      <IntroItemIcon>{icon ?? <MailIcon />}</IntroItemIcon>
+      <IntroItemIcon>
+        <MailIcon />
+      </IntroItemIcon>
 
       <IntroItemContent className="flex">
         <IntroItemLink

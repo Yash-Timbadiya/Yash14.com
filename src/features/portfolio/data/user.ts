@@ -24,7 +24,7 @@ export const USER: User = {
   jobs: [
     {
       title: "Full Stack Developer",
-      company: "Cross Even",
+      company: "CrossEven",
       website: "https://crosseven.com/?atp=yash14",
       experienceId: "cross-even",
     },

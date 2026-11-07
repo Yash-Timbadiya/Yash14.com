@@ -6,7 +6,7 @@ import { BriefcaseBusinessIcon, CodeXmlIcon } from "lucide-react";
 export const EXPERIENCES: Experience[] = [
   {
     id: "cross-even",
-    companyName: "Cross Even",
+    companyName: "CrossEven",
     companyLogo: cdn("/logo/crosseven.png"),
     companyWebsite: "https://crosseven.com",
     largeLogo: true,
