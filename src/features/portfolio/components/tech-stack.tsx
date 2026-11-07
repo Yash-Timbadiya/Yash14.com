@@ -104,7 +104,7 @@ export function TechStack() {
   );
 }
 
-function groupByCategory(
+export function groupByCategory(
   items: TechStackType[],
 ): Record<string, TechStackType[]> {
   const grouped: Record<string, TechStackType[]> = {};

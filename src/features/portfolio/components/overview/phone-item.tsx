@@ -25,9 +25,10 @@ import {
 
 type PhoneItemProps = {
   phoneNumberB64: string;
+  icon?: React.ReactNode;
 };
 
-export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
+export function PhoneItem({ phoneNumberB64, icon }: PhoneItemProps) {
   const id = useId();
   const isClient = useIsClient();
   const phoneNumberDecoded = decodePhoneNumber(phoneNumberB64);
@@ -52,9 +53,7 @@ export function PhoneItem({ phoneNumberB64 }: PhoneItemProps) {
 
   return (
     <IntroItem className="group">
-      <IntroItemIcon>
-        <PhoneIcon />
-      </IntroItemIcon>
+      <IntroItemIcon>{icon ?? <PhoneIcon />}</IntroItemIcon>
 
       <IntroItemContent className="flex">
         <IntroItemLink

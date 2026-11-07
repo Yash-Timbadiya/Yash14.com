@@ -6,6 +6,7 @@ export function IntroItem({
 }: React.ComponentProps<"div">) {
   return (
     <div
+      data-slot="intro-item"
       className={cn("flex items-center gap-4 font-mono text-sm", className)}
       {...props}
     />
@@ -18,6 +19,7 @@ export function IntroItemIcon({
 }: React.ComponentProps<"div">) {
   return (
     <div
+      data-slot="intro-item-icon"
       className={cn(
         "flex size-6 shrink-0 items-center justify-center rounded-md border border-muted-foreground/15 bg-muted ring-1 ring-line ring-offset-1 ring-offset-background",
         "[&_svg]:pointer-events-none [&_svg]:text-muted-foreground [&_svg:not([class*='size-'])]:size-4",

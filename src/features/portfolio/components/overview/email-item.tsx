@@ -25,9 +25,10 @@ import {
 
 type EmailItemProps = {
   emailB64: string;
+  icon?: React.ReactNode;
 };
 
-export function EmailItem({ emailB64 }: EmailItemProps) {
+export function EmailItem({ emailB64, icon }: EmailItemProps) {
   const id = useId();
   const isClient = useIsClient();
   const emailDecoded = decodeEmail(emailB64);
@@ -51,9 +52,7 @@ export function EmailItem({ emailB64 }: EmailItemProps) {
 
   return (
     <IntroItem className="group">
-      <IntroItemIcon>
-        <MailIcon />
-      </IntroItemIcon>
+      <IntroItemIcon>{icon ?? <MailIcon />}</IntroItemIcon>
 
       <IntroItemContent className="flex">
         <IntroItemLink

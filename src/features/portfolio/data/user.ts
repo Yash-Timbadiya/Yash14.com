@@ -26,7 +26,7 @@ export const USER: User = {
       title: "Full Stack Developer",
       company: "EnactOn",
       website: "https://www.enacton.com/?atp=yash14",
-      experienceId: "EnactOn",
+      experienceId: "enacton",
     },
   ],
   about: `

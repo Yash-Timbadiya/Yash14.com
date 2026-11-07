@@ -139,7 +139,7 @@ export function ExperiencePositionItem({
   );
 }
 
-function formatDuration(start: string, end?: string): string {
+export function formatDuration(start: string, end?: string): string {
   const startHasMonth = start.includes(".");
   const endHasMonth = end ? end.includes(".") : true;
 
