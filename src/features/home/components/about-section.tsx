@@ -42,8 +42,6 @@ const ABOUT_PARAGRAPHS = USER.about
   .filter(Boolean)
   .map(splitLead);
 
-const COUNTRY = USER.address.split(", ").at(-1);
-
 const YEARS_OF_EXPERIENCE = /(\d+\+?) years/.exec(USER.about)?.[1] ?? "2+";
 
 /**
@@ -109,7 +107,7 @@ export function AboutSection() {
             Hello, I&rsquo;m <span className="text-heat">{USER.firstName}</span>
           </>
         }
-        description={`${USER.flipSentences[1]} and ${USER.flipSentences[2]} from ${COUNTRY}.`}
+        description={`${USER.flipSentences[1]} and ${USER.flipSentences[2]} from ${USER.address}.`}
       />
 
       <div className={BAND}>

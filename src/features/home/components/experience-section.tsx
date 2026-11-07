@@ -69,7 +69,7 @@ function CompanyTab({ experience }: { experience: Experience }) {
 
   return (
     <>
-      <span className="flex items-center gap-2.5 text-[1.0625rem] font-medium tracking-[-0.012em] group-aria-pressed/tab:text-(color:--tab-accent)">
+      <span className="flex items-center gap-2.5 text-[1.0625rem] font-medium tracking-[-0.012em] lg:group-data-active/tab:text-(color:--tab-accent) max-lg:group-data-open/tab:text-(color:--tab-accent)">
         <CompanyLogo experience={experience} />
         {experience.companyName}
       </span>

@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { HeroCells } from "./hero-cells";
 import { RoastCard } from "./roast-card";
 import { SparkIcon } from "./spark-icon";
-import { SITE_INFO } from "@/config/site";
 import { AsciiField } from "./ascii-field";
 import { ConnectMenu } from "./connect-menu";
 import { ProfileWindow } from "./profile-window";
@@ -23,7 +22,13 @@ import {
 
 const WHATSAPP_MESSAGE = `Hi ${USER.firstName}, I came across your portfolio and would love to talk about working together.`;
 
-const [FIRST_LINE, SECOND_LINE] = USER.bio.split(/(?<=\.)\s+/);
+/** The hero speaks in the first person; SITE_INFO.description stays third person for search. */
+const HERO_INTRO =
+  "I build fast, pixel-perfect web apps with Next.js, React, TypeScript and Node.js.";
+
+/** The heading: the role, then where you are, in the accent. */
+const FIRST_LINE = `${USER.jobTitle}.`;
+const SECOND_LINE = `From ${USER.address}.`;
 
 /** Sits in the first and last inner columns of the twelve between the rails. */
 const TAGS = [
@@ -90,7 +95,13 @@ export function HomeHero() {
         {/* The copy sits in the clear space on wide screens and between the
             rails below that. The cells are too short to hold it above the
             overlapping roast card from 64rem to 72rem, so it sits a bit lower. */}
-        <div className="relative z-1 mx-auto flex w-[calc(100%-1.25rem)] flex-col items-center border-x border-hairline px-4 pt-10 pb-14 text-center lg:absolute lg:top-(--cell) lg:bottom-0 lg:left-1/2 lg:m-0 lg:w-[calc(var(--cell)*8)] lg:-translate-x-1/2 lg:justify-end lg:border-0 lg:p-0 lg:pb-11 min-[72rem]:pb-13">
+        <div className="relative z-1 mx-auto flex w-[calc(100%-1.25rem)] flex-col items-center border-x border-hairline px-5 pt-12 pb-14 text-center lg:absolute lg:top-(--cell) lg:bottom-0 lg:left-1/2 lg:m-0 lg:w-[calc(var(--cell)*8)] lg:-translate-x-1/2 lg:justify-end lg:border-0 lg:p-0 lg:pb-11 min-[72rem]:pb-13">
+          {/* The cell grid only shows on wide screens; a dot grid stands in
+              for it here, fading out behind the copy. */}
+          <span
+            className="pointer-events-none absolute inset-0 -z-1 bg-[radial-gradient(var(--hairline-strong)_1.2px,transparent_1.2px)] bg-size-[18px_18px] bg-center mask-[radial-gradient(ellipse_at_center,transparent_30%,black_85%)] lg:hidden"
+            aria-hidden
+          />
           <div
             className={cn(
               RISE,
@@ -124,7 +135,7 @@ export function HomeHero() {
           <h1
             className={cn(
               RISE,
-              "mt-4 text-[clamp(2.5rem,11vw,4rem)] leading-[1.06] font-medium tracking-[-0.024em] text-balance lg:text-[length:calc(var(--cell)*0.6)]",
+              "mt-5 text-[clamp(1.75rem,8.4vw,4rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance *:whitespace-nowrap sm:tracking-[-0.024em] lg:mt-4 lg:text-[length:calc(var(--cell)*0.6)]",
             )}
             style={rise(1)}
           >
@@ -134,10 +145,13 @@ export function HomeHero() {
           </h1>
 
           <p
-            className={cn(RISE, "mt-4 max-w-2xl text-base/6 text-pretty")}
+            className={cn(
+              RISE,
+              "mt-4 max-w-2xl text-[0.9375rem]/6 text-pretty text-ink/72 sm:text-base/6 sm:text-ink lg:text-ink",
+            )}
             style={rise(2)}
           >
-            {SITE_INFO.description}{" "}
+            {HERO_INTRO}{" "}
             <span className="inline-block rounded-md bg-ink/6 px-1.5 whitespace-nowrap text-ink">
               {USER.flipSentences[2]}.
             </span>
@@ -146,7 +160,7 @@ export function HomeHero() {
           <div
             className={cn(
               RISE,
-              "mt-6 flex w-full flex-col items-stretch justify-center gap-2.5 sm:w-auto sm:flex-row sm:items-center",
+              "mt-7 flex w-full flex-col items-stretch justify-center gap-2 sm:mt-6 sm:w-auto sm:flex-row sm:items-center sm:gap-2.5",
             )}
             style={rise(3)}
           >
@@ -162,8 +176,8 @@ export function HomeHero() {
       </div>
 
       <div className={BAND}>
-        <div className={cn(FRAME, "px-2.5 lg:px-6")}>
-          <div className={cn(RISE, "-mt-px px-1 lg:-mt-8")} style={rise(4)}>
+        <div className={cn(FRAME, "px-2.5 pt-6 lg:px-6 lg:pt-0")}>
+          <div className={cn(RISE, "px-1 lg:-mt-8")} style={rise(4)}>
             <RoastCard />
           </div>
 

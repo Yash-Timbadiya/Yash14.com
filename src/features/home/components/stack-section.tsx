@@ -31,24 +31,24 @@ export function StackSection() {
 
       <div className={BAND}>
         <div className={FRAME}>
-          <InsetFrame>
+          <InsetFrame className="max-md:[--inset:0.625rem]">
             <dl>
               {groups.map(([category, items], index) => (
                 <div
                   key={category}
                   className="grid grid-cols-[minmax(0,1fr)] border-t border-line first:border-t-0 md:grid-cols-[15rem_minmax(0,1fr)]"
                 >
-                  <dt className="flex items-baseline gap-2.5 px-6 pt-5 pb-1 text-[0.9375rem] md:items-center md:border-r md:border-dashed md:border-line md:py-5">
+                  <dt className="flex items-baseline gap-2.5 px-4 pt-4 pb-1 text-[0.9375rem] sm:px-6 sm:pt-5 md:items-center md:border-r md:border-dashed md:border-line md:py-5">
                     <span className="font-mono text-[0.875rem] text-ink/40">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span>{category}</span>
                   </dt>
-                  <dd className="flex flex-wrap gap-2 px-6 pt-3 pb-5 md:px-5 md:py-4">
+                  <dd className="flex flex-wrap gap-1.5 px-4 pt-2.5 pb-4 sm:gap-2 sm:px-6 sm:pt-3 sm:pb-5 md:px-5 md:py-4">
                     {items.map((item) => (
                       <TrackedLink
                         key={item.key}
-                        className="inline-flex h-7.5 items-center gap-2 rounded-full border border-line bg-surface pr-3 pl-2 font-mono text-[0.8125rem] whitespace-nowrap text-ink transition-[border-color,background-color] duration-150 ease-out hover:border-hairline-strong hover:bg-ink/4 [&_:is(svg,img)]:size-4 [&_:is(svg,img)]:shrink-0"
+                        className="inline-flex h-6.5 items-center gap-1.5 rounded-full border border-line bg-surface pr-2.5 pl-1.5 font-mono text-[0.75rem] whitespace-nowrap text-ink transition-[border-color,background-color] duration-150 ease-out hover:border-hairline-strong hover:bg-ink/4 sm:h-7.5 sm:gap-2 sm:pr-3 sm:pl-2 sm:text-[0.8125rem] [&_:is(svg,img)]:size-3.5 [&_:is(svg,img)]:shrink-0 sm:[&_:is(svg,img)]:size-4"
                         href={addQueryParams(item.href, UTM_PARAMS)}
                         target="_blank"
                         rel="noopener"

@@ -4,26 +4,41 @@ import type { CSSProperties } from "react";
 import type { Activity } from "@/features/portfolio/types/contributions";
 
 import { cn } from "@/lib/utils";
-import { use, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { trackEvent } from "@/lib/analytics";
 import { GITHUB_USERNAME } from "@/config/site";
 import { IconReload } from "@tabler/icons-react";
 import { MONO_LABEL } from "@/features/home/lib/styles";
+import { use, useEffect, useRef, useState } from "react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 const WEEKS = 53;
 const DAYS_PER_WEEK = 7;
-const CELL = 10;
-const INSET = 1;
+/** Cell pitch in CSS pixels: the minimum, grown to fill wide containers. */
+const MIN_CELL = 14;
+/** Space between cells. Cells start on whole pixels so their edges stay sharp. */
+const GAP = 3;
+/** Horizontal padding of the scroll area (px-5 on each side). */
+const PADDING_X = 40;
 const LEVELS = [0, 1, 2, 3, 4];
 
 /** The accent palette for the graph; important so it beats `.contribution-levels` in globals.css. */
 const FIELD_LEVELS =
-  "[--level-0:color-mix(in_srgb,var(--ink)_4%,transparent)]! [--level-1:color-mix(in_srgb,var(--heat)_22%,transparent)]! [--level-2:color-mix(in_srgb,var(--heat)_46%,transparent)]! [--level-3:color-mix(in_srgb,var(--heat)_72%,transparent)]! [--level-4:var(--heat)]! [&_rect]:[rx:1.5px]";
+  "[--level-0:color-mix(in_srgb,var(--ink)_4%,transparent)]! [--level-1:color-mix(in_srgb,var(--heat)_22%,transparent)]! [--level-2:color-mix(in_srgb,var(--heat)_46%,transparent)]! [--level-3:color-mix(in_srgb,var(--heat)_72%,transparent)]! [--level-4:var(--heat)]! [&_rect]:[rx:2px]";
 
 type Week = (Activity | null)[];
-type HoveredDay = { count: number; date: string; x: number; y: number };
+type HoveredDay = {
+  count: number;
+  date: string;
+  x: number;
+  y: number;
+  /** Viewport position of the block's top centre, for the tooltip. */
+  clientX: number;
+  clientY: number;
+};
+
+/** Half a typical tooltip's width, to keep it inside the viewport. */
+const TOOLTIP_HALF = 96;
 
 export function ContributionField({
   contributions,
@@ -36,6 +51,46 @@ export function ContributionField({
   // Bumping this remounts the blocks, which replays their pop-in wave.
   const [replay, setReplay] = useState(0);
 
+  const [cell, setCell] = useState(MIN_CELL);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; left: number } | null>(null);
+  const userScrolled = useRef(false);
+
+  // Whole-pixel cells keep the blocks crisp; scaling the SVG to fit would put
+  // their edges between pixels and blur them. Centering can still land the
+  // graph on a half pixel, so it is nudged back onto the pixel grid.
+  useEffect(() => {
+    const el = scrollRef.current;
+    const content = contentRef.current;
+    if (!el || !content) return;
+
+    const settle = () => {
+      setCell(fitCell(el.clientWidth));
+      requestAnimationFrame(() => {
+        // When the graph scrolls sideways, start at the latest weeks.
+        if (!userScrolled.current) el.scrollLeft = el.scrollWidth;
+        content.style.translate = "";
+        const { left, top } = content.getBoundingClientRect();
+        content.style.translate = `${Math.round(left) - left}px ${Math.round(top) - top}px`;
+      });
+    };
+
+    const observer = new ResizeObserver(settle);
+    observer.observe(el);
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, []);
+
+  // A fixed tooltip would drift away from its block as the page scrolls.
+  useEffect(() => {
+    if (!hovered) return;
+    const clear = () => setHovered(null);
+    window.addEventListener("scroll", clear, { passive: true, once: true });
+    return () => window.removeEventListener("scroll", clear);
+  }, [hovered]);
+
   const weeks = toWeeks(data);
   const months = getMonthLabels(weeks);
   const total = data.reduce((sum, day) => sum + day.count, 0);
@@ -43,19 +98,39 @@ export function ContributionField({
   const handlePointerOver = (event: React.PointerEvent<SVGSVGElement>) => {
     const block = event.target;
     if (!(block instanceof SVGRectElement) || !block.dataset.date) return;
+    const rect = block.getBoundingClientRect();
 
     setHovered({
       count: Number(block.dataset.count ?? 0),
       date: block.dataset.date,
-      x: Number(block.getAttribute("x")) - INSET,
-      y: Number(block.getAttribute("y")) - INSET,
+      x: Number(block.getAttribute("x")),
+      y: Number(block.getAttribute("y")),
+      clientX: rect.left + rect.width / 2,
+      clientY: rect.top,
     });
   };
 
   return (
     <div className="flex h-full flex-col">
+      {/* Fixed to the viewport so the scroll area's edges never clip it. */}
+      {hovered && (
+        <div
+          role="tooltip"
+          className="pointer-events-none fixed z-50 w-max -translate-x-1/2 -translate-y-full rounded-md bg-foreground px-2.5 py-1.5 text-xs font-medium text-background"
+          style={{
+            left: Math.min(
+              Math.max(hovered.clientX, TOOLTIP_HALF),
+              window.innerWidth - TOOLTIP_HALF,
+            ),
+            top: hovered.clientY - 6,
+          }}
+        >
+          {hovered.count} contribution{hovered.count === 1 ? "" : "s"} on{" "}
+          {format(parseISO(hovered.date), "dd.MM.yyyy")}
+        </div>
+      )}
       <FieldBar>
-        <span className="text-[0.8125rem] tabular-nums">
+        <span className="text-[0.8125rem] tabular-nums max-sm:hidden">
           {data.length > 0 ? total.toLocaleString("en") : "No"}{" "}
           <span className="text-ink/56">contributions</span>
         </span>
@@ -73,15 +148,44 @@ export function ContributionField({
         </button>
       </FieldBar>
 
-      {/* Narrow screens crop to the most recent weeks instead of shrinking cells. */}
-      <div className="flex flex-1 items-center justify-end overflow-hidden px-5 py-5">
-        <div className="relative w-full min-w-3xl shrink-0">
+      {/* Narrow screens keep full-size cells and scroll sideways (swipe, or
+          drag with a mouse) instead of shrinking them. */}
+      <div
+        ref={scrollRef}
+        className="no-scrollbar flex flex-1 items-center overflow-x-auto mask-[linear-gradient(to_left,transparent,black_3rem)] overscroll-x-contain py-5 pl-5 select-none"
+        onScroll={() => setHovered(null)}
+        onWheel={() => {
+          userScrolled.current = true;
+        }}
+        onTouchStart={() => {
+          userScrolled.current = true;
+        }}
+        onPointerDown={(event) => {
+          userScrolled.current = true;
+          const el = scrollRef.current;
+          if (event.pointerType !== "mouse" || !el) return;
+          if (el.scrollWidth <= el.clientWidth) return;
+          drag.current = { x: event.clientX, left: el.scrollLeft };
+        }}
+        onPointerMove={(event) => {
+          const el = scrollRef.current;
+          if (!drag.current || !el) return;
+          el.scrollLeft = drag.current.left - (event.clientX - drag.current.x);
+        }}
+        onPointerUp={() => {
+          drag.current = null;
+        }}
+        onPointerLeave={() => {
+          drag.current = null;
+        }}
+      >
+        <div ref={contentRef} className="relative mx-auto shrink-0">
           <div className="relative mb-2 h-4 select-none" aria-hidden>
             {months.map(({ label, week }) => (
               <span
                 key={`${label}-${week}`}
                 className={cn(MONO_LABEL, "absolute top-0")}
-                style={{ left: `${(week / WEEKS) * 100}%` }}
+                style={{ left: week * cell }}
               >
                 {label}
               </span>
@@ -91,37 +195,39 @@ export function ContributionField({
           <div className="relative">
             <FieldSvg
               key={replay}
+              cell={cell}
               weeks={weeks}
               selectedLevel={selectedLevel}
               hovered={hovered}
               onPointerOver={handlePointerOver}
               onPointerLeave={() => setHovered(null)}
             />
-
-            {hovered && (
-              <div
-                role="tooltip"
-                className="pointer-events-none absolute z-20 w-max -translate-x-1/2 -translate-y-full rounded-md bg-foreground px-2.5 py-1.5 text-xs font-medium text-background"
-                style={{
-                  left: `${((hovered.x + CELL / 2) / (WEEKS * CELL)) * 100}%`,
-                  top: `calc(${(hovered.y / (DAYS_PER_WEEK * CELL)) * 100}% - 6px)`,
-                }}
-              >
-                {hovered.count} contribution{hovered.count === 1 ? "" : "s"} on{" "}
-                {format(parseISO(hovered.date), "dd.MM.yyyy")}
-              </div>
-            )}
           </div>
         </div>
+        {/* Scroll areas drop their end padding; this keeps the gap after the last week. */}
+        <span className="w-5 shrink-0 self-stretch" aria-hidden />
       </div>
 
-      <div className="flex h-11 items-center justify-between gap-4 border-t border-line px-5">
+      <div className="flex min-h-11 items-center justify-between gap-4 border-t border-line px-5 max-sm:flex-col max-sm:items-stretch max-sm:gap-2.5 max-sm:py-3">
         <p className="text-[0.8125rem] text-ink/56">
-          {data.length > 0
-            ? "In the past 365 days."
-            : "Contributions are unavailable right now."}
+          {data.length === 0 ? (
+            "Contributions are unavailable right now."
+          ) : (
+            <>
+              <span className="sm:hidden">
+                <span className="text-ink tabular-nums">
+                  {total.toLocaleString("en")}
+                </span>{" "}
+                contributions in the past 365 days.
+              </span>
+              <span className="max-sm:hidden">In the past 365 days.</span>
+            </>
+          )}
         </p>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1 max-sm:self-end">
+          <span className="mr-1 text-[0.75rem] text-ink/40 sm:hidden">
+            Less
+          </span>
           {LEVELS.map((level) => (
             <button
               type="button"
@@ -160,6 +266,9 @@ export function ContributionField({
               </svg>
             </button>
           ))}
+          <span className="ml-1 text-[0.75rem] text-ink/40 sm:hidden">
+            More
+          </span>
         </div>
       </div>
     </div>
@@ -182,10 +291,15 @@ export function ContributionFieldFallback() {
   return (
     <div className="flex h-full flex-col">
       <FieldBar />
-      <div className="flex flex-1 items-center justify-end overflow-hidden p-5">
-        <div className="w-full min-w-3xl shrink-0">
+      <div className="flex flex-1 items-center overflow-hidden p-5">
+        <div className="mx-auto shrink-0">
           <div className="mb-2 h-4" />
-          <FieldSvg weeks={toWeeks([])} selectedLevel={null} hovered={null} />
+          <FieldSvg
+            cell={MIN_CELL}
+            weeks={toWeeks([])}
+            selectedLevel={null}
+            hovered={null}
+          />
         </div>
       </div>
       <div className="h-11 border-t border-line" />
@@ -194,26 +308,29 @@ export function ContributionFieldFallback() {
 }
 
 function FieldSvg({
+  cell,
   weeks,
   selectedLevel,
   hovered,
   onPointerOver,
   onPointerLeave,
 }: {
+  cell: number;
   weeks: Week[];
   selectedLevel: number | null;
   hovered: HoveredDay | null;
   onPointerOver?: React.PointerEventHandler<SVGSVGElement>;
   onPointerLeave?: React.PointerEventHandler<SVGSVGElement>;
 }) {
+  const width = WEEKS * cell - GAP;
+  const height = DAYS_PER_WEEK * cell - GAP;
   return (
     <svg
-      className={cn(
-        "contribution-levels block h-auto w-full overflow-visible",
-        FIELD_LEVELS,
-      )}
+      className={cn("contribution-levels block overflow-visible", FIELD_LEVELS)}
       data-selected-level={selectedLevel ?? undefined}
-      viewBox={`0 0 ${WEEKS * CELL} ${DAYS_PER_WEEK * CELL}`}
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
       role="img"
       aria-label="GitHub Contributions Graph"
       onPointerOver={onPointerOver}
@@ -227,10 +344,10 @@ function FieldSvg({
           {week.map((day, dayIndex) => (
             <rect
               key={day?.date ?? dayIndex}
-              x={weekIndex * CELL + INSET}
-              y={dayIndex * CELL + INSET}
-              width={CELL - INSET * 2}
-              height={CELL - INSET * 2}
+              x={weekIndex * cell}
+              y={dayIndex * cell}
+              width={cell - GAP}
+              height={cell - GAP}
               className={day ? undefined : "fill-transparent"}
               data-level={day?.level}
               data-date={day?.date}
@@ -242,15 +359,21 @@ function FieldSvg({
 
       {hovered && (
         <rect
-          className="pointer-events-none fill-transparent stroke-ink stroke-1 [vector-effect:non-scaling-stroke]"
-          x={hovered.x}
-          y={hovered.y}
-          width={CELL}
-          height={CELL}
+          className="pointer-events-none fill-transparent stroke-ink stroke-1"
+          x={hovered.x - 1.5}
+          y={hovered.y - 1.5}
+          width={cell - GAP + 3}
+          height={cell - GAP + 3}
         />
       )}
     </svg>
   );
+}
+
+/** The largest whole-pixel cell that fits the width, never below the minimum. */
+function fitCell(containerWidth: number) {
+  const available = containerWidth - PADDING_X + GAP;
+  return Math.max(MIN_CELL, Math.floor(available / WEEKS));
 }
 
 /** The last `WEEKS` Sunday-first weeks, padded where days are missing. */

@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { DisclosureChevron } from "./hover-arrow";
 import { BAND, FRAME } from "@/features/home/lib/styles";
 
 export type ExperienceEntry = {
@@ -14,21 +15,34 @@ export type ExperienceEntry = {
 
 const HASH_PREFIX = "#experience-";
 
+/**
+ * Wide screens: companies down the left, the selected one's details on the
+ * right, the first selected by default. Narrow screens: an accordion where
+ * every company starts closed and opens its details right under itself.
+ *
+ * One interleaved list (tab, panel, tab, panel...) serves both: on wide
+ * screens the tabs fill the first column and every panel sits in the second
+ * column across all rows, with only the selected one shown.
+ */
 export function ExperienceExplorer({
   entries,
 }: {
   entries: ExperienceEntry[];
 }) {
   const [active, setActive] = useState(entries[0]?.id);
+  const [open, setOpen] = useState<string | null>(null);
 
-  // Links like #experience-enacton select their company.
+  // Links like #experience-enacton select (and open) their company.
   useEffect(() => {
     const syncFromHash = () => {
       const { hash } = window.location;
       if (!hash.startsWith(HASH_PREFIX)) return;
 
       const id = hash.slice(HASH_PREFIX.length);
-      if (entries.some((entry) => entry.id === id)) setActive(id);
+      if (entries.some((entry) => entry.id === id)) {
+        setActive(id);
+        setOpen(id);
+      }
     };
 
     syncFromHash();
@@ -41,51 +55,57 @@ export function ExperienceExplorer({
       <div
         className={cn(
           FRAME,
-          "grid lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)]",
+          "grid lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:grid-rows-[repeat(var(--tabs),auto)_1fr]",
         )}
+        style={{ "--tabs": entries.length } as React.CSSProperties}
       >
-        <div className="lg:border-r lg:border-line">
-          {entries.map((entry) => (
+        {/* The rail between the tabs and the panel on wide screens. */}
+        <span
+          className="pointer-events-none absolute inset-y-0 left-[calc(19rem-1px)] w-px bg-line max-lg:hidden"
+          aria-hidden
+        />
+
+        {entries.map((entry) => {
+          const accent = entry.accent
+            ? ({ "--company-accent": entry.accent } as React.CSSProperties)
+            : undefined;
+          const isActive = active === entry.id;
+          const isOpen = open === entry.id;
+
+          return [
             <button
-              key={entry.id}
+              key={`${entry.id}-tab`}
               id={`experience-${entry.id}`}
               type="button"
-              className="group/tab relative flex w-full scroll-mt-20 flex-col gap-1.5 border-b border-hairline py-6 pr-6 pl-[1.375rem] text-left transition-colors duration-150 [--tab-accent:var(--company-accent,var(--heat))] not-aria-pressed:hover:bg-ink/4 aria-pressed:bg-[color-mix(in_srgb,var(--tab-accent)_8%,transparent)] aria-pressed:shadow-[inset_2px_0_0_var(--tab-accent)] mono:[--tab-accent:var(--heat)]"
-              aria-pressed={active === entry.id}
+              className="group/tab relative flex w-full scroll-mt-20 flex-col gap-1.5 border-b border-hairline py-6 pr-12 pl-[1.375rem] text-left transition-colors duration-150 [--tab-accent:var(--company-accent,var(--heat))] mono:[--tab-accent:var(--heat)] lg:col-start-1 lg:pr-6 max-lg:not-data-open:hover:bg-ink/4 lg:not-data-active:hover:bg-ink/4 max-lg:data-open:bg-[color-mix(in_srgb,var(--tab-accent)_8%,transparent)] max-lg:data-open:shadow-[inset_2px_0_0_var(--tab-accent)] lg:data-active:bg-[color-mix(in_srgb,var(--tab-accent)_8%,transparent)] lg:data-active:shadow-[inset_2px_0_0_var(--tab-accent)]"
+              data-active={isActive || undefined}
+              data-open={isOpen || undefined}
               aria-controls={`experience-panel-${entry.id}`}
-              style={
-                entry.accent
-                  ? ({
-                      "--company-accent": entry.accent,
-                    } as React.CSSProperties)
-                  : undefined
-              }
-              onClick={() => setActive(entry.id)}
+              aria-expanded={isOpen}
+              style={accent}
+              onClick={() => {
+                setActive(entry.id);
+                setOpen((current) => (current === entry.id ? null : entry.id));
+              }}
             >
               {entry.tab}
-            </button>
-          ))}
-        </div>
+              <DisclosureChevron className="absolute top-7.5 right-6 text-ink/40 lg:hidden" />
+            </button>,
 
-        <div className="min-w-0">
-          {entries.map((entry) => (
             <div
-              key={entry.id}
+              key={`${entry.id}-panel`}
               id={`experience-panel-${entry.id}`}
-              hidden={active !== entry.id}
-              className="[--tab-accent:var(--company-accent,var(--heat))] mono:[--tab-accent:var(--heat)]"
-              style={
-                entry.accent
-                  ? ({
-                      "--company-accent": entry.accent,
-                    } as React.CSSProperties)
-                  : undefined
-              }
+              className={cn(
+                "min-w-0 [--tab-accent:var(--company-accent,var(--heat))] mono:[--tab-accent:var(--heat)] max-lg:border-b max-lg:border-hairline lg:col-start-2 lg:row-[1/-1]",
+                !isOpen && "max-lg:hidden",
+                !isActive && "lg:hidden",
+              )}
+              style={accent}
             >
               {entry.panel}
-            </div>
-          ))}
-        </div>
+            </div>,
+          ];
+        })}
       </div>
     </div>
   );

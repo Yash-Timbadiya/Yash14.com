@@ -10,7 +10,7 @@ export const SITE_INFO = {
   url: config.app.url,
   ogImage: USER.ogImage,
   // Longer than the on-page bio so search snippets carry role, location and stack.
-  description: `${USER.displayName} is a ${USER.jobTitle} in ${USER.address}, building fast, pixel-perfect web apps with Next.js, React, TypeScript and Node.js.`,
+  description: `${USER.displayName} is a ${USER.jobTitle} from ${USER.address}, building fast, pixel-perfect web apps with Next.js, React, TypeScript and Node.js.`,
   keywords: USER.keywords,
 };
 

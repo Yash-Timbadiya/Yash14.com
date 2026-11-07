@@ -31,11 +31,11 @@ export function ProfileWindow() {
   return (
     <div className="mt-12 rounded-t-3xl border border-b-0 border-hairline px-1.5 pt-1.5 lg:mt-16">
       <div className="rounded-t-[1.125rem] border border-b-0 border-hairline bg-paper">
-        <div className="flex h-12 items-end gap-4 pl-5">
+        <div className="flex h-12 items-end gap-3 pl-4 sm:gap-4 sm:pl-5">
           <WindowDots className="self-center" />
           {/* The tab's concave corners run its outline into the strip's
               bottom rule. */}
-          <div className="relative z-1 -mb-px flex h-10 w-60 min-w-0 items-center gap-2.5 rounded-t-[0.875rem] border border-hairline border-b-surface bg-surface px-3.5 text-[0.8125rem] [--flare:0.75rem] before:absolute before:right-full before:-bottom-px before:size-(--flare) before:bg-[radial-gradient(circle_at_0_0,transparent_calc(var(--flare)-1px),var(--hairline)_calc(var(--flare)-1px),var(--hairline)_var(--flare),var(--surface)_var(--flare))] after:absolute after:-bottom-px after:left-full after:size-(--flare) after:bg-[radial-gradient(circle_at_100%_0,transparent_calc(var(--flare)-1px),var(--hairline)_calc(var(--flare)-1px),var(--hairline)_var(--flare),var(--surface)_var(--flare))]">
+          <div className="relative z-1 -mb-px flex h-10 w-44 min-w-0 sm:w-60 items-center gap-2.5 rounded-t-[0.875rem] border border-hairline border-b-surface bg-surface px-3.5 text-[0.8125rem] [--flare:0.75rem] before:absolute before:right-full before:-bottom-px before:size-(--flare) before:bg-[radial-gradient(circle_at_0_0,transparent_calc(var(--flare)-1px),var(--hairline)_calc(var(--flare)-1px),var(--hairline)_var(--flare),var(--surface)_var(--flare))] after:absolute after:-bottom-px after:left-full after:size-(--flare) after:bg-[radial-gradient(circle_at_100%_0,transparent_calc(var(--flare)-1px),var(--hairline)_calc(var(--flare)-1px),var(--hairline)_var(--flare),var(--surface)_var(--flare))]">
             <YTMark className="h-3 shrink-0 text-heat" aria-hidden />
             <span className="truncate">{USER.displayName}</span>
           </div>
@@ -73,7 +73,7 @@ export function ProfileWindow() {
                 <ProfileDetails />
               </div>
 
-              <div className="relative min-w-0 border-t border-hairline lg:mr-6 lg:border-x lg:border-t-0">
+              <div className="relative min-w-0 border-t border-hairline max-sm:hidden lg:mr-6 lg:border-x lg:border-t-0">
                 <div className="flex h-12 items-center justify-between border-b border-line px-5">
                   <WindowDots />
                   <span className={BRACKETS}>
@@ -114,7 +114,7 @@ function WindowDots({ className }: { className?: string }) {
 
 function ProfileDetails() {
   return (
-    <dl className="flex flex-col gap-3">
+    <dl className="flex flex-col gap-3 max-sm:gap-2.5">
       {USER.jobs.map((job) => (
         <SpecRow key={job.company} label="Role">
           <JobItem
@@ -200,7 +200,7 @@ function SpecRow({
 }) {
   return (
     <div className="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-x-4 text-[0.8125rem] max-sm:grid-cols-[minmax(0,1fr)] max-sm:gap-y-1 [&_[data-slot=intro-item]]:gap-2.5 [&_[data-slot=intro-item]]:text-[0.8125rem] [&_[data-slot=intro-item]]:tracking-normal">
-      <dt className="justify-self-start rounded-md bg-ink/6 px-2 py-1 font-mono text-[0.75rem]/4 whitespace-nowrap text-ink/56">
+      <dt className="max-sm:sr-only justify-self-start rounded-md bg-ink/6 px-2 py-1 font-mono text-[0.75rem]/4 whitespace-nowrap text-ink/56">
         {label}
       </dt>
       <dd className="flex min-h-8 min-w-0 items-center">{children}</dd>
