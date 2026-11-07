@@ -1,23 +1,19 @@
 import type { Activity } from "@/features/portfolio/components/contribution-graph";
 
 import { Suspense } from "react";
+import { HoverArrow } from "./hover-arrow";
 import { USER } from "@/features/portfolio/data/user";
 import { SectionHead, SectionIndex } from "./section-intro";
 import { getProducts } from "@/features/home/lib/get-products";
 import { SOCIAL } from "@/features/portfolio/data/social-links";
 import { TECH_STACK } from "@/features/portfolio/data/tech-stack";
+import { IconBolt, IconTargetArrow, IconUserFilled } from "@tabler/icons-react";
 import { YTMarkIsometric } from "@/features/portfolio/components/yt-mark-isometric";
 import { getGitHubContributions } from "@/features/portfolio/data/github-contributions";
 import {
   ContributionField,
   ContributionFieldFallback,
 } from "./contribution-field";
-import {
-  IconBolt,
-  IconChevronRight,
-  IconTargetArrow,
-  IconUserFilled,
-} from "@tabler/icons-react";
 
 /** Splits a sentence into its lead and the rest, for the two-tone treatment. */
 function splitLead(text: string): [string, string] {
@@ -36,6 +32,8 @@ const ABOUT_PARAGRAPHS = USER.about
   .map((line) => line.replace(/^- /, "").trim())
   .filter(Boolean)
   .map(splitLead);
+
+const COUNTRY = USER.address.split(", ").at(-1);
 
 const YEARS_OF_EXPERIENCE = /(\d+\+?) years/.exec(USER.about)?.[1] ?? "2+";
 
@@ -93,7 +91,7 @@ export function AboutSection() {
             Hello, I&rsquo;m <span className="home-heat">{USER.firstName}</span>
           </>
         }
-        description={`${USER.flipSentences[1]} and ${USER.flipSentences[2]} in ${USER.address}.`}
+        description={`${USER.flipSentences[1]} and ${USER.flipSentences[2]} from ${COUNTRY}.`}
       />
 
       <div className="home-band">
@@ -122,7 +120,7 @@ export function AboutSection() {
                 rel={index === 0 ? undefined : "noopener"}
               >
                 {index === 0 ? "View my CV" : "See my GitHub"}
-                <IconChevronRight aria-hidden />
+                <HoverArrow />
               </a>
             </article>
           ))}
@@ -138,18 +136,17 @@ export function AboutSection() {
             </Suspense>
           </div>
 
-          <figure className="relative flex min-w-0 flex-col overflow-clip max-lg:border-t max-lg:border-line">
-            <figcaption className="flex h-12 items-center justify-between gap-3 border-b border-line px-5">
-              <span className="home-brackets text-(color:--ink-40)">
+          <figure className="relative flex min-w-0 flex-col overflow-clip bg-(--surface) max-lg:border-t max-lg:border-line">
+            <figcaption className="home-engraved flex h-12 items-center justify-end px-5">
+              <span className="home-brackets">
                 [ <span className="home-heat">FIG_001</span> ]
               </span>
-              <span className="home-mono-label truncate">Click the mark</span>
             </figcaption>
-            <div className="@container my-auto px-4 py-6">
+            <div className="home-mark @container my-auto px-4 py-6">
               <YTMarkIsometric />
             </div>
-            <p className="home-mono-label flex h-11 items-center justify-end border-t border-line px-5">
-              Right-click to switch rides
+            <p className="home-engraved flex h-11 items-center justify-end px-5">
+              Click the mark
             </p>
           </figure>
         </div>

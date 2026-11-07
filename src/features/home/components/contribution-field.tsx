@@ -7,6 +7,7 @@ import { use, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { trackEvent } from "@/lib/analytics";
 import { GITHUB_USERNAME } from "@/config/site";
+import { IconReload } from "@tabler/icons-react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 
 const WEEKS = 53;
@@ -26,6 +27,8 @@ export function ContributionField({
   const data = use(contributions);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [hovered, setHovered] = useState<HoveredDay | null>(null);
+  // Bumping this remounts the blocks, which replays their pop-in wave.
+  const [replay, setReplay] = useState(0);
 
   const weeks = toWeeks(data);
   const months = getMonthLabels(weeks);
@@ -50,6 +53,18 @@ export function ContributionField({
           {data.length > 0 ? total.toLocaleString("en") : "No"}{" "}
           <span className="text-(color:--ink-56)">contributions</span>
         </span>
+        <button
+          type="button"
+          aria-label="Replay the animation"
+          title="Replay"
+          className="home-field-replay"
+          onClick={() => {
+            setHovered(null);
+            setReplay((count) => count + 1);
+          }}
+        >
+          <IconReload aria-hidden />
+        </button>
       </FieldBar>
 
       {/* Narrow screens crop to the most recent weeks instead of shrinking cells. */}
@@ -69,6 +84,7 @@ export function ContributionField({
 
           <div className="relative">
             <FieldSvg
+              key={replay}
               weeks={weeks}
               selectedLevel={selectedLevel}
               hovered={hovered}
@@ -120,6 +136,8 @@ export function ContributionField({
                 setSelectedLevel((current) =>
                   current === level ? null : level,
                 );
+                setHovered(null);
+                setReplay((count) => count + 1);
               }}
             >
               <svg
@@ -145,7 +163,7 @@ function FieldBar({ children }: { children?: React.ReactNode }) {
       <span className="truncate text-[0.8125rem] text-(color:--ink-56)">
         github.com/<span className="text-foreground">{GITHUB_USERNAME}</span>
       </span>
-      {children}
+      <div className="flex items-center gap-3">{children}</div>
     </div>
   );
 }

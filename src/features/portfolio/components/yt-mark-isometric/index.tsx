@@ -206,7 +206,9 @@ const WALL_EDGES_BEHIND_TRAFFIC = GEO.wallEdgesBehindTraffic.map((e) =>
 );
 const TOP_EDGES = GEO.topEdges.map((e) => toShape(e, false));
 
-const SURFACE_FILL = "var(--background)";
+// Overridable per page; both fall back to the plain look used on "/".
+const SURFACE_FILL = "var(--yt-top, var(--background))";
+const SIDE_FILL = "var(--yt-side, var(--background))";
 
 const GUIDE_LINES = [
   "M-700 879L1230 -237",
@@ -688,7 +690,7 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
               <motion.path
                 key={`side-behind-${i}`}
                 d={shape.normal}
-                fill={SURFACE_FILL}
+                fill={SIDE_FILL}
                 variants={variantsFor(shape)}
                 transition={transition}
               />
@@ -741,7 +743,7 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
               <motion.path
                 key={`side-${i}`}
                 d={shape.normal}
-                fill={SURFACE_FILL}
+                fill={SIDE_FILL}
                 variants={variantsFor(shape)}
                 transition={transition}
               />

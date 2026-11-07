@@ -285,8 +285,36 @@ html.dark:has(.home) {
   transition: translate 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.home-link:hover svg {
+.home-link:hover svg:not(.home-arrow) {
   translate: 2px 0;
+}
+
+/* Hover arrow: the chevron slides right and a shaft grows in behind it. */
+.home-link .home-arrow {
+  width: 0.375rem;
+  height: 0.6rem;
+  overflow: visible;
+}
+
+.home-arrow-group,
+.home-arrow-shaft {
+  transition:
+    translate 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    scale 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-arrow-shaft {
+  transform-box: fill-box;
+  transform-origin: right center;
+  scale: 0 1;
+}
+
+:hover > .home-arrow .home-arrow-group {
+  translate: 3px 0;
+}
+
+:hover > .home-arrow .home-arrow-shaft {
+  scale: 1 1;
 }
 
 /* Header */
@@ -1159,10 +1187,76 @@ html.dark:has(.home) {
   fill: transparent;
 }
 
+.home-field-replay {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  color: var(--ink-56);
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.home-field-replay:hover {
+  color: var(--ink);
+  background-color: var(--ink-4);
+}
+
+.home-field-replay svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  transition: rotate 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-field-replay:hover svg {
+  rotate: 180deg;
+}
+
 .home-field .home-field-cursor {
   fill: transparent;
   stroke: var(--ink);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
   pointer-events: none;
+}
+
+/* Isometric mark beside the contribution graph: the same greys as on "/",
+   with faces in the panel color. Dark edges are a step brighter because the
+   panel is lighter than the page background on "/". */
+.home-mark svg {
+  --yt-top: var(--surface);
+  --yt-side: var(--surface);
+}
+
+.dark .home-mark svg {
+  --pattern: color-mix(in srgb, var(--ink) 16%, var(--surface));
+  --stroke: color-mix(in srgb, var(--ink) 28%, var(--surface));
+}
+
+/* Captions engraved into the panel: a light edge below and a dark edge above
+   make the letters read as pressed into the surface. */
+.home-engraved {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: color-mix(in srgb, var(--ink) 34%, var(--surface));
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  white-space: nowrap;
+  text-shadow:
+    0 1px 0 oklch(1 0 0 / 0.9),
+    0 -1px 0 oklch(0 0 0 / 0.14);
+  pointer-events: none;
+  user-select: none;
+}
+
+.dark .home-engraved {
+  text-shadow:
+    0 1px 0 oklch(1 0 0 / 0.07),
+    0 -1px 0 oklch(0 0 0 / 0.7);
 }
