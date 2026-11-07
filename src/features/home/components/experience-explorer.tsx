@@ -3,6 +3,8 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { DisclosureChevron } from "./hover-arrow";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { motion, useReducedMotion } from "motion/react";
 import { BAND, FRAME } from "@/features/home/lib/styles";
 
 export type ExperienceEntry = {
@@ -31,6 +33,10 @@ export function ExperienceExplorer({
 }) {
   const [active, setActive] = useState(entries[0]?.id);
   const [open, setOpen] = useState<string | null>(null);
+  // Only animate after the first choice, so the page loads without motion.
+  const [interacted, setInteracted] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 64rem)");
+  const reduceMotion = useReducedMotion();
 
   // Links like #experience-enacton select (and open) their company.
   useEffect(() => {
@@ -42,6 +48,7 @@ export function ExperienceExplorer({
       if (entries.some((entry) => entry.id === id)) {
         setActive(id);
         setOpen(id);
+        setInteracted(true);
       }
     };
 
@@ -61,7 +68,7 @@ export function ExperienceExplorer({
       >
         {/* The rail between the tabs and the panel on wide screens. */}
         <span
-          className="pointer-events-none absolute inset-y-0 left-[calc(19rem-1px)] w-px bg-line max-lg:hidden"
+          className="pointer-events-none absolute inset-y-0 left-75.75 w-px bg-line max-lg:hidden"
           aria-hidden
         />
 
@@ -77,7 +84,7 @@ export function ExperienceExplorer({
               key={`${entry.id}-tab`}
               id={`experience-${entry.id}`}
               type="button"
-              className="group/tab relative flex w-full scroll-mt-20 flex-col gap-1.5 border-b border-hairline py-6 pr-12 pl-[1.375rem] text-left transition-colors duration-150 [--tab-accent:var(--company-accent,var(--heat))] mono:[--tab-accent:var(--heat)] lg:col-start-1 lg:pr-6 max-lg:not-data-open:hover:bg-ink/4 lg:not-data-active:hover:bg-ink/4 max-lg:data-open:bg-[color-mix(in_srgb,var(--tab-accent)_8%,transparent)] max-lg:data-open:shadow-[inset_2px_0_0_var(--tab-accent)] lg:data-active:bg-[color-mix(in_srgb,var(--tab-accent)_8%,transparent)] lg:data-active:shadow-[inset_2px_0_0_var(--tab-accent)]"
+              className="group/tab relative flex w-full scroll-mt-20 flex-col gap-1.5 border-b border-hairline py-6 pr-12 pl-5.5 text-left transition-colors duration-150 [--tab-accent:var(--company-accent,var(--heat))] mono:[--tab-accent:var(--heat)] lg:col-start-1 lg:pr-6 max-lg:not-data-open:hover:bg-ink/4 lg:not-data-active:hover:bg-ink/4 max-lg:data-open:bg-[color-mix(in_srgb,var(--tab-accent)_8%,transparent)] max-lg:data-open:shadow-[inset_2px_0_0_var(--tab-accent)] lg:data-active:bg-[color-mix(in_srgb,var(--tab-accent)_8%,transparent)] lg:data-active:shadow-[inset_2px_0_0_var(--tab-accent)]"
               data-active={isActive || undefined}
               data-open={isOpen || undefined}
               aria-controls={`experience-panel-${entry.id}`}
@@ -85,6 +92,7 @@ export function ExperienceExplorer({
               style={accent}
               onClick={() => {
                 setActive(entry.id);
+                setInteracted(true);
                 setOpen((current) => (current === entry.id ? null : entry.id));
               }}
             >
@@ -96,13 +104,43 @@ export function ExperienceExplorer({
               key={`${entry.id}-panel`}
               id={`experience-panel-${entry.id}`}
               className={cn(
-                "min-w-0 [--tab-accent:var(--company-accent,var(--heat))] mono:[--tab-accent:var(--heat)] max-lg:border-b max-lg:border-hairline lg:col-start-2 lg:row-[1/-1]",
-                !isOpen && "max-lg:hidden",
+                "min-w-0 [--tab-accent:var(--company-accent,var(--heat))] mono:[--tab-accent:var(--heat)] lg:col-start-2 lg:row-span-full",
                 !isActive && "lg:hidden",
               )}
               style={accent}
             >
-              {entry.panel}
+              {/* Narrow screens: the details slide open under the company.
+                  Wide screens always show the selected panel at full height. */}
+              <motion.div
+                className="max-lg:overflow-hidden lg:h-auto! lg:opacity-100!"
+                initial={false}
+                animate={
+                  isOpen
+                    ? { height: "auto", opacity: 1 }
+                    : { height: 0, opacity: 0 }
+                }
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { duration: 0.35, ease: [0.22, 1, 0.36, 1] }
+                }
+                inert={!isDesktop && !isOpen}
+              >
+                {/* Remounts when the company changes, so its details rise in. */}
+                <motion.div
+                  key={String(isActive)}
+                  className="max-lg:border-b max-lg:border-hairline"
+                  initial={
+                    interacted && !reduceMotion
+                      ? { opacity: 0, y: 10, filter: "blur(4px)" }
+                      : false
+                  }
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {entry.panel}
+                </motion.div>
+              </motion.div>
             </div>,
           ];
         })}

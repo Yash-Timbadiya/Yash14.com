@@ -52,7 +52,7 @@ const ENGRAVED =
   "pointer-events-none relative z-1 m-0 font-mono text-xs/4 whitespace-nowrap text-[color-mix(in_srgb,var(--ink)_34%,var(--paper))] select-none [text-shadow:0_1px_0_oklch(1_0_0/0.9),0_-1px_0_oklch(0_0_0/0.14)] dark:[text-shadow:0_1px_0_oklch(1_0_0/0.07),0_-1px_0_oklch(0_0_0/0.7)]";
 
 const STAT_CLASS =
-  "flex flex-col gap-3 border-line p-6 not-first:border-l max-lg:nth-[3]:border-l-0 max-lg:nth-[n+3]:border-t lg:px-7 lg:py-9";
+  "flex flex-col gap-2 border-line px-5 py-5 not-first:border-l max-lg:nth-[3]:border-l-0 max-lg:nth-[n+3]:border-t sm:gap-3 sm:p-6 lg:px-7 lg:py-9";
 
 function Stat({
   value,
@@ -65,11 +65,13 @@ function Stat({
 }) {
   return (
     <div className={STAT_CLASS}>
-      <dd className="text-[clamp(2.5rem,4vw,3.25rem)]/none font-medium tracking-[-0.028em] text-heat tabular-nums">
+      <dd className="text-[clamp(1.875rem,4vw,3.25rem)]/none font-medium tracking-[-0.028em] text-heat tabular-nums">
         {value}
       </dd>
-      <dt className="text-[0.9375rem]">{title}</dt>
-      <dd className="-mt-2 text-[0.8125rem] text-ink/56">{detail}</dd>
+      <dt className="text-[0.875rem]/5 sm:text-[0.9375rem]">{title}</dt>
+      <dd className="-mt-1.5 text-[0.75rem] text-ink/56 sm:-mt-2 sm:text-[0.8125rem]">
+        {detail}
+      </dd>
     </div>
   );
 }

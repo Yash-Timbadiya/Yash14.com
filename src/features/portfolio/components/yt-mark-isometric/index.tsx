@@ -404,7 +404,7 @@ export function YTMarkIsometric({
   const svgRef = useRef<SVGSVGElement>(null);
   const isInView = useInView(svgRef, { margin: "80px" });
 
-  // Edge highlight that follows the cursor across the whole window.
+  // Edge highlight that follows the cursor while it is over the mark's box.
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
   const highlightCx = useSpring(
@@ -443,13 +443,27 @@ export function YTMarkIsometric({
     if (reduceMotion || !isInView) return;
     if (window.matchMedia("(hover: none)").matches) return;
 
+    // Follows the cursor only inside the box that holds the mark.
+    const svg = svgRef.current;
+    const box = svg?.closest("figure") ?? svg?.parentElement;
+    if (!svg || !box) return;
+
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX / window.innerWidth);
-      mouseY.set(e.clientY / window.innerHeight);
+      const rect = svg.getBoundingClientRect();
+      mouseX.set((e.clientX - rect.left) / rect.width);
+      mouseY.set((e.clientY - rect.top) / rect.height);
+    };
+    const handleMouseLeave = () => {
+      mouseX.set(0.5);
+      mouseY.set(0.5);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    box.addEventListener("mousemove", handleMouseMove);
+    box.addEventListener("mouseleave", handleMouseLeave);
+    return () => {
+      box.removeEventListener("mousemove", handleMouseMove);
+      box.removeEventListener("mouseleave", handleMouseLeave);
+    };
   }, [reduceMotion, isInView, mouseX, mouseY]);
 
   const transition: Transition = reduceMotion

@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { InsetFrame } from "./inset-frame";
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
@@ -10,6 +11,37 @@ import { groupByCategory } from "@/features/home/lib/group-by-category";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { TECH_STACK_BRAND_ICONS } from "@/features/portfolio/data/tech-stack-brand-icons";
 import { TechStackItemIcon } from "@/features/portfolio/components/tech-stack-brand-icons";
+
+/** Niche tools left out on phones, so each category stays a few rows tall. */
+const HIDDEN_ON_PHONE = new Set([
+  "radixui",
+  "base-ui",
+  "expo",
+  "tanstack",
+  "zustand",
+  "bun",
+  "nginx",
+  "trpc",
+  "zod",
+  "drizzle-orm",
+  "neon",
+  "planetscale",
+  "supabase",
+  "square",
+  "dodo-payments",
+  "authorize-net",
+  "retell-ai",
+  "telnyx",
+  "gohighlevel",
+  "klaviyo",
+  "railway",
+  "gemini",
+  "chatgpt",
+  "betterstack",
+  "microsoft-clarity",
+  "meta-pixel",
+  "paper",
+]);
 
 export function StackSection() {
   const groups = Object.entries(groupByCategory(TECH_STACK));
@@ -31,7 +63,7 @@ export function StackSection() {
 
       <div className={BAND}>
         <div className={FRAME}>
-          <InsetFrame className="max-md:[--inset:0.625rem]">
+          <InsetFrame className="max-md:p-0 max-md:[&>div]:border-0 max-md:[&>svg]:hidden">
             <dl>
               {groups.map(([category, items], index) => (
                 <div
@@ -48,7 +80,10 @@ export function StackSection() {
                     {items.map((item) => (
                       <TrackedLink
                         key={item.key}
-                        className="inline-flex h-6.5 items-center gap-1.5 rounded-full border border-line bg-surface pr-2.5 pl-1.5 font-mono text-[0.75rem] whitespace-nowrap text-ink transition-[border-color,background-color] duration-150 ease-out hover:border-hairline-strong hover:bg-ink/4 sm:h-7.5 sm:gap-2 sm:pr-3 sm:pl-2 sm:text-[0.8125rem] [&_:is(svg,img)]:size-3.5 [&_:is(svg,img)]:shrink-0 sm:[&_:is(svg,img)]:size-4"
+                        className={cn(
+                          "inline-flex h-6.5 items-center gap-1.5 rounded-full border border-line bg-surface pr-2.5 pl-1.5 font-mono text-[0.75rem] whitespace-nowrap text-ink transition-[border-color,background-color] duration-150 ease-out hover:border-hairline-strong hover:bg-ink/4 sm:h-7.5 sm:gap-2 sm:pr-3 sm:pl-2 sm:text-[0.8125rem] [&_:is(svg,img)]:size-3.5 [&_:is(svg,img)]:shrink-0 sm:[&_:is(svg,img)]:size-4",
+                          HIDDEN_ON_PHONE.has(item.key) && "max-sm:hidden",
+                        )}
                         href={addQueryParams(item.href, UTM_PARAMS)}
                         target="_blank"
                         rel="noopener"

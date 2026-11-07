@@ -13,10 +13,10 @@ export function ProductsStrip() {
       </div>
       <div className={BAND}>
         <div className={cn(FRAME, "grid lg:grid-cols-[17.5rem_minmax(0,1fr)]")}>
-          <p className="flex items-center px-6 py-6 text-base/6 text-balance lg:px-10 lg:py-0">
+          <p className="flex items-center border-hairline px-5 py-3.5 text-[0.9375rem]/6 text-balance max-lg:border-b lg:px-10 lg:py-0 lg:text-base/6">
             <span>
-              <span className="text-heat">{products.length} products</span>{" "}
-              I&rsquo;ve built and maintain
+              Trusted to ship <span className="text-heat">products</span> for
+              clients
             </span>
           </p>
           <ProductMarquee products={products} />

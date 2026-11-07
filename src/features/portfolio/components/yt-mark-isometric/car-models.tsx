@@ -41,14 +41,7 @@ export function boxFaces({ u: [u0, u1], v: [v0, v1], w: [w0, w1] }: Box) {
   };
 }
 
-export type Prim = {
-  d: string;
-  fill: string;
-  stroked: boolean;
-  /** Overrides the default outline color and width. */
-  stroke?: string;
-  width?: number;
-};
+export type Prim = { d: string; fill: string; stroked: boolean };
 
 export const boxPrims = (
   b: Box,
@@ -218,331 +211,267 @@ export function buildDetailedCar(): Prim[] {
   ];
 }
 
-type Vec3 = [number, number, number];
-type Point2 = [number, number];
-
-const pathOf = (points: Point2[], close: boolean) =>
-  `M${points.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join("L")}${close ? "Z" : ""}`;
-
-const project = (points: Vec3[]) => points.map((p) => vproj(...p));
-
-/** Convex hull (monotone chain) of projected points, for clean silhouettes. */
-function hull(points: Point2[]): Point2[] {
-  const sorted = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-  const cross = (o: Point2, a: Point2, b: Point2) =>
-    (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
-  const build = (input: Point2[]) => {
-    const chain: Point2[] = [];
-    for (const p of input) {
-      while (
-        chain.length >= 2 &&
-        cross(chain[chain.length - 2], chain[chain.length - 1], p) <= 0
-      ) {
-        chain.pop();
-      }
-      chain.push(p);
-    }
-    return chain.slice(0, -1);
-  };
-  return [...build(sorted), ...build([...sorted].reverse())];
-}
-
-/** Blends two face colors by how much a surface faces up (0 to 1). */
-const shade = (up: number, top: string, side: string) =>
-  `color-mix(in oklab, ${top} ${Math.round(Math.min(Math.max(up, 0), 1) * 100)}%, ${side})`;
-
-/** A curved-surface strip: stroked in its own color so strips show no seams. */
-const facet = (points: Point2[], fill: string): Prim => ({
-  d: pathOf(points, true),
-  fill,
-  stroked: true,
-  stroke: fill,
-  width: 0.35,
-});
-
-const outline = (points: Point2[]): Prim => ({
-  d: pathOf(hull(points), true),
-  fill: "none",
-  stroked: true,
-});
-
-const line = (points: Vec3[], stroke: string, width: number): Prim => ({
-  d: pathOf(project(points), false),
-  fill: "none",
-  stroked: true,
-  stroke,
-  width,
-});
-
-/**
- * A bar along u with rounded top edges. It can taper: half-width and top
- * height are given at the rear (u0) and the front (u1).
- */
-function roundedBar({
-  u: [u0, u1],
-  v,
-  half: [h0, h1],
-  w0,
-  top: [t0, t1],
-  r,
-  cap = "var(--v-front)",
-}: {
-  u: [number, number];
-  v: number;
-  half: [number, number];
-  w0: number;
-  top: [number, number];
-  r: number;
-  cap?: string;
-}): Prim[] {
-  const steps = 4;
-
-  // Counter-clockwise in the (v, w) plane: up the near side, over the top,
-  // down the far side.
-  const profile = (h: number, t: number): Point2[] => {
-    const rr = Math.min(r, h, t - w0);
-    const pts: Point2[] = [[h, w0]];
-    for (let i = 0; i <= steps; i++) {
-      const a = (i / steps) * (Math.PI / 2);
-      pts.push([h - rr + rr * Math.cos(a), t - rr + rr * Math.sin(a)]);
-    }
-    for (let i = 0; i <= steps; i++) {
-      const a = Math.PI / 2 + (i / steps) * (Math.PI / 2);
-      pts.push([-h + rr + rr * Math.cos(a), t - rr + rr * Math.sin(a)]);
-    }
-    pts.push([-h, w0]);
-    return pts;
-  };
-
-  const back = profile(h0, t0).map(([pv, pw]): Vec3 => [u0, v + pv, pw]);
-  const front = profile(h1, t1).map(([pv, pw]): Vec3 => [u1, v + pv, pw]);
-  const prims: Prim[] = [];
-
-  for (let i = 0; i < front.length - 1; i++) {
-    const dv = front[i + 1][1] - front[i][1];
-    const dw = front[i + 1][2] - front[i][2];
-    const len = Math.hypot(dv, dw) || 1;
-    const nv = dw / len;
-    const nw = -dv / len;
-    // The viewer looks down (1, 1, 1), so a strip shows when nv + nw > 0.
-    if (nv + nw <= 0.01) continue;
-    prims.push(
-      facet(
-        project([back[i], back[i + 1], front[i + 1], front[i]]),
-        shade(nw, "var(--v-top)", "var(--v-side)"),
-      ),
-    );
-  }
-
-  prims.push({ d: pathOf(project(front), true), fill: cap, stroked: true });
-  prims.push(outline(project([...back, ...front])));
-  return prims;
-}
-
-/** A tyre: a short cylinder on the v axis, with a rim and hub on its near face. */
-function tyre(uc: number, radius: number, [v0, v1]: [number, number]): Prim[] {
-  const steps = 24;
-  const ring = (v: number, r: number): Vec3[] =>
-    Array.from({ length: steps }, (_, i): Vec3 => {
-      const a = (i / steps) * Math.PI * 2;
-      return [uc + r * Math.cos(a), v, radius + r * Math.sin(a)];
-    });
-
-  const far = ring(v0, radius);
-  const near = ring(v1, radius);
-  const prims: Prim[] = [];
-
-  for (let i = 0; i < steps; i++) {
-    const j = (i + 1) % steps;
-    const a = ((i + 0.5) / steps) * Math.PI * 2;
-    if (Math.cos(a) + Math.sin(a) <= 0) continue;
-    prims.push(
-      facet(
-        project([far[i], far[j], near[j], near[i]]),
-        shade(Math.sin(a), "var(--v-wheel-top)", "var(--v-wheel-front)"),
-      ),
-    );
-  }
-
-  prims.push(outline(project([...far, ...near])));
-  prims.push({
-    d: pathOf(project(near), true),
-    fill: "var(--v-wheel-side)",
-    stroked: true,
-  });
-  prims.push({
-    d: pathOf(project(ring(v1, radius * 0.6)), true),
-    fill: "var(--v-wheel)",
-    stroked: false,
-  });
-  prims.push({
-    d: pathOf(project(ring(v1, radius * 0.2)), true),
-    fill: "var(--v-stroke)",
-    stroked: false,
-  });
-  return prims;
-}
-
-/** A flat ellipse lying in the (u, v) plane at height w. */
-function disc(
-  [uc, vc, w]: Vec3,
-  [ru, rv]: [number, number],
-  fill: string,
-  stroked = false,
-): Prim {
-  const steps = 20;
-  const pts = Array.from({ length: steps }, (_, i): Vec3 => {
-    const a = (i / steps) * Math.PI * 2;
-    return [uc + ru * Math.cos(a), vc + rv * Math.sin(a), w];
-  });
-  return { d: pathOf(project(pts), true), fill, stroked };
-}
-
 export function buildF1Car(): Prim[] {
-  const c = 0.05;
+  const vOffset = 0.05;
+  const off = (arr: [number, number]): [number, number] => [
+    arr[0] + vOffset,
+    arr[1] + vOffset,
+  ];
   const dark = {
     side: "var(--v-bumper)",
     front: "var(--v-bumper)",
     top: "var(--v-bumper)",
   };
-  const arm = "var(--v-wheel-side)";
 
-  const plate = (
-    u: [number, number],
-    v: [number, number],
-    w: [number, number],
-  ) => boxPrims({ u, v: [c + v[0], c + v[1]], w }, dark);
+  const floor: Box = {
+    u: [-0.4, 0.32],
+    v: off([-0.18, 0.18]),
+    w: [0.02, 0.045],
+  };
+  const monocoque: Box = {
+    u: [-0.36, 0.32],
+    v: off([-0.09, 0.09]),
+    w: [0.045, 0.15],
+  };
+  const sidepodFar: Box = {
+    u: [-0.32, 0.04],
+    v: off([-0.17, -0.09]),
+    w: [0.045, 0.135],
+  };
+  const sidepodNear: Box = {
+    u: [-0.32, 0.04],
+    v: off([0.09, 0.17]),
+    w: [0.045, 0.135],
+  };
+  const engineCover: Box = {
+    u: [-0.34, 0.02],
+    v: off([-0.045, 0.045]),
+    w: [0.15, 0.22],
+  };
+  const sharkFin: Box = {
+    u: [-0.5, -0.3],
+    v: off([-0.015, 0.015]),
+    w: [0.1, 0.21],
+  };
+  const gearbox: Box = {
+    u: [-0.48, -0.34],
+    v: off([-0.05, 0.05]),
+    w: [0.045, 0.12],
+  };
+  const halo: Box = {
+    u: [0.16, 0.2],
+    v: off([-0.06, 0.06]),
+    w: [0.15, 0.19],
+  };
+  const nose: Box = {
+    u: [0.3, 0.5],
+    v: off([-0.05, 0.05]),
+    w: [0.06, 0.125],
+  };
+  const noseTip: Box = {
+    u: [0.5, 0.58],
+    v: off([-0.03, 0.03]),
+    w: [0.055, 0.1],
+  };
 
-  const wishbones = (side: 1 | -1): Prim[] => [
-    line(
-      [
-        [0.32, c + side * 0.06, 0.11],
-        [0.4, c + side * 0.2, 0.085],
-        [0.46, c + side * 0.04, 0.1],
-      ],
-      arm,
-      1.1,
-    ),
-    line(
-      [
-        [-0.29, c + side * 0.07, 0.1],
-        [-0.37, c + side * 0.2, 0.095],
-        [-0.44, c + side * 0.05, 0.1],
-      ],
-      arm,
-      1.1,
-    ),
+  const rearWingMain: Box = {
+    u: [-0.56, -0.47],
+    v: off([-0.24, 0.24]),
+    w: [0.19, 0.235],
+  };
+  const rearWingFlap: Box = {
+    u: [-0.58, -0.52],
+    v: off([-0.24, 0.24]),
+    w: [0.245, 0.275],
+  };
+  const rearEndplateFar: Box = {
+    u: [-0.58, -0.44],
+    v: off([-0.25, -0.22]),
+    w: [0.1, 0.28],
+  };
+  const rearEndplateNear: Box = {
+    u: [-0.58, -0.44],
+    v: off([0.22, 0.25]),
+    w: [0.1, 0.28],
+  };
+
+  const frontWingMain: Box = {
+    u: [0.54, 0.63],
+    v: off([-0.29, 0.29]),
+    w: [0.02, 0.05],
+  };
+  const frontWingFlap: Box = {
+    u: [0.5, 0.56],
+    v: off([-0.28, 0.28]),
+    w: [0.05, 0.075],
+  };
+  const frontEndplateFar: Box = {
+    u: [0.52, 0.64],
+    v: off([-0.3, -0.27]),
+    w: [0.02, 0.09],
+  };
+  const frontEndplateNear: Box = {
+    u: [0.52, 0.64],
+    v: off([0.27, 0.3]),
+    w: [0.02, 0.09],
+  };
+
+  const diffuser: Box = {
+    u: [-0.49, -0.4],
+    v: off([-0.13, 0.13]),
+    w: [0.02, 0.05],
+  };
+  const exhaust: Box = {
+    u: [-0.51, -0.48],
+    v: off([-0.02, 0.02]),
+    w: [0.06, 0.09],
+  };
+  const drsActuator: Box = {
+    u: [-0.56, -0.53],
+    v: off([-0.02, 0.02]),
+    w: [0.235, 0.245],
+  };
+  const airboxIntake = frontPoly(
+    0.02,
+    off([-0.03, 0.03]),
+    [0.16, 0.2],
+    "var(--v-window)",
+  );
+  const tCam: Box = {
+    u: [-0.06, -0.02],
+    v: off([-0.015, 0.015]),
+    w: [0.22, 0.245],
+  };
+  const mirrorFar: Box = {
+    u: [0.18, 0.21],
+    v: off([-0.13, -0.1]),
+    w: [0.13, 0.155],
+  };
+  const mirrorNear: Box = {
+    u: [0.18, 0.21],
+    v: off([0.1, 0.13]),
+    w: [0.13, 0.155],
+  };
+  const bargeboardFar: Box = {
+    u: [0.06, 0.16],
+    v: off([-0.185, -0.16]),
+    w: [0.05, 0.12],
+  };
+  const bargeboardNear: Box = {
+    u: [0.06, 0.16],
+    v: off([0.16, 0.185]),
+    w: [0.05, 0.12],
+  };
+
+  const armFrontFar: Box = {
+    u: [0.36, 0.39],
+    v: off([-0.19, -0.04]),
+    w: [0.09, 0.11],
+  };
+  const armFrontNear: Box = {
+    u: [0.36, 0.39],
+    v: off([0.04, 0.19]),
+    w: [0.09, 0.11],
+  };
+  const armRearFar: Box = {
+    u: [-0.4, -0.37],
+    v: off([-0.19, -0.05]),
+    w: [0.07, 0.09],
+  };
+  const armRearNear: Box = {
+    u: [-0.4, -0.37],
+    v: off([0.05, 0.19]),
+    w: [0.07, 0.09],
+  };
+
+  const wheelFrontFar = wheelPrims([0.3, 0.46], off([-0.28, -0.19]), [0, 0.14]);
+  const wheelRearFar = wheelPrims(
+    [-0.46, -0.3],
+    off([-0.28, -0.19]),
+    [0, 0.15],
+  );
+  const wheelFrontNear = wheelPrims([0.3, 0.46], off([0.19, 0.28]), [0, 0.14]);
+  const wheelRearNear = wheelPrims([-0.46, -0.3], off([0.19, 0.28]), [0, 0.15]);
+
+  const rimOuterV = 0.28 + vOffset;
+  const rimFrontNear = [
+    sidePoly(rimOuterV, [0.335, 0.425], [0.035, 0.105], "var(--v-wheel)"),
+    sidePoly(rimOuterV, [0.365, 0.395], [0.055, 0.085], "var(--v-stroke)"),
+  ];
+  const rimRearNear = [
+    sidePoly(rimOuterV, [-0.425, -0.335], [0.04, 0.11], "var(--v-wheel)"),
+    sidePoly(rimOuterV, [-0.395, -0.365], [0.06, 0.09], "var(--v-stroke)"),
   ];
 
-  const sidepod = (side: 1 | -1) =>
-    roundedBar({
-      u: [-0.3, 0.06],
-      v: c + side * 0.12,
-      half: [0.035, 0.05],
-      w0: 0.04,
-      top: [0.095, 0.13],
-      r: 0.035,
-      cap: "var(--v-window)",
-    });
-
-  const rear: [number, number] = [0.18, 0.31];
-  const front: [number, number] = [0.185, 0.29];
-
   return [
-    // Far side first, so nearer parts paint over it.
-    ...tyre(-0.37, 0.095, [c - rear[1], c - rear[0]]),
-    ...tyre(0.4, 0.085, [c - front[1], c - front[0]]),
-    ...wishbones(-1),
+    ...wheelFrontFar,
+    ...wheelRearFar,
+    ...boxPrims(armFrontFar, dark),
+    ...boxPrims(armRearFar, dark),
 
-    // Rear wing: far endplate, pillar, flap, main plane.
-    ...plate([-0.63, -0.49], [-0.25, -0.225], [0.1, 0.285]),
-    ...plate([-0.555, -0.525], [-0.012, 0.012], [0.09, 0.21]),
-    ...plate([-0.63, -0.57], [-0.225, 0.225], [0.25, 0.275]),
-    ...boxPrims({
-      u: [-0.6, -0.5],
-      v: [c - 0.225, c + 0.225],
-      w: [0.205, 0.24],
+    ...boxPrims(rearEndplateFar, dark),
+    ...boxPrims(rearWingFlap, dark),
+    ...boxPrims(drsActuator, {
+      side: "var(--v-wheel-side)",
+      front: "var(--v-wheel-front)",
+      top: "var(--v-wheel-top)",
+    }),
+    ...boxPrims(rearWingMain, dark),
+    ...boxPrims(rearEndplateNear, dark),
+
+    ...boxPrims(diffuser, dark),
+    ...boxPrims(exhaust, {
+      side: "var(--v-wheel-side)",
+      front: "var(--v-wheel-front)",
+      top: "var(--v-wheel-top)",
+    }),
+    ...boxPrims(gearbox, dark),
+    ...boxPrims(floor, dark),
+
+    ...boxPrims(bargeboardFar, dark),
+    ...boxPrims(sidepodFar),
+    frontPoly(0.04, off([-0.16, -0.1]), [0.06, 0.12], "var(--v-window)"),
+    ...boxPrims(mirrorFar, dark),
+
+    ...boxPrims(monocoque),
+
+    ...boxPrims(sidepodNear),
+    frontPoly(0.04, off([0.1, 0.16]), [0.06, 0.12], "var(--v-window)"),
+    sidePoly(0.17 + vOffset, [-0.26, -0.04], [0.07, 0.115], "var(--v-window)"),
+    ...boxPrims(bargeboardNear, dark),
+
+    ...boxPrims(engineCover),
+    airboxIntake,
+    ...boxPrims(sharkFin),
+    ...boxPrims(tCam, {
+      side: "var(--v-wheel-side)",
+      front: "var(--v-wheel-front)",
+      top: "var(--v-wheel-top)",
     }),
 
-    // Gearbox, floor, far sidepod.
-    ...plate([-0.5, -0.4], [-0.06, 0.06], [0.03, 0.1]),
-    ...plate([-0.42, 0.3], [-0.17, 0.17], [0.02, 0.04]),
-    ...sidepod(-1),
-
-    // Engine cover with its fin and airbox.
-    ...roundedBar({
-      u: [-0.42, 0.06],
-      v: c,
-      half: [0.035, 0.075],
-      w0: 0.04,
-      top: [0.12, 0.2],
-      r: 0.035,
+    topPoly(0.15, [0.04, 0.18], off([-0.05, 0.05]), "var(--v-window)"),
+    ...boxPrims(halo, {
+      side: "var(--v-wheel-side)",
+      front: "var(--v-wheel-front)",
+      top: "var(--v-wheel-top)",
     }),
-    {
-      d: pathOf(
-        project([
-          [-0.08, c, 0.175],
-          [-0.42, c, 0.19],
-          [-0.42, c, 0.12],
-        ]),
-        true,
-      ),
-      fill: "var(--v-side)",
-      stroked: true,
-    },
-    ...sidepod(1),
+    ...boxPrims(mirrorNear, dark),
 
-    // Cockpit: tub, opening, helmet, halo.
-    ...roundedBar({
-      u: [0.04, 0.32],
-      v: c,
-      half: [0.075, 0.055],
-      w0: 0.04,
-      top: [0.155, 0.13],
-      r: 0.035,
-    }),
-    disc([0.165, c, 0.146], [0.07, 0.04], "var(--v-window)"),
-    disc([0.145, c, 0.175], [0.03, 0.03], "var(--v-light-front)", true),
-    line(
-      [
-        [0.08, c - 0.055, 0.15],
-        [0.1, c - 0.055, 0.2],
-        [0.2, c - 0.03, 0.205],
-        [0.245, c, 0.195],
-        [0.2, c + 0.03, 0.205],
-        [0.1, c + 0.055, 0.2],
-        [0.08, c + 0.055, 0.15],
-      ],
-      arm,
-      1.6,
-    ),
-    line(
-      [
-        [0.245, c, 0.195],
-        [0.27, c, 0.135],
-      ],
-      arm,
-      1.6,
-    ),
+    ...boxPrims(nose),
+    topPoly(0.125, [0.32, 0.48], off([-0.03, 0.03]), "var(--v-light-front)"),
+    ...boxPrims(noseTip),
+    ...boxPrims(armFrontNear, dark),
+    ...boxPrims(armRearNear, dark),
 
-    // Front wing under a tapered nose.
-    ...plate([0.52, 0.65], [-0.3, -0.275], [0.02, 0.085]),
-    ...plate([0.52, 0.64], [-0.275, 0.275], [0.02, 0.04]),
-    ...plate([0.5, 0.56], [-0.26, 0.26], [0.04, 0.06]),
-    ...roundedBar({
-      u: [0.3, 0.6],
-      v: c,
-      half: [0.05, 0.022],
-      w0: 0.05,
-      top: [0.13, 0.08],
-      r: 0.02,
-    }),
-    ...plate([0.52, 0.65], [0.275, 0.3], [0.02, 0.085]),
-    ...plate([-0.63, -0.49], [0.225, 0.25], [0.1, 0.285]),
+    ...boxPrims(frontEndplateFar, dark),
+    ...boxPrims(frontWingFlap, dark),
+    ...boxPrims(frontWingMain, dark),
+    ...boxPrims(frontEndplateNear, dark),
 
-    ...wishbones(1),
-    ...tyre(-0.37, 0.095, [c + rear[0], c + rear[1]]),
-    ...tyre(0.4, 0.085, [c + front[0], c + front[1]]),
+    ...wheelFrontNear,
+    ...rimFrontNear,
+    ...wheelRearNear,
+    ...rimRearNear,
   ];
 }
 
@@ -1238,14 +1167,14 @@ export function VehicleShape({
 }) {
   const prims = MODEL_PRIMS[model];
   return (
-    <g strokeLinejoin="round" strokeLinecap="round">
+    <g strokeLinejoin="round">
       {prims.map((p, i) => (
         <path
           key={i}
           d={p.d}
           fill={p.fill}
-          stroke={p.stroked ? (p.stroke ?? "var(--v-stroke)") : "none"}
-          strokeWidth={p.stroked ? (p.width ?? 0.9) : 0}
+          stroke={p.stroked ? "var(--v-stroke)" : "none"}
+          strokeWidth={p.stroked ? 0.9 : 0}
         />
       ))}
     </g>
