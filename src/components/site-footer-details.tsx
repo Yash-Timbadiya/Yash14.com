@@ -8,7 +8,6 @@ import { config } from "@/config";
 import { trackEvent } from "@/lib/analytics";
 import { addQueryParams } from "@/utils/url";
 import { USER } from "@/features/portfolio/data/user";
-import { LinkPreview } from "@/components/link-preview";
 import { motion, useReducedMotion } from "motion/react";
 import { getBuildInfo, getStack } from "@/lib/build-info";
 import { YashSignature } from "@/components/yash-signature";
@@ -43,9 +42,11 @@ export function SiteFooterDetails({
     <dl className="grid grid-cols-2 gap-px bg-line font-mono md:grid-cols-4">
       <Field label="Crafted by">
         {xLink ? (
-          <LinkPreview
-            url={addQueryParams(xLink.href, UTM_PARAMS)}
-            className="link-underline"
+          <a
+            target="_blank"
+            rel="noopener"
+            href={addQueryParams(xLink.href, UTM_PARAMS)}
+            className="link-underline text-foreground"
             onClick={() =>
               trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_X, {
                 section: ANALYTICS_SECTIONS.FOOTER,
@@ -55,15 +56,17 @@ export function SiteFooterDetails({
             }
           >
             {xLink.handle}
-          </LinkPreview>
+          </a>
         ) : null}
       </Field>
 
       <Field label="Protected by">
         {DMCA_URL ? (
-          <LinkPreview
-            url={DMCA_URL}
-            className="link-underline"
+          <a
+            target="_blank"
+            rel="noopener"
+            href={DMCA_URL}
+            className="link-underline text-foreground"
             onClick={() =>
               trackEvent(ANALYTICS_EVENTS.VIEW_DMCA, {
                 section: ANALYTICS_SECTIONS.FOOTER,
@@ -72,7 +75,7 @@ export function SiteFooterDetails({
             }
           >
             DMCA
-          </LinkPreview>
+          </a>
         ) : null}
       </Field>
 
@@ -108,9 +111,11 @@ export function SiteFooterDetails({
       </Field>
 
       <Field label="Source code">
-        <LinkPreview
-          url={SOURCE_CODE_GITHUB_URL}
-          className="link-underline"
+        <a
+          target="_blank"
+          rel="noopener"
+          href={SOURCE_CODE_GITHUB_URL}
+          className="link-underline text-foreground"
           onClick={() =>
             trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_GITHUB, {
               section: ANALYTICS_SECTIONS.FOOTER,
@@ -120,13 +125,15 @@ export function SiteFooterDetails({
           }
         >
           GitHub
-        </LinkPreview>
+        </a>
       </Field>
 
       <Field label="License">
-        <LinkPreview
-          url={LICENSE.url}
-          className="link-underline"
+        <a
+          target="_blank"
+          rel="noopener"
+          href={LICENSE.url}
+          className="link-underline text-foreground"
           onClick={() =>
             trackEvent(ANALYTICS_EVENTS.VIEW_LICENSE, {
               section: ANALYTICS_SECTIONS.FOOTER,
@@ -136,7 +143,7 @@ export function SiteFooterDetails({
           }
         >
           {LICENSE.name}
-        </LinkPreview>
+        </a>
       </Field>
 
       <Field label="Typeface">{typeface}</Field>
@@ -173,9 +180,11 @@ export function SiteFooterDetails({
       <Field label="Analytics">
         <ul className="flex flex-col gap-0.5">
           <li className="w-fit transition-transform duration-200 hover:translate-x-0.5">
-            <LinkPreview
-              url={POSTHOG_URL}
-              className="link-underline"
+            <a
+              target="_blank"
+              rel="noopener"
+              href={POSTHOG_URL}
+              className="link-underline text-foreground"
               onClick={() =>
                 trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_POSTHOG, {
                   section: ANALYTICS_SECTIONS.FOOTER,
@@ -184,7 +193,7 @@ export function SiteFooterDetails({
               }
             >
               PostHog
-            </LinkPreview>
+            </a>
           </li>
           <li>Google Search Console</li>
         </ul>
@@ -269,9 +278,11 @@ function BuildValue({ build }: { build: BuildInfo }) {
   return (
     <>
       {build.commitUrl ? (
-        <LinkPreview
-          url={build.commitUrl}
-          className="link-underline"
+        <a
+          target="_blank"
+          rel="noopener"
+          href={build.commitUrl}
+          className="link-underline text-foreground"
           onClick={() =>
             trackEvent(ANALYTICS_EVENTS.REDIRECT_TO_GITHUB, {
               section: ANALYTICS_SECTIONS.FOOTER,
@@ -281,7 +292,7 @@ function BuildValue({ build }: { build: BuildInfo }) {
           }
         >
           {build.commitShortSha}
-        </LinkPreview>
+        </a>
       ) : (
         build.commitShortSha
       )}

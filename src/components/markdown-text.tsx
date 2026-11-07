@@ -36,7 +36,7 @@ function createMarkdownComponents(
   };
 }
 
-export function MarkdownLinkPreview({
+export function MarkdownText({
   children,
   eventProperties,
 }: {

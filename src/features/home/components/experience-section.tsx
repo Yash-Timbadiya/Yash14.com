@@ -7,12 +7,12 @@ import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
 import { TrackedLink } from "@/components/tracked-link";
 import { ExternalArrow, HoverArrow } from "./hover-arrow";
+import { MarkdownText } from "@/components/markdown-text";
 import { IconBriefcaseFilled } from "@tabler/icons-react";
 import { ExperienceExplorer } from "./experience-explorer";
 import { SectionHead, SectionIndex } from "./section-intro";
 import { EXPERIENCES } from "@/features/portfolio/data/experiences";
 import { formatDuration } from "@/features/home/lib/format-duration";
-import { MarkdownLinkPreview } from "@/components/markdown-link-preview";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   CHIP,
@@ -129,9 +129,9 @@ function CompanyPanel({ experience }: { experience: Experience }) {
 
             <div className={cn(PROSE, "px-6 py-6 lg:px-8")}>
               {visible.length > 0 && (
-                <MarkdownLinkPreview eventProperties={eventProperties}>
+                <MarkdownText eventProperties={eventProperties}>
                   {toMarkdownList(visible)}
-                </MarkdownLinkPreview>
+                </MarkdownText>
               )}
 
               {hidden.length > 0 && (
@@ -142,9 +142,9 @@ function CompanyPanel({ experience }: { experience: Experience }) {
                   eventProperties={eventProperties}
                 >
                   <div className="pt-2">
-                    <MarkdownLinkPreview eventProperties={eventProperties}>
+                    <MarkdownText eventProperties={eventProperties}>
                       {toMarkdownList(hidden)}
-                    </MarkdownLinkPreview>
+                    </MarkdownText>
                   </div>
                 </ShowMore>
               )}

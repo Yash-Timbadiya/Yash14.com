@@ -7,9 +7,9 @@ import { addQueryParams } from "@/utils/url";
 import { ExternalArrow } from "./hover-arrow";
 import { IconSchoolFilled } from "@tabler/icons-react";
 import { TrackedLink } from "@/components/tracked-link";
+import { MarkdownText } from "@/components/markdown-text";
 import { SectionHead, SectionIndex } from "./section-intro";
 import { EDUCATION } from "@/features/portfolio/data/education";
-import { MarkdownLinkPreview } from "@/components/markdown-link-preview";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import {
   parseDescription,
@@ -133,9 +133,9 @@ export function EducationNotes({ item }: { item: Education }) {
     <div>
       {summary && summary.items.length > 0 && (
         <div className={PROSE}>
-          <MarkdownLinkPreview eventProperties={eventProperties}>
+          <MarkdownText eventProperties={eventProperties}>
             {toMarkdownList(summary.items.slice(0, 1))}
-          </MarkdownLinkPreview>
+          </MarkdownText>
         </div>
       )}
 
@@ -149,9 +149,9 @@ export function EducationNotes({ item }: { item: Education }) {
           <div className="pt-2">
             {hiddenBullets.length > 0 && (
               <div className={PROSE}>
-                <MarkdownLinkPreview eventProperties={eventProperties}>
+                <MarkdownText eventProperties={eventProperties}>
                   {toMarkdownList(hiddenBullets)}
-                </MarkdownLinkPreview>
+                </MarkdownText>
               </div>
             )}
 
@@ -201,9 +201,9 @@ export function EducationNotes({ item }: { item: Education }) {
                     </ul>
                   ) : (
                     <div className={PROSE}>
-                      <MarkdownLinkPreview eventProperties={eventProperties}>
+                      <MarkdownText eventProperties={eventProperties}>
                         {toMarkdownList(section.items)}
-                      </MarkdownLinkPreview>
+                      </MarkdownText>
                     </div>
                   )}
                 </div>
