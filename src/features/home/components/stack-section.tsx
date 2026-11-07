@@ -1,3 +1,4 @@
+import { InsetFrame } from "./inset-frame";
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
 import { IconStackFilled } from "@tabler/icons-react";
@@ -28,41 +29,45 @@ export function StackSection() {
       />
 
       <div className="home-band">
-        <dl className="home-frame bg-(--surface)">
-          {groups.map(([category, items], index) => (
-            <div key={category} className="home-stack-row">
-              <dt className="home-stack-label">
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <span>{category}</span>
-              </dt>
-              <dd className="home-stack-tools">
-                {items.map((item) => (
-                  <TrackedLink
-                    key={item.key}
-                    className="home-stack-chip"
-                    href={addQueryParams(item.href, UTM_PARAMS)}
-                    target="_blank"
-                    rel="noopener"
-                    event={ANALYTICS_EVENTS.TECH_STACK_CLICK}
-                    eventProperties={{
-                      section: ANALYTICS_SECTIONS.TECH_STACK,
-                      tech: item.title,
-                      key: item.key,
-                      category,
-                      url: item.href,
-                    }}
-                  >
-                    <TechStackItemIcon
-                      icon={item.icon}
-                      brandIcon={TECH_STACK_BRAND_ICONS[item.key]}
-                    />
-                    {item.title}
-                  </TrackedLink>
-                ))}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <div className="home-frame">
+          <InsetFrame>
+            <dl>
+              {groups.map(([category, items], index) => (
+                <div key={category} className="home-stack-row">
+                  <dt className="home-stack-label">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <span>{category}</span>
+                  </dt>
+                  <dd className="home-stack-tools">
+                    {items.map((item) => (
+                      <TrackedLink
+                        key={item.key}
+                        className="home-stack-chip"
+                        href={addQueryParams(item.href, UTM_PARAMS)}
+                        target="_blank"
+                        rel="noopener"
+                        event={ANALYTICS_EVENTS.TECH_STACK_CLICK}
+                        eventProperties={{
+                          section: ANALYTICS_SECTIONS.TECH_STACK,
+                          tech: item.title,
+                          key: item.key,
+                          category,
+                          url: item.href,
+                        }}
+                      >
+                        <TechStackItemIcon
+                          icon={item.icon}
+                          brandIcon={TECH_STACK_BRAND_ICONS[item.key]}
+                        />
+                        {item.title}
+                      </TrackedLink>
+                    ))}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </InsetFrame>
+        </div>
       </div>
     </section>
   );
