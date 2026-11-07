@@ -285,8 +285,20 @@ html.dark:has(.home) {
   transition: translate 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.home-link:hover svg:not(.home-arrow) {
+.home-link:hover svg:not(.home-arrow, .home-chevron-down) {
   translate: 2px 0;
+}
+
+/* Disclosure chevron: heavy like the hover arrow, still on hover, and turned
+   up while its panel is open. */
+.home-link .home-chevron-down {
+  width: 0.6rem;
+  height: 0.375rem;
+  transition: rotate 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-link[data-panel-open] .home-chevron-down {
+  rotate: 180deg;
 }
 
 /* Hover arrow: the chevron slides right and a shaft grows in behind it. */

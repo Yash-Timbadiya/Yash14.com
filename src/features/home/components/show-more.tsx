@@ -3,7 +3,7 @@
 import type { AnalyticsProperties } from "@/lib/analytics";
 import type { AnalyticsEvent } from "@/lib/analytics-events";
 
-import { IconChevronDown } from "@tabler/icons-react";
+import { DisclosureChevron } from "./hover-arrow";
 import { CollapsibleTrigger } from "@/components/base/ui/collapsible";
 import {
   Collapsible,
@@ -42,10 +42,7 @@ function ShowMoreTrigger({ label }: { label: string }) {
   return (
     <CollapsibleTrigger className="home-link group mt-3 outline-none focus-visible:underline">
       {open ? "Show less" : label}
-      <IconChevronDown
-        className="transition-transform duration-200 group-data-panel-open:rotate-180"
-        aria-hidden
-      />
+      <DisclosureChevron />
     </CollapsibleTrigger>
   );
 }
