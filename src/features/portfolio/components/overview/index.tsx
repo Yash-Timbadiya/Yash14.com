@@ -99,7 +99,7 @@ export function Overview() {
   );
 }
 
-function getGenderIcon(gender: User["gender"]) {
+export function getGenderIcon(gender: User["gender"]) {
   switch (gender) {
     case "male":
       return <MarsIcon />;

@@ -637,7 +637,8 @@ html.dark:has(.home) {
   letter-spacing: 0;
 }
 
-.home-spec-row [data-slot="intro-item-icon"] {
+/* The browser variant keeps the boxed icons from `/`, so only the plain rows strip them. */
+dl:not(.home-fields) > .home-spec-row [data-slot="intro-item-icon"] {
   width: 1rem;
   height: 1rem;
   border: 0;
@@ -645,18 +646,23 @@ html.dark:has(.home) {
   box-shadow: none;
 }
 
-.home-spec-row [data-slot="intro-item-icon"] svg {
+dl:not(.home-fields) > .home-spec-row [data-slot="intro-item-icon"] svg {
   width: 0.9375rem;
   height: 0.9375rem;
   color: var(--ink-40);
 }
 
 /* The live clock reads as a filled dial with cut-out hands. */
-.home-spec-row [data-slot="intro-item-icon"] svg circle {
+dl:not(.home-fields) > .home-spec-row [data-slot="intro-item-icon"] svg circle {
   fill: currentColor;
 }
 
-.home-spec-row [data-slot="intro-item-icon"] svg circle + path {
+dl:not(.home-fields)
+  > .home-spec-row
+  [data-slot="intro-item-icon"]
+  svg
+  circle
+  + path {
   stroke: var(--surface);
   stroke-width: 2.5;
 }
@@ -818,15 +824,15 @@ html.dark:has(.home) {
 }
 
 .home-fields .home-spec-row {
-  grid-template-columns: 5.5rem minmax(0, 1fr);
-  column-gap: 0.875rem;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  column-gap: 1rem;
   min-height: 0;
   padding-inline: 0;
   border-bottom: 0;
 }
 
 .home-fields .home-spec-row > dt {
-  justify-self: end;
+  justify-self: start;
   padding: 0.25rem 0.5rem;
   border-radius: 0.375rem;
   background-color: var(--ink-6);
@@ -840,22 +846,13 @@ html.dark:has(.home) {
 .home-fields .home-spec-row > dd {
   display: flex;
   align-items: center;
-  width: fit-content;
-  max-width: 100%;
-  min-height: 2.5rem;
-  padding-inline: 0.75rem;
-  border: 1px solid var(--hairline);
-  border-radius: 0.75rem;
+  min-height: 2rem;
 }
 
 @media (max-width: 39.999rem) {
   .home-fields .home-spec-row {
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 0.375rem;
-  }
-
-  .home-fields .home-spec-row > dt {
-    justify-self: start;
+    row-gap: 0.25rem;
   }
 }
 

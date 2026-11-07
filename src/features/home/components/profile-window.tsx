@@ -2,8 +2,10 @@ import { cn } from "@/lib/utils";
 import { urlToName } from "@/utils/url";
 import { ProfileJson } from "./profile-json";
 import { YTMark } from "@/components/yt-mark";
+import { LinkIcon, MapPinIcon } from "lucide-react";
 import { USER } from "@/features/portfolio/data/user";
 import { TrackedLink } from "@/components/tracked-link";
+import { getGenderIcon } from "@/features/portfolio/components/overview";
 import { JobItem } from "@/features/portfolio/components/overview/job-item";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { EmailItem } from "@/features/portfolio/components/overview/email-item";
@@ -28,6 +30,30 @@ import {
 } from "@tabler/icons-react";
 
 const LOCATION_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(USER.address)}`;
+
+type DetailIcons = Record<
+  "job" | "location" | "phone" | "email" | "website" | "pronouns",
+  React.ReactNode
+>;
+
+const FILLED_ICONS: DetailIcons = {
+  job: <IconBriefcaseFilled />,
+  location: <IconMapPinFilled />,
+  phone: <IconPhoneFilled />,
+  email: <IconMailFilled />,
+  website: <IconLink />,
+  pronouns: <IconUserFilled />,
+};
+
+/** The outline set from `/`; job, phone and email fall back to their own defaults. */
+const SITE_ICONS: DetailIcons = {
+  job: undefined,
+  location: <MapPinIcon />,
+  phone: undefined,
+  email: undefined,
+  website: <LinkIcon />,
+  pronouns: getGenderIcon(USER.gender),
+};
 
 /** Two side-by-side panes: profile rows and the same profile as JSON. */
 export function ProfileWindow() {
@@ -79,7 +105,11 @@ export function ProfileBrowser() {
 
             <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
               <div className="min-w-0 px-4 py-6 lg:px-8 lg:py-10">
-                <ProfileDetails className="home-fields" shortcuts={false} />
+                <ProfileDetails
+                  className="home-fields"
+                  icons={SITE_ICONS}
+                  shortcuts={false}
+                />
               </div>
 
               <JsonPane className="home-chrome-pane" />
@@ -143,9 +173,11 @@ function JsonPane({ className }: { className: string }) {
 
 function ProfileDetails({
   className,
+  icons = FILLED_ICONS,
   shortcuts = true,
 }: {
   className?: string;
+  icons?: DetailIcons;
   shortcuts?: boolean;
 }) {
   return (
@@ -156,16 +188,14 @@ function ProfileDetails({
             title={job.title}
             company={job.company}
             website={job.website}
-            icon={<IconBriefcaseFilled />}
+            icon={icons.job}
           />
         </SpecRow>
       ))}
 
       <SpecRow label="Location">
         <IntroItem>
-          <IntroItemIcon>
-            <IconMapPinFilled />
-          </IntroItemIcon>
+          <IntroItemIcon>{icons.location}</IntroItemIcon>
           <IntroItemContent>
             <IntroItemLink
               href={LOCATION_MAP_URL}
@@ -189,7 +219,7 @@ function ProfileDetails({
       <SpecRow label="Phone">
         <PhoneItem
           phoneNumberB64={USER.phoneNumberB64}
-          icon={<IconPhoneFilled />}
+          icon={icons.phone}
           shortcuts={shortcuts}
         />
       </SpecRow>
@@ -197,16 +227,14 @@ function ProfileDetails({
       <SpecRow label="Email">
         <EmailItem
           emailB64={USER.emailB64}
-          icon={<IconMailFilled />}
+          icon={icons.email}
           shortcuts={shortcuts}
         />
       </SpecRow>
 
       <SpecRow label="Website">
         <IntroItem>
-          <IntroItemIcon>
-            <IconLink />
-          </IntroItemIcon>
+          <IntroItemIcon>{icons.website}</IntroItemIcon>
           <IntroItemContent>
             <IntroItemLink
               href={USER.website}
@@ -225,9 +253,7 @@ function ProfileDetails({
 
       <SpecRow label="Pronouns">
         <IntroItem>
-          <IntroItemIcon>
-            <IconUserFilled />
-          </IntroItemIcon>
+          <IntroItemIcon>{icons.pronouns}</IntroItemIcon>
           <IntroItemContent aria-label={`Pronouns: ${USER.pronouns}`}>
             {USER.pronouns}
           </IntroItemContent>
