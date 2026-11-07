@@ -386,11 +386,16 @@ const bandRevealTransition: Transition = {
 
 type YTMarkIsometricProps = {
   onActivate?: () => void;
+  /** The car the traffic starts with; right-click still switches it. */
+  defaultCarModel?: CarModel;
 };
 
 const HIGHLIGHT_SPRING = { stiffness: 300, damping: 30, mass: 0.1 };
 
-export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
+export function YTMarkIsometric({
+  onActivate,
+  defaultCarModel = "detailed",
+}: YTMarkIsometricProps) {
   const patternId = `yt-hatch${useId().replace(/:/g, "")}`;
   const bandId0 = `yt-band-0${useId().replace(/:/g, "")}`;
   const bandId1 = `yt-band-1${useId().replace(/:/g, "")}`;
@@ -413,7 +418,7 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
   const reduceMotion = useReducedMotion();
   const [animateTraffic, setAnimateTraffic] = useState(false);
   const [active, setActive] = useState(false);
-  const [carModel, setCarModel] = useState<CarModel>("detailed");
+  const [carModel, setCarModel] = useState<CarModel>(defaultCarModel);
   const [introReady, setIntroReady] = useState(false);
 
   useEffect(() => {

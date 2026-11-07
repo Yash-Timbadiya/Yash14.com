@@ -1,6 +1,5 @@
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
-import { StackExplorer } from "./stack-explorer";
 import { IconStackFilled } from "@tabler/icons-react";
 import { TrackedLink } from "@/components/tracked-link";
 import { SectionHead, SectionIndex } from "./section-intro";
@@ -12,37 +11,6 @@ import { TechStackItemIcon } from "@/features/portfolio/components/tech-stack-br
 
 export function StackSection() {
   const groups = Object.entries(groupByCategory(TECH_STACK));
-
-  const tiles = groups.flatMap(([category, items]) =>
-    items.map((item) => ({
-      key: item.key,
-      category,
-      node: (
-        <TrackedLink
-          className="home-tile"
-          href={addQueryParams(item.href, UTM_PARAMS)}
-          target="_blank"
-          rel="noopener"
-          event={ANALYTICS_EVENTS.TECH_STACK_CLICK}
-          eventProperties={{
-            section: ANALYTICS_SECTIONS.TECH_STACK,
-            tech: item.title,
-            key: item.key,
-            category,
-            url: item.href,
-          }}
-        >
-          <span className="home-tile-icon">
-            <TechStackItemIcon
-              icon={item.icon}
-              brandIcon={TECH_STACK_BRAND_ICONS[item.key]}
-            />
-          </span>
-          <span className="truncate">{item.title}</span>
-        </TrackedLink>
-      ),
-    })),
-  );
 
   return (
     <section id="stack" className="scroll-mt-16">
@@ -58,7 +26,44 @@ export function StackSection() {
         }
         description={`${TECH_STACK.length} tools across ${groups.length} categories, from language to analytics.`}
       />
-      <StackExplorer categories={groups.map(([name]) => name)} tiles={tiles} />
+
+      <div className="home-band">
+        <dl className="home-frame bg-(--surface)">
+          {groups.map(([category, items], index) => (
+            <div key={category} className="home-stack-row">
+              <dt className="home-stack-label">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <span>{category}</span>
+              </dt>
+              <dd className="home-stack-tools">
+                {items.map((item) => (
+                  <TrackedLink
+                    key={item.key}
+                    className="home-stack-chip"
+                    href={addQueryParams(item.href, UTM_PARAMS)}
+                    target="_blank"
+                    rel="noopener"
+                    event={ANALYTICS_EVENTS.TECH_STACK_CLICK}
+                    eventProperties={{
+                      section: ANALYTICS_SECTIONS.TECH_STACK,
+                      tech: item.title,
+                      key: item.key,
+                      category,
+                      url: item.href,
+                    }}
+                  >
+                    <TechStackItemIcon
+                      icon={item.icon}
+                      brandIcon={TECH_STACK_BRAND_ICONS[item.key]}
+                    />
+                    {item.title}
+                  </TrackedLink>
+                ))}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </section>
   );
 }

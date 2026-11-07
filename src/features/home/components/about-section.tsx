@@ -143,9 +143,9 @@ export function AboutSection() {
               </span>
             </figcaption>
             <div className="home-mark @container my-auto px-4 py-6">
-              <YTMarkIsometric />
+              <YTMarkIsometric defaultCarModel="f1" />
             </div>
-            <p className="home-engraved flex h-11 items-center justify-end px-5">
+            <p className="home-engraved flex h-11 items-center justify-start px-5">
               Click the mark
             </p>
           </figure>
