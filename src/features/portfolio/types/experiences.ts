@@ -32,6 +32,8 @@ export type Experience = {
   invertLogoInLight?: boolean;
   /** UI icon to represent the company; used if `companyLogo` is not provided. */
   companyIcon?: React.ReactElement;
+  /** Color for this company's selected state on /home; defaults to the site accent. */
+  accentColor?: string;
   /** URL to the company's website. */
   companyWebsite?: string;
   location?: string;

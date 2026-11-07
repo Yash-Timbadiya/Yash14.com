@@ -2,6 +2,7 @@ import type { Experience } from "@/features/portfolio/types/experiences";
 
 import { cn } from "@/lib/utils";
 import { ShowMore } from "./show-more";
+import { HoverArrow } from "./hover-arrow";
 import { StatusIcon } from "./status-icon";
 import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
@@ -10,12 +11,8 @@ import { ExperienceExplorer } from "./experience-explorer";
 import { SectionHead, SectionIndex } from "./section-intro";
 import { EXPERIENCES } from "@/features/portfolio/data/experiences";
 import { MarkdownLinkPreview } from "@/components/markdown-link-preview";
+import { IconArrowUpRight, IconBriefcaseFilled } from "@tabler/icons-react";
 import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
-import {
-  IconArrowUpRight,
-  IconBriefcaseFilled,
-  IconChevronRight,
-} from "@tabler/icons-react";
 import { formatDuration } from "@/features/portfolio/components/experiences/experience-position-item";
 import {
   parseDescription,
@@ -33,6 +30,7 @@ export function ExperienceSection() {
 
   const entries = EXPERIENCES.map((experience) => ({
     id: experience.id,
+    accent: experience.accentColor,
     tab: <CompanyTab experience={experience} />,
     panel: <CompanyPanel experience={experience} />,
   }));
@@ -209,7 +207,7 @@ function CompanyPanel({ experience }: { experience: Experience }) {
                   }}
                 >
                   Visit site
-                  <IconChevronRight aria-hidden />
+                  <HoverArrow />
                 </TrackedLink>
               )}
             </footer>
@@ -238,7 +236,7 @@ function CompanyLogo({ experience }: { experience: Experience }) {
   }
 
   return (
-    <span className="text-(color:--ink-56) [&_svg]:size-5" aria-hidden>
+    <span className="text-(color:--ink-56) [&_svg]:size-6" aria-hidden>
       {experience.companyIcon}
     </span>
   );

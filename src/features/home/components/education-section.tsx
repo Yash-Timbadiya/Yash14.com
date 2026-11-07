@@ -32,18 +32,66 @@ export function EducationSection() {
       />
 
       <div className="home-band">
-        <div className="home-frame grid lg:grid-cols-2">
-          <span className="home-star max-lg:hidden" aria-hidden />
+        <ol className="home-frame home-edu-timeline">
           {EDUCATION.map((item) => (
-            <EducationCell key={item.id} item={item} />
+            <li key={item.id} className="home-edu-step">
+              <div className="home-edu-years">
+                <span>{yearOf(item.period.end)}</span>
+                <span>{yearOf(item.period.start)}</span>
+                <span className="home-mono-label">{duration(item.period)}</span>
+              </div>
+              <div className="home-edu-body">
+                <h3 className="home-feature-text">
+                  <strong>{item.school}.</strong>{" "}
+                  {[item.degree, item.fieldOfStudy].filter(Boolean).join(", ")}.
+                </h3>
+                <EducationNotes item={item} />
+                <Skills skills={item.skills} />
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );
 }
 
-function EducationCell({ item }: { item: Education }) {
+/** "09.2021" -> months since year 0, for working out a duration. */
+function toMonths(value: string) {
+  const [month, year] = value.split(".").map(Number);
+  return year * 12 + (month - 1);
+}
+
+function duration({ start, end }: Education["period"]) {
+  if (!end) return "Ongoing";
+  const months = toMonths(end) - toMonths(start);
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  return [
+    years > 0 && `${years} yr${years === 1 ? "" : "s"}`,
+    rest > 0 && `${rest} mo`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+const yearOf = (value?: string) => value?.split(".")[1] ?? "Now";
+
+function Skills({ skills }: { skills?: string[] }) {
+  if (!skills?.length) return null;
+  return (
+    <ul className="flex flex-wrap gap-1.5">
+      {skills.map((skill) => (
+        <li key={skill} className="home-chip">
+          {skill}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The first bullet, with the rest of the description behind "Show details". */
+export function EducationNotes({ item }: { item: Education }) {
   const eventProperties = {
     section: ANALYTICS_SECTIONS.EDUCATION,
     school: item.school,
@@ -54,106 +102,84 @@ function EducationCell({ item }: { item: Education }) {
   const hiddenBullets = summary?.items.slice(1) ?? [];
 
   return (
-    <article className="flex min-w-0 flex-col gap-5 border-line px-6 py-10 not-first:max-lg:border-t lg:px-14 lg:py-14 lg:nth-[n+3]:border-l">
-      <p className="flex items-center gap-2.5 text-[0.8125rem] tabular-nums text-(color:--ink-72)">
-        <IconSchoolFilled className="size-4" aria-hidden />
-        {item.period.start} — {item.period.end ?? "Present"}
-      </p>
-
-      <h3 className="home-feature-text">
-        <strong>{item.school}.</strong>{" "}
-        {[item.degree, item.fieldOfStudy].filter(Boolean).join(", ")}.
-      </h3>
-
-      <div>
-        {summary && summary.items.length > 0 && (
-          <div className="home-prose">
-            <MarkdownLinkPreview eventProperties={eventProperties}>
-              {toMarkdownList(summary.items.slice(0, 1))}
-            </MarkdownLinkPreview>
-          </div>
-        )}
-
-        {(hiddenBullets.length > 0 || details.length > 0) && (
-          <ShowMore
-            label="Show details"
-            openEvent={ANALYTICS_EVENTS.EDUCATION_OPENED}
-            closeEvent={ANALYTICS_EVENTS.EDUCATION_CLOSED}
-            eventProperties={eventProperties}
-          >
-            <div className="pt-2">
-              {hiddenBullets.length > 0 && (
-                <div className="home-prose">
-                  <MarkdownLinkPreview eventProperties={eventProperties}>
-                    {toMarkdownList(hiddenBullets)}
-                  </MarkdownLinkPreview>
-                </div>
-              )}
-
-              {details.map((section) => {
-                const linked = parseLinkedItems(section.items);
-
-                return (
-                  <div key={section.heading} className="mt-6">
-                    {section.heading && (
-                      <p className="home-mono-label mb-3">{section.heading}</p>
-                    )}
-
-                    {linked ? (
-                      <ul className="border-t border-line">
-                        {linked.map((project) => (
-                          <li key={project.url}>
-                            <TrackedLink
-                              className="home-row-link grid-cols-[minmax(0,1fr)_0.875rem] gap-x-6 py-3"
-                              href={addQueryParams(project.url, UTM_PARAMS)}
-                              target="_blank"
-                              rel="noopener"
-                              event={ANALYTICS_EVENTS.DESCRIPTION_LINK_CLICK}
-                              eventProperties={{
-                                section: ANALYTICS_SECTIONS.EDUCATION,
-                                url: project.url,
-                              }}
-                            >
-                              <span>
-                                <span className="block text-sm font-medium">
-                                  {project.name}
-                                </span>
-                                <span className="mt-1 block text-[0.8125rem]/normal text-pretty text-(color:--ink-72)">
-                                  {project.description}
-                                </span>
-                              </span>
-                              <IconArrowUpRight
-                                className="home-row-arrow self-start"
-                                aria-hidden
-                              />
-                            </TrackedLink>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className="home-prose">
-                        <MarkdownLinkPreview eventProperties={eventProperties}>
-                          {toMarkdownList(section.items)}
-                        </MarkdownLinkPreview>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </ShowMore>
-        )}
-      </div>
-
-      {item.skills && item.skills.length > 0 && (
-        <ul className="mt-auto flex flex-wrap gap-1.5">
-          {item.skills.map((skill) => (
-            <li key={skill} className="home-chip">
-              {skill}
-            </li>
-          ))}
-        </ul>
+    <div>
+      {summary && summary.items.length > 0 && (
+        <div className="home-prose">
+          <MarkdownLinkPreview eventProperties={eventProperties}>
+            {toMarkdownList(summary.items.slice(0, 1))}
+          </MarkdownLinkPreview>
+        </div>
       )}
-    </article>
+
+      {(hiddenBullets.length > 0 || details.length > 0) && (
+        <ShowMore
+          label="Show details"
+          openEvent={ANALYTICS_EVENTS.EDUCATION_OPENED}
+          closeEvent={ANALYTICS_EVENTS.EDUCATION_CLOSED}
+          eventProperties={eventProperties}
+        >
+          <div className="pt-2">
+            {hiddenBullets.length > 0 && (
+              <div className="home-prose">
+                <MarkdownLinkPreview eventProperties={eventProperties}>
+                  {toMarkdownList(hiddenBullets)}
+                </MarkdownLinkPreview>
+              </div>
+            )}
+
+            {details.map((section) => {
+              const linked = parseLinkedItems(section.items);
+
+              return (
+                <div key={section.heading} className="mt-6">
+                  {section.heading && (
+                    <p className="home-mono-label mb-3">{section.heading}</p>
+                  )}
+
+                  {linked ? (
+                    <ul className="flex flex-col gap-0.5">
+                      {linked.map((project) => (
+                        <li key={project.url}>
+                          <TrackedLink
+                            className="home-row-link home-row-soft grid-cols-[minmax(0,1fr)_0.875rem] gap-x-6 px-3 py-3"
+                            href={addQueryParams(project.url, UTM_PARAMS)}
+                            target="_blank"
+                            rel="noopener"
+                            event={ANALYTICS_EVENTS.DESCRIPTION_LINK_CLICK}
+                            eventProperties={{
+                              section: ANALYTICS_SECTIONS.EDUCATION,
+                              url: project.url,
+                            }}
+                          >
+                            <span>
+                              <span className="block text-sm font-medium">
+                                {project.name}
+                              </span>
+                              <span className="mt-1 block text-[0.8125rem]/normal text-pretty text-(color:--ink-72)">
+                                {project.description}
+                              </span>
+                            </span>
+                            <IconArrowUpRight
+                              className="home-row-arrow self-start"
+                              aria-hidden
+                            />
+                          </TrackedLink>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="home-prose">
+                      <MarkdownLinkPreview eventProperties={eventProperties}>
+                        {toMarkdownList(section.items)}
+                      </MarkdownLinkPreview>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </ShowMore>
+      )}
+    </div>
   );
 }

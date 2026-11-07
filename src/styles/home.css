@@ -977,6 +977,115 @@ html.dark:has(.home) {
   line-height: 1;
 }
 
+/* Education: years on a rail, end above start, with a dot per school. */
+.home-edu-timeline {
+  padding: 2.5rem 1.5rem;
+}
+
+.home-edu-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  padding-bottom: 3rem;
+}
+
+.home-edu-step:last-child {
+  padding-bottom: 0;
+}
+
+.home-edu-years {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--ink-40);
+}
+
+.home-edu-years > span:first-child {
+  color: var(--heat);
+}
+
+/* Narrow screens read the range left to right: start, then end. */
+@media (max-width: 63.999rem) {
+  .home-edu-years > span:nth-child(2) {
+    order: -1;
+  }
+
+  .home-edu-years > span:nth-child(2)::after {
+    content: " \2014";
+  }
+}
+
+.home-edu-body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+@media (min-width: 64rem) {
+  .home-edu-timeline {
+    padding: 3.5rem;
+  }
+
+  .home-edu-step {
+    grid-template-columns: 9rem 2.5rem minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .home-edu-years {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+    padding-right: 0.25rem;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .home-edu-years .home-mono-label {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+  }
+
+  /* The rail runs down the middle column; the dot sits level with the year. */
+  .home-edu-step::before {
+    content: "";
+    position: absolute;
+    top: 0.5rem;
+    bottom: -0.5rem;
+    left: calc(9rem + 1.25rem - 0.5px);
+    width: 1px;
+    background-image: linear-gradient(var(--line) 50%, transparent 50%);
+    background-size: 1px 6px;
+  }
+
+  .home-edu-step:last-child::before {
+    bottom: auto;
+    height: 100%;
+    mask-image: linear-gradient(black 60%, transparent);
+  }
+
+  .home-edu-step::after {
+    content: "";
+    position: absolute;
+    top: 0.4rem;
+    left: calc(9rem + 1.25rem - 5px);
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--heat);
+    border-radius: 9999px;
+    background-color: var(--paper);
+  }
+
+  .home-edu-body {
+    grid-column: 3;
+  }
+}
+
 /* Inset card: padding inside the frame, dashed guides along each edge running
    out to the rails, and a cross at each corner. */
 .home-inset {
@@ -1156,8 +1265,12 @@ html.dark:has(.home) {
 }
 
 .home-usecase[aria-pressed="true"] {
-  background-color: var(--heat-8);
-  box-shadow: inset 2px 0 0 var(--heat);
+  background-color: color-mix(
+    in srgb,
+    var(--tab-accent, var(--heat)) 8%,
+    transparent
+  );
+  box-shadow: inset 2px 0 0 var(--tab-accent, var(--heat));
 }
 
 .home-usecase-name {
@@ -1170,7 +1283,19 @@ html.dark:has(.home) {
 }
 
 .home-usecase[aria-pressed="true"] .home-usecase-name {
-  color: var(--heat);
+  color: var(--tab-accent, var(--heat));
+}
+
+/* A company can bring its own accent (`--company-accent`, set inline). With
+   brand colors off, every tab falls back to the monochrome accent. */
+.home-usecase,
+[id^="experience-panel-"] {
+  --tab-accent: var(--company-accent, var(--heat));
+}
+
+[data-brand-colors="false"] .home-usecase,
+[data-brand-colors="false"] [id^="experience-panel-"] {
+  --tab-accent: var(--heat);
 }
 
 .home-chip {
@@ -1194,6 +1319,16 @@ html.dark:has(.home) {
 
 .home-row-link:hover {
   background-color: var(--ink-4);
+}
+
+/* A softer row for lists inside cards: no rule, a rounded tint on hover. */
+.home-row-soft {
+  border-bottom: 0;
+  border-radius: 0.625rem;
+}
+
+.home-row-soft:hover {
+  background-color: var(--ink-6);
 }
 
 .home-row-link:hover .home-row-arrow {
@@ -1307,16 +1442,16 @@ html.dark:has(.home) {
 }
 
 /* Isometric mark beside the contribution graph: the same greys as on "/",
-   with faces in the panel color. Dark edges are a step brighter because the
-   panel is lighter than the page background on "/". */
+   with faces in the page color so the mark sits on the ground. Dark edges are
+   a step brighter so they read on the grey page. */
 .home-mark svg {
-  --yt-top: var(--surface);
-  --yt-side: var(--surface);
+  --yt-top: var(--paper);
+  --yt-side: var(--paper);
 }
 
 .dark .home-mark svg {
-  --pattern: color-mix(in srgb, var(--ink) 16%, var(--surface));
-  --stroke: color-mix(in srgb, var(--ink) 28%, var(--surface));
+  --pattern: color-mix(in srgb, var(--ink) 16%, var(--paper));
+  --stroke: color-mix(in srgb, var(--ink) 28%, var(--paper));
 }
 
 /* Captions engraved into the panel: a light edge below and a dark edge above
@@ -1325,7 +1460,7 @@ html.dark:has(.home) {
   position: relative;
   z-index: 1;
   margin: 0;
-  color: color-mix(in srgb, var(--ink) 34%, var(--surface));
+  color: color-mix(in srgb, var(--ink) 34%, var(--paper));
   font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1rem;

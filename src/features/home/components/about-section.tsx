@@ -129,14 +129,14 @@ export function AboutSection() {
 
       <div className="home-band">
         <div className="home-frame grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          <div className="min-w-0 bg-(--surface) lg:border-r lg:border-line">
+          <div className="min-w-0 lg:border-r lg:border-line">
             <h3 className="sr-only">GitHub Contributions</h3>
             <Suspense fallback={<ContributionFieldFallback />}>
               <ContributionField contributions={contributions} />
             </Suspense>
           </div>
 
-          <figure className="relative flex min-w-0 flex-col overflow-clip bg-(--surface) max-lg:border-t max-lg:border-line">
+          <figure className="relative flex min-w-0 flex-col overflow-clip max-lg:border-t max-lg:border-line">
             <figcaption className="home-engraved flex h-12 items-center justify-end px-5">
               <span className="home-brackets">
                 [ <span className="home-heat">FIG_001</span> ]

@@ -1,7 +1,8 @@
 import type { Experience } from "@/features/portfolio/types/experiences";
 
 import { cdn } from "@/utils/cdn";
-import { BriefcaseBusinessIcon, CodeXmlIcon } from "lucide-react";
+import { CodeXmlIcon } from "lucide-react";
+import { FreelanceIcon } from "@/features/portfolio/components/freelance-icon";
 
 export const EXPERIENCES: Experience[] = [
   {
@@ -97,7 +98,8 @@ Products I've built and maintain:
   {
     id: "freelance",
     companyName: "Freelance",
-    companyIcon: <BriefcaseBusinessIcon strokeWidth={1.8} />,
+    companyIcon: <FreelanceIcon />,
+    accentColor: "#4a89dc",
     positions: [
       {
         id: "1",

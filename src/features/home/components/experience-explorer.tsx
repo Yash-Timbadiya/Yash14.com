@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 export type ExperienceEntry = {
   id: string;
+  /** Overrides the selected tab's accent, e.g. to match a company icon. */
+  accent?: string;
   tab: React.ReactNode;
   panel: React.ReactNode;
 };
@@ -44,6 +46,13 @@ export function ExperienceExplorer({
               className="home-usecase scroll-mt-20"
               aria-pressed={active === entry.id}
               aria-controls={`experience-panel-${entry.id}`}
+              style={
+                entry.accent
+                  ? ({
+                      "--company-accent": entry.accent,
+                    } as React.CSSProperties)
+                  : undefined
+              }
               onClick={() => setActive(entry.id)}
             >
               {entry.tab}
@@ -57,6 +66,13 @@ export function ExperienceExplorer({
               key={entry.id}
               id={`experience-panel-${entry.id}`}
               hidden={active !== entry.id}
+              style={
+                entry.accent
+                  ? ({
+                      "--company-accent": entry.accent,
+                    } as React.CSSProperties)
+                  : undefined
+              }
             >
               {entry.panel}
             </div>
