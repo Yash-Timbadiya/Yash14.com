@@ -81,7 +81,19 @@ function sampleTerrain({ col, row, cols, rows, time, seed }: Sample) {
 }
 
 /** The YT mark, filled with shimmering characters. */
-function sampleMark({ col, row, cols, rows, time }: Sample) {
+const inMark = (x: number, y: number) =>
+  Boolean(MARK[Math.floor(y)]?.[Math.floor(x)]);
+
+/** Wraps into [0, length), for negative values too. */
+const wrap = (value: number, length: number) =>
+  ((value % length) + length) % length;
+
+/**
+ * The flat YT mark, with a bright diagonal band of light sweeping across it
+ * every few seconds. The seed offsets the sweep, so two marks never pulse
+ * together.
+ */
+function sampleMark({ col, row, cols, rows, time, seed }: Sample) {
   // Leaves a margin, so the mark never touches the edges of its panel.
   const unitX = Math.min(
     (cols * 0.8) / 6,
@@ -90,10 +102,17 @@ function sampleMark({ col, row, cols, rows, time }: Sample) {
   const unitY = (unitX * CHAR_WIDTH) / CHAR_HEIGHT;
   const left = (cols - unitX * 6) / 2;
   const top = (rows - unitY * 4) / 2;
-  const gridX = Math.floor((col - left) / unitX);
-  const gridY = Math.floor((row - top) / unitY);
-  if (!MARK[gridY]?.[gridX]) return 0;
-  return 0.3 + noise(col * 0.28, row * 0.42 + time * 0.8) * 0.7;
+  const x = (col - left) / unitX;
+  const y = (row - top) / unitY;
+
+  if (!inMark(x, y)) return 0;
+
+  const grain = noise(col * 0.28, row * 0.42 + time * 0.6);
+  // Distance from the sweep's centre line, which crosses the 6-unit-wide
+  // mark and then pauses off-screen before the next pass.
+  const sweep = wrap(x + y * 0.7 - time * 1.6 - seed * 2.3, 14) - 3;
+  const light = Math.max(0, 1 - Math.abs(sweep) / 1.1);
+  return Math.min(0.25 + grain * 0.45 + light * 0.6, 1);
 }
 
 const SAMPLERS: Record<AsciiVariant, (sample: Sample) => number> = {
