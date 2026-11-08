@@ -3,7 +3,10 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useRef } from "react";
 
-type AsciiVariant = "islands" | "terrain" | "mark";
+type AsciiVariant = "islands" | "terrain" | "fire" | "mark";
+
+/** Characters at least this bright use `--ascii-hot`, when the canvas sets it. */
+const HOT_VALUE = 0.62;
 
 const CHAR_WIDTH = 6.6;
 const CHAR_HEIGHT = 11;
@@ -80,7 +83,29 @@ function sampleTerrain({ col, row, cols, rows, time, seed }: Sample) {
   return Math.min(fill * 0.55 + noise(col * 0.3, row * 0.3 + time) * 0.3, 1);
 }
 
-/** The YT mark, filled with shimmering characters. */
+/**
+ * Flames licking up from the base, tallest towards both edges so the middle
+ * stays clear. Each column's height flickers on its own, the turbulence
+ * scrolls upwards, and a few embers drift off the tips.
+ */
+function sampleFire({ col, row, cols, rows, time, seed }: Sample) {
+  const edge = Math.abs((col / Math.max(cols - 1, 1)) * 2 - 1);
+  const flicker = noise(col * 0.18 + seed, time * 1.8);
+  const height = rows * (0.1 + edge ** 1.4 * 0.9) * (0.45 + flicker * 0.75);
+  const depth = rows - row;
+
+  if (depth > height) {
+    if (depth > height + rows * 0.35) return 0;
+    const ember = hash(col + seed * 13, Math.floor(row + time * 4));
+    return ember > 0.992 ? 0.2 : 0;
+  }
+
+  const heat = 1 - depth / height;
+  const rise = fbm(col * 0.16 + seed, row * 0.2 + time * 2.4);
+  const value = heat * 0.85 + (rise - 0.5) * 0.9;
+  return value < 0.12 ? 0 : Math.min(value, 1);
+}
+
 const inMark = (x: number, y: number) =>
   Boolean(MARK[Math.floor(y)]?.[Math.floor(x)]);
 
@@ -118,6 +143,7 @@ function sampleMark({ col, row, cols, rows, time, seed }: Sample) {
 const SAMPLERS: Record<AsciiVariant, (sample: Sample) => number> = {
   islands: sampleIslands,
   terrain: sampleTerrain,
+  fire: sampleFire,
   mark: sampleMark,
 };
 
@@ -158,8 +184,8 @@ export function AsciiField({
       const time = reduceMotion ? 0 : now / 1000;
 
       context.clearRect(0, 0, width, height);
+      const hot = styles.getPropertyValue("--ascii-hot").trim();
       context.font = `${FONT_SIZE}px ${styles.fontFamily}`;
-      context.fillStyle = styles.color;
       context.textBaseline = "top";
 
       for (let row = 0; row < rows; row++) {
@@ -167,7 +193,11 @@ export function AsciiField({
           const value = sampler({ col, row, cols, rows, time, seed });
           if (value <= 0) continue;
 
-          context.globalAlpha = 0.35 + value * 0.65;
+          const isHot = hot && value >= HOT_VALUE;
+          context.fillStyle = isHot ? hot : styles.color;
+          // The hot color is opaque, unlike the faded text color, so it is
+          // toned down to glow rather than shout.
+          context.globalAlpha = (0.35 + value * 0.65) * (isHot ? 0.55 : 1);
           context.fillText(
             RAMP[Math.min(Math.floor(value * RAMP.length), RAMP.length - 1)],
             col * CHAR_WIDTH,

@@ -54,13 +54,13 @@ export function HomeHero() {
   return (
     <section className="@container relative">
       {/* `--cell` is one of the twelve columns between the rails. */}
-      <div className="relative [--cell:calc(min(100cqw_-_1.25rem,80rem)/12)] lg:h-[calc(var(--cell)*5)] lg:overflow-hidden">
+      <div className="relative [--cell:calc(min(100cqw-1.25rem,80rem)/12)] lg:h-[calc(var(--cell)*5)] lg:overflow-hidden">
         <HeroCells />
         {/* Sits low on both sides of the clear space. */}
         <AsciiField
-          variant="terrain"
+          variant="fire"
           seed={3}
-          className="absolute top-[calc(var(--cell)*2.4)] bottom-0 left-1/2 z-0 h-[calc(var(--cell)*2.6)] w-[calc(var(--cell)*8)] -translate-x-1/2 text-ink/24 mask-[linear-gradient(to_top,black_40%,transparent)] max-lg:hidden"
+          className="absolute top-[calc(var(--cell)*2.4)] bottom-0 left-1/2 z-0 h-[calc(var(--cell)*2.6)] w-[calc(var(--cell)*8)] -translate-x-1/2 text-ink/24 [--ascii-hot:var(--heat)] mask-[linear-gradient(to_top,black_40%,transparent)] max-lg:hidden"
         />
 
         <span
@@ -105,7 +105,7 @@ export function HomeHero() {
           <div
             className={cn(
               RISE,
-              "inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-hairline-strong bg-surface pr-3 pl-[0.4375rem] text-[0.9375rem] font-medium",
+              "inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-hairline-strong bg-surface pr-3 pl-1.75 text-[0.9375rem] font-medium",
             )}
             style={rise(0)}
           >
@@ -135,7 +135,7 @@ export function HomeHero() {
           <h1
             className={cn(
               RISE,
-              "mt-5 text-[clamp(1.75rem,8.4vw,4rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance *:whitespace-nowrap sm:tracking-[-0.024em] lg:mt-4 lg:text-[length:calc(var(--cell)*0.6)]",
+              "mt-5 text-[clamp(1.75rem,8.4vw,4rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance *:whitespace-nowrap sm:tracking-[-0.024em] lg:mt-4 lg:text-[calc(var(--cell)*0.6)]",
             )}
             style={rise(1)}
           >
