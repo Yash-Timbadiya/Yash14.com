@@ -5,8 +5,11 @@ const ROWS = 5;
 /** Sixteen wide, minus the eight by four clear space behind the copy. */
 const CELL_COUNT = COLUMNS * ROWS - 8 * 4;
 
-/** Cell indexes that show flickering pixels instead of a dot. */
-const PIXEL_CELLS = new Set([11, 13, 22, 36, 41]);
+/**
+ * Cell indexes that show flickering pixels instead of a dot. Kept off the
+ * cells under the corner tags (2 and 13), so the labels stay readable.
+ */
+const PIXEL_CELLS = new Set([11, 22, 36, 41]);
 
 const CELL = "grid place-items-center rounded-lg bg-paper";
 
