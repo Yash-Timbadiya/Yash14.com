@@ -50,11 +50,20 @@ type Sample = {
 };
 
 /**
- * Sparse clouds drifting sideways across the panel (about two characters a
- * second) while slowly changing shape.
+ * Sparse clouds that wander: the drift swings left and right and up and down
+ * on two slow, out-of-step waves, so they never just slide one way.
  */
 function sampleIslands({ col, row, time, seed }: Sample) {
-  const value = fbm(col * 0.05 + seed - time * 0.1, row * 0.11 + time * 0.05);
+  const driftX = Math.sin(time * 0.11 + seed) * 1.4;
+  const driftY = Math.cos(time * 0.07 + seed * 2) * 0.6;
+  const body = fbm(
+    col * 0.05 + seed + driftX,
+    row * 0.11 + driftY + time * 0.02,
+  );
+  // A finer layer flowing against the drift, so edges keep billowing and the
+  // shapes change all the time rather than only shifting.
+  const billow = noise(col * 0.12 - time * 0.35, row * 0.24 + time * 0.25);
+  const value = body * 0.72 + billow * 0.28;
   return value < 0.52 ? 0 : (value - 0.52) / 0.48;
 }
 
