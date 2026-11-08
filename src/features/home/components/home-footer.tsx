@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { AsciiField } from "./ascii-field";
+import { UTM_PARAMS } from "@/config/site";
 import { addQueryParams } from "@/utils/url";
 import { YTMark } from "@/components/yt-mark";
 import packageJson from "../../../../package.json";
 import { USER } from "@/features/portfolio/data/user";
 import { TrackedLink } from "@/components/tracked-link";
 import { ChevronRight, ExternalArrow } from "./hover-arrow";
-import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { SiteFooterLinks } from "@/components/site-footer-links";
-import { SOURCE_CODE_GITHUB_URL, UTM_PARAMS } from "@/config/site";
 import { SiteFooterDetails } from "@/components/site-footer-details";
+import { ANALYTICS_EVENTS, ANALYTICS_SECTIONS } from "@/lib/analytics-events";
 import { SiteFooterInteractiveLogotype } from "@/components/site-footer-brand";
 import { SOCIAL_ICONS } from "@/features/portfolio/components/social-link-icons";
 import {
@@ -28,7 +28,6 @@ import {
 } from "@/features/home/lib/styles";
 import {
   IconBookmarkFilled,
-  IconCode,
   IconFileTextFilled,
   IconFlameFilled,
   IconPaletteFilled,
@@ -47,10 +46,11 @@ const INSPIRED_BY = [
   "shadcncraft",
 ];
 
+const CV_URL = "https://cv.yash14.com";
+
 const SITE_LINKS = [
   { title: "Roast My Site", href: "/roast", icon: IconFlameFilled },
   { title: "Bookmarks", href: "/bookmarks", icon: IconBookmarkFilled },
-  { title: "CV", href: "/cv", icon: IconFileTextFilled },
   {
     title: "Brand guidelines",
     href: "/brand-guidelines",
@@ -104,60 +104,65 @@ export function HomeFooter() {
             />
           </div>
 
-          <ul className="grid min-w-0 content-start sm:grid-cols-2">
-            {SOCIAL_LINKS.map((item) => (
-              <li
-                key={item.name}
-                className="sm:even:border-l sm:even:border-line"
-              >
+          {/* Outbound links in the left column, pages on this site in the right. */}
+          <div className="grid min-w-0 content-start sm:grid-cols-2">
+            <ul>
+              {SOCIAL_LINKS.map((item) => (
+                <li key={item.name}>
+                  <TrackedLink
+                    className={FOOTER_ROW}
+                    href={addQueryParams(item.href, UTM_PARAMS)}
+                    target="_blank"
+                    rel="noopener"
+                    event={SOCIAL_REDIRECT_EVENTS[item.name]}
+                    eventProperties={{
+                      section: ANALYTICS_SECTIONS.FOOTER,
+                      url: item.href,
+                    }}
+                  >
+                    {SOCIAL_ICONS[item.name]}
+                    <span className="truncate text-sm" title={item.handle}>
+                      {item.title}
+                    </span>
+                    <ExternalArrow className={ROW_ARROW} />
+                  </TrackedLink>
+                </li>
+              ))}
+              <li>
                 <TrackedLink
                   className={FOOTER_ROW}
-                  href={addQueryParams(item.href, UTM_PARAMS)}
+                  href={CV_URL}
                   target="_blank"
                   rel="noopener"
-                  event={SOCIAL_REDIRECT_EVENTS[item.name]}
+                  event={ANALYTICS_EVENTS.VIEW_CV}
                   eventProperties={{
                     section: ANALYTICS_SECTIONS.FOOTER,
-                    url: item.href,
+                    url: CV_URL,
                   }}
                 >
-                  {SOCIAL_ICONS[item.name]}
-                  <span className="truncate text-sm" title={item.handle}>
-                    {item.title}
-                  </span>
+                  <IconFileTextFilled aria-hidden />
+                  <span className="truncate text-sm">CV</span>
                   <ExternalArrow className={ROW_ARROW} />
                 </TrackedLink>
               </li>
-            ))}
-            <li className="sm:even:border-l sm:even:border-line">
-              <a
-                className={FOOTER_ROW}
-                href={SOURCE_CODE_GITHUB_URL}
-                target="_blank"
-                rel="noopener"
-              >
-                <IconCode aria-hidden />
-                <span className="truncate text-sm">Source code</span>
-                <ExternalArrow className={ROW_ARROW} />
-              </a>
-            </li>
-            {SITE_LINKS.map((link) => {
-              const Icon = link.icon;
+            </ul>
 
-              return (
-                <li
-                  key={link.href}
-                  className="sm:even:border-l sm:even:border-line"
-                >
-                  <Link className={FOOTER_ROW} href={link.href}>
-                    <Icon aria-hidden />
-                    <span className="truncate text-sm">{link.title}</span>
-                    <ChevronRight className={ROW_ARROW} />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+            <ul className="sm:border-l sm:border-line">
+              {SITE_LINKS.map((link) => {
+                const Icon = link.icon;
+
+                return (
+                  <li key={link.href}>
+                    <Link className={FOOTER_ROW} href={link.href}>
+                      <Icon aria-hidden />
+                      <span className="truncate text-sm">{link.title}</span>
+                      <ChevronRight className={ROW_ARROW} />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       </div>
 
