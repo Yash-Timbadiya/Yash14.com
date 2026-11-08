@@ -68,7 +68,7 @@
 
   --animate-rise: rise 800ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
   --animate-marquee: marquee 60s linear infinite;
-  --animate-pixel: pixel 3.6s steps(1) infinite;
+  --animate-morph: morph 5s cubic-bezier(0.8, 0, 0.2, 1) infinite;
   --animate-spark: spark 5s ease-in-out infinite;
 
   @keyframes rise {
@@ -84,22 +84,28 @@
     }
   }
 
-  /* A pixel lights up in the accent, cools through a brighter ink and
-     settles back; steps(1) keeps each tone a hard, pixel-like cut. */
-  @keyframes pixel {
+  /* One square splits into a shape, holds it, collapses into a dot, then
+     grows back into the square. Every piece of the shape stacks on the
+     centre at the start and end, so together they read as one square.
+     Each piece sets its offset (--x, --y), its scales as the square
+     (--sx0, --sy0) and as the dot (--dx, --dy); --u is the grid unit. */
+  @keyframes morph {
     0%,
-    30%,
+    10%,
     100% {
-      background-color: color-mix(in oklab, var(--ink) 12%, transparent);
+      transform: translate(-50%, -50%) scale(var(--sx0), var(--sy0));
     }
-    6% {
-      background-color: var(--heat);
+    22%,
+    58% {
+      transform: translate(
+          calc(-50% + var(--x) * var(--u)),
+          calc(-50% + var(--y) * var(--u))
+        )
+        scale(1);
     }
-    14% {
-      background-color: color-mix(in oklab, var(--heat) 45%, transparent);
-    }
-    22% {
-      background-color: color-mix(in oklab, var(--ink) 32%, transparent);
+    68%,
+    80% {
+      transform: translate(-50%, -50%) scale(var(--dx), var(--dy));
     }
   }
 
@@ -664,4 +670,112 @@ html:has(.home) {
 
 html.dark:has(.home) {
   background-color: #0e0e0e;
+}
+
+/* The hero's branching tree (see `hero-cells.tsx`), on a 6s loop. Each
+   node and link sets its value for every stage (--x0 to --x3 and so on);
+   these registered numbers carry the current one, so they can animate
+   between stages and drive size, position and the ticks around a node. */
+@property --hx {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --hy {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --hs {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --lx {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ly {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --la {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ll {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes tree-node {
+  0%,
+  8%,
+  86%,
+  100% {
+    --hx: var(--x0);
+    --hy: var(--y0);
+    --hs: var(--s0);
+  }
+  18%,
+  26% {
+    --hx: var(--x1);
+    --hy: var(--y1);
+    --hs: var(--s1);
+  }
+  36%,
+  44% {
+    --hx: var(--x2);
+    --hy: var(--y2);
+    --hs: var(--s2);
+  }
+  54%,
+  72% {
+    --hx: var(--x3);
+    --hy: var(--y3);
+    --hs: var(--s3);
+  }
+}
+
+@keyframes tree-link {
+  0%,
+  8%,
+  86%,
+  100% {
+    --lx: var(--lx0);
+    --ly: var(--ly0);
+    --la: var(--la0);
+    --ll: var(--ll0);
+  }
+  18%,
+  26% {
+    --lx: var(--lx1);
+    --ly: var(--ly1);
+    --la: var(--la1);
+    --ll: var(--ll1);
+  }
+  36%,
+  44% {
+    --lx: var(--lx2);
+    --ly: var(--ly2);
+    --la: var(--la2);
+    --ll: var(--ll2);
+  }
+  54%,
+  72% {
+    --lx: var(--lx3);
+    --ly: var(--ly3);
+    --la: var(--la3);
+    --ll: var(--ll3);
+  }
 }
