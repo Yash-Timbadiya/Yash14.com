@@ -192,7 +192,10 @@ function BrandMenuItem({
   return (
     <ContextMenuItem
       {...props}
-      className={cn("bg-transparent focus:bg-transparent", className)}
+      className={cn(
+        "bg-transparent focus:bg-transparent [&_svg]:transition-colors [&_svg]:duration-150 focus:[&_svg]:text-foreground brand:focus:[&_svg]:text-[#ff4d00]",
+        className,
+      )}
       onPointerEnter={handleActivate}
       onFocus={handleActivate}
     >

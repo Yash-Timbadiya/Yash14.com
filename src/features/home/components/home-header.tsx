@@ -18,13 +18,6 @@ const BrandContextMenu = dynamic(
 
 const CommandMenu = dynamic(() => import("@/components/command-menu"));
 
-const SECTION_LINKS = [
-  { title: "Hello", href: "/#hello" },
-  { title: "Stack", href: "/#stack" },
-  { title: "Experience", href: "/#experience" },
-  { title: "Education", href: "/#education" },
-];
-
 export function AnnouncementBar() {
   return (
     <div className={cn(FRAME, "p-3 pb-2.5")}>
@@ -61,16 +54,6 @@ export function HomeHeader() {
         </span>
 
         <div className="mx-auto flex items-center gap-1">
-          <nav
-            className="flex items-center gap-1 max-xl:hidden"
-            aria-label="Sections"
-          >
-            {SECTION_LINKS.map((link) => (
-              <a key={link.href} href={link.href}>
-                {link.title}
-              </a>
-            ))}
-          </nav>
           <NavDesktop items={MAIN_NAV} />
         </div>
 
