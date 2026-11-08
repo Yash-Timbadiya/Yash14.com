@@ -21,14 +21,19 @@ export type BrandColor = {
 /** A color sample over its values, each one click to copy. */
 export function ColorSwatch({ color }: { color: BrandColor }) {
   return (
-    <article className="flex min-w-0 flex-col">
+    <article className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-hairline">
       <div
         className={cn(
-          "flex h-40 items-end p-5 text-lg font-medium tracking-[-0.012em]",
+          "flex h-44 flex-col justify-between p-5",
           color.sampleClassName,
         )}
       >
-        {color.name}
+        <span className="text-lg font-medium tracking-[-0.012em]">
+          {color.name}
+        </span>
+        <span className="font-mono text-[0.8125rem] tracking-normal uppercase opacity-72">
+          {color.hex}
+        </span>
       </div>
 
       <p className="px-5 pt-4 text-[0.8125rem]/normal text-pretty text-ink/72">
@@ -78,7 +83,10 @@ function ColorValue({
           <span className="min-w-0 flex-1 truncate font-mono text-[0.8125rem] tracking-normal tabular-nums">
             {value}
           </span>
-          <span className="text-ink/40 transition-colors group-hover/value:text-ink [&_svg]:size-3.5">
+          <span className="inline-flex items-center gap-1.5 text-ink/40 transition-colors group-hover/value:text-heat [&_svg]:size-3.5">
+            <span className="font-mono text-xs tracking-normal opacity-0 transition-opacity group-hover/value:opacity-100 max-sm:hidden">
+              Copy
+            </span>
             <CopyStateIcon state={state} />
           </span>
         </button>

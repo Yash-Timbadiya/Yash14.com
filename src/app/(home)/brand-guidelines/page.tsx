@@ -76,9 +76,21 @@ const SECTIONS = [
 
 /** How the logos sit on each brand color. Fixed values, so they read the same in either theme. */
 const TILES = [
-  { name: "Heat on Paper", className: "bg-[#f9f9f9] text-[#ff5400]" },
-  { name: "Ink on Paper", className: "bg-[#f9f9f9] text-[#262626]" },
-  { name: "Paper on Ink", className: "bg-[#262626] text-[#f9f9f9]" },
+  {
+    name: "Heat on Paper",
+    className: "bg-[#f9f9f9] text-[#ff5400]",
+    swatches: ["#ff5400", "#f9f9f9"],
+  },
+  {
+    name: "Ink on Paper",
+    className: "bg-[#f9f9f9] text-[#262626]",
+    swatches: ["#262626", "#f9f9f9"],
+  },
+  {
+    name: "Paper on Ink",
+    className: "bg-[#262626] text-[#f9f9f9]",
+    swatches: ["#f9f9f9", "#262626"],
+  },
 ] as const;
 
 const COLORS: BrandColor[] = [
@@ -180,15 +192,17 @@ export default function BrandPage() {
         id="mark"
         title="Mark"
         description="The YT mark on its own. Use it where space is square or tight: avatars, favicons and small placements. Do not stretch, rotate or recolor it beyond the tiles shown."
+        actions={
+          <AssetActions
+            type="mark"
+            href={MARK_ASSET}
+            event={ANALYTICS_EVENTS.DOWNLOAD_MARK_SVG}
+          />
+        }
       >
         <LogoTiles>
           <YTMark className="h-14 w-auto" />
         </LogoTiles>
-        <AssetActions
-          type="mark"
-          href={MARK_ASSET}
-          event={ANALYTICS_EVENTS.DOWNLOAD_MARK_SVG}
-        />
       </BrandSection>
 
       <BrandSection
@@ -196,15 +210,17 @@ export default function BrandPage() {
         id="logotype"
         title="Logotype"
         description="The primary logo for most placements, with the name set beside the mark. Keep its proportions and give it room to breathe."
+        actions={
+          <AssetActions
+            type="logotype"
+            href={LOGOTYPE_ASSET}
+            event={ANALYTICS_EVENTS.DOWNLOAD_LOGOTYPE_SVG}
+          />
+        }
       >
         <LogoTiles>
           <YTWordmark className="h-7 w-auto max-w-full" />
         </LogoTiles>
-        <AssetActions
-          type="logotype"
-          href={LOGOTYPE_ASSET}
-          event={ANALYTICS_EVENTS.DOWNLOAD_LOGOTYPE_SVG}
-        />
       </BrandSection>
 
       <BrandSection
@@ -227,7 +243,7 @@ export default function BrandPage() {
         title="Color"
         description="Heat carries the identity; Ink and Paper give it a calm, neutral stage. Click any value to copy it."
       >
-        <div className="grid divide-hairline max-md:divide-y md:grid-cols-3 md:divide-x">
+        <div className="grid gap-3 p-3 sm:p-4 md:grid-cols-3 lg:gap-4 lg:p-6">
           {COLORS.map((color) => (
             <ColorSwatch key={color.name} color={color} />
           ))}
@@ -237,18 +253,23 @@ export default function BrandPage() {
   );
 }
 
-/** A numbered section: its title and guidance on the left, the assets on the right. */
+/**
+ * A numbered section: a full-width heading row (title and guidance, with the
+ * section's downloads on the right), then its assets across the frame.
+ */
 function BrandSection({
   index,
   id,
   title,
   description,
+  actions,
   children,
 }: {
   index: number;
   id: string;
   title: string;
   description: string;
+  actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -257,10 +278,10 @@ function BrandSection({
         <div
           className={cn(
             FRAME,
-            "grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]",
+            "flex flex-col gap-6 px-6 py-10 lg:flex-row lg:items-end lg:justify-between lg:gap-12 lg:px-14 lg:py-14",
           )}
         >
-          <div className="flex flex-col gap-3 px-6 py-8 max-lg:border-b max-lg:border-hairline lg:border-r lg:border-hairline lg:px-10 lg:py-12">
+          <div className="flex max-w-xl flex-col gap-3">
             <span className={cn(MONO_LABEL, "text-ink/24")}>
               [{" "}
               <span className="text-heat">
@@ -270,7 +291,7 @@ function BrandSection({
             </span>
             <h2
               id={`${id}-title`}
-              className="text-[1.5rem]/tight font-medium tracking-[-0.016em]"
+              className="text-[clamp(1.75rem,3vw,2.25rem)]/[1.1] font-medium tracking-[-0.022em]"
             >
               {title}
             </h2>
@@ -278,30 +299,49 @@ function BrandSection({
               {description}
             </p>
           </div>
-          <div className="flex min-w-0 flex-col">{children}</div>
+          {actions && <div className="shrink-0">{actions}</div>}
         </div>
+      </div>
+      <div className={BAND}>
+        <div className={cn(FRAME, "flex min-w-0 flex-col")}>{children}</div>
       </div>
     </section>
   );
 }
 
-/** The logo on each brand color; right-click any tile to copy or download. */
+/**
+ * The logo on each brand color, as cards: a preview over a caption naming the
+ * pairing and its two colors. Right-click any card to copy or download.
+ */
 function LogoTiles({ children }: { children: React.ReactNode }) {
   return (
     <BrandContextMenu section={SECTION}>
-      <ul className="grid flex-1 divide-hairline max-sm:divide-y sm:grid-cols-3 sm:divide-x">
+      <ul className="grid gap-3 p-3 sm:grid-cols-3 sm:p-4 lg:gap-4 lg:p-6">
         {TILES.map((tile) => (
           <li
             key={tile.name}
-            className={cn(
-              "relative flex min-h-48 items-center justify-center px-8 py-12",
-              tile.className,
-            )}
+            className="overflow-hidden rounded-xl border border-hairline"
           >
-            <span className="absolute top-3 left-4 font-mono text-[0.6875rem] tracking-normal uppercase opacity-60">
-              {tile.name}
-            </span>
-            {children}
+            <div
+              className={cn(
+                "flex aspect-[4/3] items-center justify-center px-8",
+                tile.className,
+              )}
+            >
+              {children}
+            </div>
+            <div className="flex items-center justify-between gap-3 border-t border-hairline px-4 py-3">
+              <span className="text-[0.8125rem] font-medium">{tile.name}</span>
+              <span className="flex -space-x-1" aria-hidden>
+                {tile.swatches.map((swatch) => (
+                  <span
+                    key={swatch}
+                    className="size-3.5 rounded-full ring-1 ring-hairline-strong"
+                    style={{ backgroundColor: swatch }}
+                  />
+                ))}
+              </span>
+            </div>
           </li>
         ))}
       </ul>
@@ -321,23 +361,25 @@ function AssetActions({
     | typeof ANALYTICS_EVENTS.DOWNLOAD_LOGOTYPE_SVG;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 border-t border-hairline px-4 py-3 lg:px-6">
-      <TrackedLink
-        className={cn(BTN, BTN_SOFT, "h-9 px-3")}
-        href={href}
-        download
-        event={event}
-        eventProperties={{
-          section: SECTION,
-          source: ANALYTICS_SOURCES.ASSET_BUTTONS,
-          url: href,
-        }}
-      >
-        <IconDownload aria-hidden />
-        SVG
-      </TrackedLink>
-      <CopyBrandSvgButton type={type} />
-      <span className={cn(MONO_LABEL, "ml-auto max-sm:hidden")}>
+    <div className="flex flex-col gap-2.5 lg:items-end">
+      <div className="flex flex-wrap items-center gap-2">
+        <TrackedLink
+          className={cn(BTN, BTN_SOFT, "h-9 px-3")}
+          href={href}
+          download
+          event={event}
+          eventProperties={{
+            section: SECTION,
+            source: ANALYTICS_SOURCES.ASSET_BUTTONS,
+            url: href,
+          }}
+        >
+          <IconDownload aria-hidden />
+          SVG
+        </TrackedLink>
+        <CopyBrandSvgButton type={type} />
+      </div>
+      <span className={cn(MONO_LABEL, "max-sm:hidden")}>
         Right-click a tile for more
       </span>
     </div>
