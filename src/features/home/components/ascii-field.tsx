@@ -49,10 +49,13 @@ type Sample = {
   seed: number;
 };
 
-/** Sparse landmasses that drift slowly. */
+/**
+ * Sparse clouds drifting sideways across the panel (about two characters a
+ * second) while slowly changing shape.
+ */
 function sampleIslands({ col, row, time, seed }: Sample) {
-  const value = fbm(col * 0.05 + seed, row * 0.11 + time * 0.03);
-  return value < 0.6 ? 0 : (value - 0.6) / 0.4;
+  const value = fbm(col * 0.05 + seed - time * 0.1, row * 0.11 + time * 0.05);
+  return value < 0.52 ? 0 : (value - 0.52) / 0.48;
 }
 
 /** A ridge line, rising towards both edges and denser towards its base. */
