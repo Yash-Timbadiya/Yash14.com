@@ -15,8 +15,8 @@ export const EDUCATION: Education[] = [
 - Turned academic learning into production experience by starting professional full-stack development work before graduation.
 
 Selected projects:
-- [Plura](https://github.com/Yash-Timbadiya/Plura) - Built a multi-tenant SaaS platform with a drag-and-drop website and funnel builder, agency and sub-account management, Stripe subscriptions and Connect payments, dashboards, and a Kanban project board.
-- [Community](https://github.com/Yash-Timbadiya/Community) - Built a real-time community platform with customizable channels, direct messaging, file attachments, audio and video calls, roles, invitations, and responsive light and dark interfaces.
+- [Plura](https://github.com/Yash-Timbadiya/Plura) - Multi-tenant SaaS with a drag-and-drop funnel builder and Stripe payments.
+- [Community](https://github.com/Yash-Timbadiya/Community) - Real-time community app with channels, DMs, and audio and video calls.
 
 Achievements:
 - Built and shipped custom business websites and e-commerce experiences while completing the degree.

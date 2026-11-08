@@ -29,12 +29,18 @@ import {
 } from "@/features/home/lib/styles";
 
 /**
- * One school on the timeline. On wide screens a dashed rail runs down the
- * middle column (fading out after the last school) with a ring level with the
- * end year.
+ * One school on the timeline. A dashed rail (fading out after the last school)
+ * with a ring level with the dates: down the left edge on narrow screens, down
+ * the middle column on wide ones.
  */
-const TIMELINE_STEP =
-  "relative grid grid-cols-[minmax(0,1fr)] gap-4 pb-12 last:pb-0 lg:grid-cols-[9rem_2.5rem_minmax(0,1fr)] lg:gap-0 lg:before:absolute lg:before:top-2 lg:before:-bottom-2 lg:before:left-[calc(9rem+1.25rem-0.5px)] lg:before:w-px lg:before:bg-[linear-gradient(var(--line)_50%,transparent_50%)] lg:before:bg-size-[1px_6px] lg:last:before:bottom-auto lg:last:before:h-full lg:last:before:mask-[linear-gradient(black_60%,transparent)] lg:after:absolute lg:after:top-[0.4rem] lg:after:left-[calc(9rem+1.25rem-5px)] lg:after:size-2.5 lg:after:rounded-full lg:after:border-2 lg:after:border-heat lg:after:bg-paper";
+const TIMELINE_STEP = [
+  "relative grid grid-cols-[minmax(0,1fr)] gap-3 pb-10 pl-7 last:pb-0 lg:grid-cols-[9rem_2.5rem_minmax(0,1fr)] lg:gap-0 lg:pb-12 lg:pl-0",
+  "before:absolute before:top-2 before:-bottom-2 before:left-[calc(0.3125rem-0.5px)] before:w-px before:bg-[linear-gradient(var(--line)_50%,transparent_50%)] before:bg-size-[1px_6px] last:before:bottom-auto last:before:h-full last:before:mask-[linear-gradient(black_60%,transparent)] lg:before:left-[calc(9rem+1.25rem-0.5px)]",
+  "after:absolute after:top-[0.3rem] after:left-0 after:size-2.5 after:rounded-full after:border-2 after:border-heat after:bg-paper lg:after:top-[0.4rem] lg:after:left-[calc(9rem+1.25rem-5px)]",
+].join(" ");
+
+/** Badges shown on phones before the rest collapse into a "+N" chip. */
+const PHONE_SKILLS = 4;
 
 export function EducationSection() {
   return (
@@ -53,25 +59,35 @@ export function EducationSection() {
       />
 
       <div className={BAND}>
-        <ol className={cn(FRAME, "px-6 py-10 lg:p-14")}>
+        <ol className={cn(FRAME, "px-5 py-8 sm:px-6 sm:py-10 lg:p-14")}>
           {EDUCATION.map((item) => (
             <li key={item.id} className={TIMELINE_STEP}>
               {/* Wide screens stack end over start beside the rail; narrow
                   ones read the range left to right: start, then end. */}
-              <div className="flex items-baseline gap-2 font-mono text-[0.875rem] text-ink/40 lg:flex-col lg:items-end lg:gap-1 lg:pr-1 lg:text-[1.5rem]/[1.1] lg:tracking-[-0.02em]">
+              <div className="flex items-baseline gap-2 font-mono text-[0.8125rem] text-ink/40 lg:flex-col lg:items-end lg:gap-1 lg:pr-1 lg:text-[1.5rem]/[1.1] lg:tracking-[-0.02em]">
                 <span className="text-heat">{yearOf(item.period.end)}</span>
                 <span className="max-lg:order-first">
                   {yearOf(item.period.start)}
                   <span className="lg:hidden">{" —"}</span>
                 </span>
-                <span className={cn(MONO_LABEL, "lg:mt-2")}>
+                <span
+                  className={cn(
+                    MONO_LABEL,
+                    "max-lg:before:mr-2 max-lg:before:content-['/'] lg:mt-2",
+                  )}
+                >
                   {duration(item.period)}
                 </span>
               </div>
-              <div className="flex min-w-0 flex-col gap-5 lg:col-start-3">
+              <div className="flex min-w-0 flex-col gap-4 lg:col-start-3 lg:gap-5">
                 <h3 className={FEATURE_TEXT}>
-                  <strong>{item.school}.</strong>{" "}
-                  {[item.degree, item.fieldOfStudy].filter(Boolean).join(", ")}.
+                  <strong className="max-lg:block">{item.school}.</strong>{" "}
+                  <span className="max-lg:mt-1 max-lg:block max-lg:text-[0.9375rem]/[1.45]">
+                    {[item.degree, item.fieldOfStudy]
+                      .filter(Boolean)
+                      .join(", ")}
+                    .
+                  </span>
                 </h3>
                 <EducationNotes item={item} />
                 <Skills skills={item.skills} />
@@ -109,16 +125,24 @@ function Skills({ skills }: { skills?: string[] }) {
   if (!skills?.length) return null;
   return (
     <ul className="flex flex-wrap gap-1.5">
-      {skills.map((skill) => (
-        <li key={skill} className={CHIP}>
+      {skills.map((skill, index) => (
+        <li
+          key={skill}
+          className={cn(CHIP, index >= PHONE_SKILLS && "max-sm:hidden")}
+        >
           {skill}
         </li>
       ))}
+      {skills.length > PHONE_SKILLS && (
+        <li className={cn(CHIP, "text-ink/40 sm:hidden")}>
+          +{skills.length - PHONE_SKILLS}
+        </li>
+      )}
     </ul>
   );
 }
 
-/** The first bullet, with the rest of the description behind "Show details". */
+/** The whole description, collapsed behind "Show details". */
 export function EducationNotes({ item }: { item: Education }) {
   const eventProperties = {
     section: ANALYTICS_SECTIONS.EDUCATION,
@@ -127,18 +151,10 @@ export function EducationNotes({ item }: { item: Education }) {
   const [summary, ...details] = item.description
     ? parseDescription(item.description)
     : [];
-  const hiddenBullets = summary?.items.slice(1) ?? [];
+  const hiddenBullets = summary?.items ?? [];
 
   return (
     <div>
-      {summary && summary.items.length > 0 && (
-        <div className={PROSE}>
-          <MarkdownText eventProperties={eventProperties}>
-            {toMarkdownList(summary.items.slice(0, 1))}
-          </MarkdownText>
-        </div>
-      )}
-
       {(hiddenBullets.length > 0 || details.length > 0) && (
         <ShowMore
           label="Show details"
