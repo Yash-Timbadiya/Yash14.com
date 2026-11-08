@@ -84,16 +84,22 @@
     }
   }
 
+  /* A pixel lights up in the accent, cools through a brighter ink and
+     settles back; steps(1) keeps each tone a hard, pixel-like cut. */
   @keyframes pixel {
     0%,
+    30%,
     100% {
-      opacity: 1;
+      background-color: color-mix(in oklab, var(--ink) 12%, transparent);
     }
-    33% {
-      opacity: 0.15;
+    6% {
+      background-color: var(--heat);
     }
-    66% {
-      opacity: 0.55;
+    14% {
+      background-color: color-mix(in oklab, var(--heat) 45%, transparent);
+    }
+    22% {
+      background-color: color-mix(in oklab, var(--ink) 32%, transparent);
     }
   }
 
