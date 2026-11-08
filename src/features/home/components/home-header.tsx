@@ -18,6 +18,9 @@ const BrandContextMenu = dynamic(
 
 const CommandMenu = dynamic(() => import("@/components/command-menu"));
 
+const HEADER_STAR =
+  "pointer-events-none absolute -bottom-2 z-2 size-[15px] bg-hairline-strong mask-(--star) mask-contain mask-center mask-no-repeat";
+
 export function AnnouncementBar() {
   return (
     <div className={cn(FRAME, "p-3 pb-2.5")}>
@@ -44,6 +47,11 @@ export function HomeHeader() {
           "flex h-14 items-center gap-3 px-4 lg:h-18 lg:px-10",
         )}
       >
+        {/* Stars where the rails meet the header's bottom rule. Drawn here,
+            since the band below sits under this sticky header and would
+            only show their lower half. */}
+        <span className={cn(HEADER_STAR, "-left-2")} aria-hidden />
+        <span className={cn(HEADER_STAR, "-right-2")} aria-hidden />
         <BrandContextMenu section={ANALYTICS_SECTIONS.HEADER}>
           <span className="text-heat [&_svg]:h-7">
             <SiteHeaderLogo />

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { ChevronRight } from "./hover-arrow";
 import { SectionHead } from "./section-intro";
 import { TrackedLink } from "@/components/tracked-link";
-import { BAND, FRAME, GAP, MONO_LABEL } from "@/features/home/lib/styles";
+import { BAND, FRAME } from "@/features/home/lib/styles";
 import { ANALYTICS_EVENTS, ANALYTICS_SOURCES } from "@/lib/analytics-events";
 
 /**
@@ -35,15 +35,29 @@ export function PageHeader({
 }) {
   return (
     <>
-      <div className={BAND}>
-        <div className={cn(FRAME, GAP)} />
+      {/* No top rule: the sticky header's bottom border already draws it. */}
+      <div className="relative">
+        {/* A slim decorative strip under the site header: two blank "fields"
+            sketched in hairlines, in place of the full section gap. */}
+        <div className={cn(FRAME, "grid h-9 sm:grid-cols-2")} aria-hidden>
+          {["start", "end"].map((half) => (
+            <div
+              key={half}
+              className="flex items-center gap-3 px-2 not-first:border-l not-first:border-hairline max-sm:not-first:hidden sm:gap-4"
+            >
+              <span className="h-3.5 flex-1 rounded-[5px] border border-hairline" />
+              <span className="size-4.5 shrink-0 rounded-full border border-hairline" />
+              <span className="h-3.5 flex-1 rounded-[5px] border border-hairline" />
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className={BAND}>
         <div
           className={cn(
             FRAME,
-            "flex h-14 items-center justify-between gap-3 px-4 lg:px-6",
+            "flex h-14 items-center justify-between gap-3 px-2.5 lg:px-4",
           )}
         >
           <span
@@ -52,14 +66,11 @@ export function PageHeader({
           />
           <TrackedLink
             href="/"
-            className={cn(
-              MONO_LABEL,
-              "group/back inline-flex items-center gap-2 uppercase transition-colors hover:text-ink",
-            )}
+            className="group/back inline-flex h-9 items-center gap-2.5 rounded-[0.625rem] px-3 text-[0.9375rem] font-medium text-ink/72 transition-colors duration-150 hover:bg-ink/4 hover:text-ink"
             event={ANALYTICS_EVENTS.VIEW_HOME}
             eventProperties={{ section, source: ANALYTICS_SOURCES.TOOLBAR }}
           >
-            <ChevronRight className="h-2.5 w-1.5 rotate-180 transition-transform duration-200 ease-snappy group-hover/back:-translate-x-0.5" />
+            <ChevronRight className="h-3 w-2 rotate-180 transition-transform duration-200 ease-snappy group-hover/back:-translate-x-0.5" />
             Home
           </TrackedLink>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
