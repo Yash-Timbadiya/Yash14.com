@@ -20,7 +20,7 @@ import {
   IconStackFilled,
 } from "@tabler/icons-react";
 
-const CATEGORY_ICONS: Record<BookmarkCategory, React.ReactNode> = {
+export const CATEGORY_ICONS: Record<BookmarkCategory, React.ReactNode> = {
   [BookmarkCategory.ARTICLE]: <IconArticleFilled />,
   [BookmarkCategory.COURSE]: <IconSchoolFilled />,
   [BookmarkCategory.BOOK]: <IconBookFilled />,

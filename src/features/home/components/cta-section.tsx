@@ -13,7 +13,6 @@ import {
   BTN_SOFT,
   FRAME,
   GAP,
-  H2,
 } from "@/features/home/lib/styles";
 
 const WHATSAPP_MESSAGE = `Hi ${USER.firstName}, I came across your portfolio and would love to talk about working together.`;
@@ -47,17 +46,26 @@ export function CtaSection() {
           </div>
 
           <figure className="flex flex-col items-center px-6 py-16 text-center lg:py-24">
-            <blockquote>
-              <p className={H2}>
-                Learn continually. There&rsquo;s always{" "}
-                <span className="text-heat">one more thing</span> to learn
+            <span className={BRACKETS} aria-hidden>
+              [ WORDS I WORK BY ]
+            </span>
+            <blockquote className="mt-6">
+              <p className="text-[clamp(1.75rem,3.2vw,2.625rem)]/[1.15] font-medium tracking-[-0.022em] text-balance text-ink/40">
+                <span className="text-ink">&ldquo;Learn continually.</span>{" "}
+                There&rsquo;s always{" "}
+                <span className="whitespace-nowrap text-heat">
+                  one more thing
+                </span>{" "}
+                to learn.&rdquo;
               </p>
             </blockquote>
-            <figcaption className="mt-4 text-base/6 text-ink/72">
+            <figcaption className="mt-5 inline-flex items-center gap-3 font-mono text-xs/4 tracking-normal text-ink/56">
+              <span className="h-px w-6 bg-hairline-strong" aria-hidden />
               Steve Jobs
+              <span className="h-px w-6 bg-hairline-strong" aria-hidden />
             </figcaption>
 
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-2.5">
               <WhatsAppLink
                 className={cn(BTN, BTN_HEAT)}
                 message={WHATSAPP_MESSAGE}
