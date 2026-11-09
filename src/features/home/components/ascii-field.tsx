@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useRef } from "react";
 
-type AsciiVariant = "islands" | "terrain" | "fire" | "mark";
+type AsciiVariant = "islands" | "embers" | "fire" | "mark";
 
 /** Characters at least this bright use `--ascii-hot`, when the canvas sets it. */
 const HOT_VALUE = 0.62;
@@ -70,17 +70,34 @@ function sampleIslands({ col, row, time, seed }: Sample) {
   return value < 0.52 ? 0 : (value - 0.52) / 0.48;
 }
 
-/** A ridge line, rising towards both edges and denser towards its base. */
-function sampleTerrain({ col, row, cols, rows, time, seed }: Sample) {
-  const edge = Math.abs((col / Math.max(cols - 1, 1)) * 2 - 1);
-  const ridge = fbm(edge * 7 + seed, 0.5);
-  const height = rows * (0.12 + edge ** 1.3 * 0.88) * (0.45 + ridge * 0.7);
+/**
+ * A bed of flames right across the width, unlike the hero's, which burn only
+ * at the edges. Narrow tongues leap above a slow swell, the body sways as it
+ * rises, and sparks shoot up from the tips, cooling as they climb.
+ */
+function sampleEmbers({ col, row, rows, time, seed }: Sample) {
   const depth = rows - row;
-  if (depth > height) return 0;
+  const swell = fbm(col * 0.06 + seed, time * 0.5);
+  const tongue = noise(col * 0.4 + seed * 3, time * 2.6);
+  const height = rows * (0.18 + swell * 0.45) * (0.55 + tongue * 0.9);
 
-  const fill = 1 - depth / height;
-  if (noise(col * 0.8, row * 0.8 + time * 0.4) > 0.22 + fill * 0.8) return 0;
-  return Math.min(fill * 0.55 + noise(col * 0.3, row * 0.3 + time) * 0.3, 1);
+  if (depth > height) {
+    // A few columns carry a spark, each on its own speed and phase.
+    if (hash(col, seed) < 0.9) return 0;
+    const climb = rows * 2.5;
+    const speed = 3 + hash(col + 17, seed) * 4;
+    const rise = wrap(time * speed + hash(col + 5, seed) * climb, climb);
+    if (Math.abs(depth - rise) > 0.5) return 0;
+    return Math.max(0.15, 0.7 - (rise / rows) * 0.5);
+  }
+
+  const heat = 1 - depth / height;
+  // Each row is pushed sideways by a wave travelling up, so the flames lick
+  // from side to side instead of only flickering.
+  const sway = Math.sin(row * 0.5 - time * 3 + col * 0.05) * 1.6;
+  const rise = fbm((col + sway) * 0.2 + seed, row * 0.3 + time * 3.2);
+  const value = heat * 1.05 + (rise - 0.5) * 0.8;
+  return value < 0.1 ? 0 : Math.min(value, 1);
 }
 
 /**
@@ -142,7 +159,7 @@ function sampleMark({ col, row, cols, rows, time, seed }: Sample) {
 
 const SAMPLERS: Record<AsciiVariant, (sample: Sample) => number> = {
   islands: sampleIslands,
-  terrain: sampleTerrain,
+  embers: sampleEmbers,
   fire: sampleFire,
   mark: sampleMark,
 };
