@@ -206,7 +206,9 @@ const WALL_EDGES_BEHIND_TRAFFIC = GEO.wallEdgesBehindTraffic.map((e) =>
 );
 const TOP_EDGES = GEO.topEdges.map((e) => toShape(e, false));
 
-const SURFACE_FILL = "var(--background)";
+// Overridable per page; both fall back to the plain look used on "/".
+const SURFACE_FILL = "var(--yt-top, var(--background))";
+const SIDE_FILL = "var(--yt-side, var(--background))";
 
 const GUIDE_LINES = [
   "M-700 879L1230 -237",
@@ -384,11 +386,16 @@ const bandRevealTransition: Transition = {
 
 type YTMarkIsometricProps = {
   onActivate?: () => void;
+  /** The car the traffic starts with; right-click still switches it. */
+  defaultCarModel?: CarModel;
 };
 
 const HIGHLIGHT_SPRING = { stiffness: 300, damping: 30, mass: 0.1 };
 
-export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
+export function YTMarkIsometric({
+  onActivate,
+  defaultCarModel = "detailed",
+}: YTMarkIsometricProps) {
   const patternId = `yt-hatch${useId().replace(/:/g, "")}`;
   const bandId0 = `yt-band-0${useId().replace(/:/g, "")}`;
   const bandId1 = `yt-band-1${useId().replace(/:/g, "")}`;
@@ -397,7 +404,7 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const isInView = useInView(svgRef, { margin: "80px" });
 
-  // Edge highlight that follows the cursor across the whole window.
+  // Edge highlight that follows the cursor while it is over the mark's box.
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
   const highlightCx = useSpring(
@@ -411,7 +418,7 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
   const reduceMotion = useReducedMotion();
   const [animateTraffic, setAnimateTraffic] = useState(false);
   const [active, setActive] = useState(false);
-  const [carModel, setCarModel] = useState<CarModel>("detailed");
+  const [carModel, setCarModel] = useState<CarModel>(defaultCarModel);
   const [introReady, setIntroReady] = useState(false);
 
   useEffect(() => {
@@ -436,13 +443,27 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
     if (reduceMotion || !isInView) return;
     if (window.matchMedia("(hover: none)").matches) return;
 
+    // Follows the cursor only inside the box that holds the mark.
+    const svg = svgRef.current;
+    const box = svg?.closest("figure") ?? svg?.parentElement;
+    if (!svg || !box) return;
+
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX / window.innerWidth);
-      mouseY.set(e.clientY / window.innerHeight);
+      const rect = svg.getBoundingClientRect();
+      mouseX.set((e.clientX - rect.left) / rect.width);
+      mouseY.set((e.clientY - rect.top) / rect.height);
+    };
+    const handleMouseLeave = () => {
+      mouseX.set(0.5);
+      mouseY.set(0.5);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    box.addEventListener("mousemove", handleMouseMove);
+    box.addEventListener("mouseleave", handleMouseLeave);
+    return () => {
+      box.removeEventListener("mousemove", handleMouseMove);
+      box.removeEventListener("mouseleave", handleMouseLeave);
+    };
   }, [reduceMotion, isInView, mouseX, mouseY]);
 
   const transition: Transition = reduceMotion
@@ -688,7 +709,7 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
               <motion.path
                 key={`side-behind-${i}`}
                 d={shape.normal}
-                fill={SURFACE_FILL}
+                fill={SIDE_FILL}
                 variants={variantsFor(shape)}
                 transition={transition}
               />
@@ -741,7 +762,7 @@ export function YTMarkIsometric({ onActivate }: YTMarkIsometricProps) {
               <motion.path
                 key={`side-${i}`}
                 d={shape.normal}
-                fill={SURFACE_FILL}
+                fill={SIDE_FILL}
                 variants={variantsFor(shape)}
                 transition={transition}
               />

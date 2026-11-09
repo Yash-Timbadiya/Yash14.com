@@ -2,16 +2,17 @@ import type { Metadata } from "next";
 import type { CollectionPage, WithContext } from "schema-dts";
 import type { BookmarkListEntry } from "@/features/bookmark/types";
 
+import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import { SITE_INFO } from "@/config/site";
 import { absoluteUrl } from "@/lib/utils";
 import { JsonLdScript } from "@/lib/json-ld";
-import { ArrowLeftIcon } from "lucide-react";
 import { JSON_LD_ID } from "@/config/json-ld";
-import { Button } from "@/components/ui/button";
 import { BOOKMARKS } from "@/features/bookmark/data";
-import { TrackedLink } from "@/components/tracked-link";
-import { DocContainer } from "@/features/doc/components/doc-layout";
+import { BAND, FRAME } from "@/features/home/lib/styles";
+import { IconBookmarkFilled } from "@tabler/icons-react";
+import { ANALYTICS_SECTIONS } from "@/lib/analytics-events";
+import { PageHeader } from "@/features/home/components/page-header";
 import { BOOKMARK_CATEGORY_TO_PARAM } from "@/features/bookmark/types";
 import { sortBookmarksNewestFirst } from "@/features/bookmark/lib/sort";
 import { DocShareMenu } from "@/features/doc/components/doc-share-menu";
@@ -20,11 +21,6 @@ import { BookmarkList } from "@/features/bookmark/components/bookmark-list";
 import { BookmarkFilters } from "@/features/bookmark/components/bookmark-filters";
 import { LLMCopyButtonWithViewOptions } from "@/features/doc/components/doc-page-actions";
 import { BookmarkListFiltered } from "@/features/bookmark/components/bookmark-list-filtered";
-import {
-  ANALYTICS_EVENTS,
-  ANALYTICS_SECTIONS,
-  ANALYTICS_SOURCES,
-} from "@/lib/analytics-events";
 
 const PAGE_TITLE = "Bookmarks";
 const PAGE_DESCRIPTION =
@@ -77,34 +73,19 @@ export default function BookmarksPage() {
     <>
       <JsonLdScript data={getCollectionPageJsonLd()} />
 
-      <DocContainer>
-        {/* Top spacer */}
-        <div className="h-12" />
-
-        <div className="screen-line-bottom h-px" />
-
-        {/* Page toolbar */}
-        <div className="flex items-center justify-between p-2 pl-4">
-          <Button
-            className="h-7 gap-2 border-none px-0 text-muted-foreground hover:text-foreground hover:no-underline"
-            variant="link"
-            size="sm"
-            asChild
-          >
-            <TrackedLink
-              href="/"
-              event={ANALYTICS_EVENTS.VIEW_HOME}
-              eventProperties={{
-                section: ANALYTICS_SECTIONS.BOOKMARKS_PAGE,
-                source: ANALYTICS_SOURCES.TOOLBAR,
-              }}
-            >
-              <ArrowLeftIcon />
-              Home
-            </TrackedLink>
-          </Button>
-
-          <div className="flex items-center gap-2">
+      <PageHeader
+        section={ANALYTICS_SECTIONS.BOOKMARKS_PAGE}
+        seed={71}
+        icon={<IconBookmarkFilled aria-hidden />}
+        label={PAGE_TITLE}
+        title={
+          <>
+            Things worth <span className="text-heat">saving</span>
+          </>
+        }
+        description={PAGE_DESCRIPTION}
+        actions={
+          <>
             <LLMCopyButtonWithViewOptions
               markdownUrl="/bookmarks.md"
               section={ANALYTICS_SECTIONS.BOOKMARKS_PAGE}
@@ -114,40 +95,25 @@ export default function BookmarksPage() {
               url="/bookmarks"
               section={ANALYTICS_SECTIONS.BOOKMARKS_PAGE}
             />
-          </div>
-        </div>
+          </>
+        }
+      />
 
-        <div className="screen-line-top screen-line-bottom py-px">
-          <div className="h-4" />
-        </div>
-
-        <h1 className="screen-line-bottom px-4 text-4xl font-medium tracking-tight text-balance">
-          {PAGE_TITLE}
-        </h1>
-
-        <p className="screen-line-bottom p-4 text-balance text-muted-foreground">
-          {PAGE_DESCRIPTION}
-        </p>
-
-        <div className="h-4" />
-
-        <div className="screen-line-top screen-line-bottom">
+      <div className={BAND}>
+        <div className={FRAME}>
           <Suspense fallback={<div className="h-12" />}>
             <BookmarkFilters categories={categories} />
           </Suspense>
         </div>
+      </div>
 
-        <div className="stripe-divider h-4 w-full" />
-
-        <div className="screen-line-top screen-line-bottom">
+      <div className={BAND}>
+        <div className={cn(FRAME, "-mb-px")}>
           <Suspense fallback={<BookmarkList entries={entries} />}>
             <BookmarkListFiltered entries={entries} />
           </Suspense>
         </div>
-
-        {/* Bottom separator, matches the home page */}
-        <div className="stripe-divider h-8 w-full" />
-      </DocContainer>
+      </div>
     </>
   );
 }

@@ -15,11 +15,6 @@ export const config = {
     contributionsApiUrl: process.env.GITHUB_CONTRIBUTIONS_API_URL,
   },
 
-  /** Renders the live screenshots shown in link previews. */
-  microlink: {
-    apiUrl: "https://api.microlink.io",
-  },
-
   analytics: {
     /**
      * Whether PostHog runs during `next dev`. Off keeps local clicks out of

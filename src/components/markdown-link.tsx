@@ -4,10 +4,9 @@ import type { AnalyticsProperties } from "@/lib/analytics";
 
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
-import { LinkPreview } from "@/components/link-preview";
 import { ANALYTICS_EVENTS } from "@/lib/analytics-events";
 
-/** A link inside server-rendered markdown: hover preview plus click tracking. */
+/** A link inside server-rendered markdown, with click tracking. */
 export function MarkdownLink({
   href,
   className,
@@ -24,12 +23,11 @@ export function MarkdownLink({
   children: React.ReactNode;
 }) {
   return (
-    <LinkPreview
-      url={href}
-      className={cn("link-underline", className)}
+    <a
+      href={href}
+      className={cn("link-underline text-foreground", className)}
       rel={rel}
       target={target}
-      side="top"
       onClick={
         eventProperties
           ? () =>
@@ -41,6 +39,6 @@ export function MarkdownLink({
       }
     >
       {children}
-    </LinkPreview>
+    </a>
   );
 }

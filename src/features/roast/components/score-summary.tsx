@@ -46,7 +46,7 @@ export function ScoreSummary({ result }: { result: RoastResult }) {
 
         <LighthouseGauges
           result={result}
-          className="border-t border-line pt-4 sm:grid-cols-4"
+          className="flex-1 content-center border-t border-line pt-4 sm:grid-cols-4"
         />
       </div>
     </div>

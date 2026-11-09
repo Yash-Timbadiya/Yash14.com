@@ -15,7 +15,8 @@ export type RoastView = "roast" | "split" | "editorial";
 const BLOCK = "block rounded-[1px] bg-muted-foreground/25";
 const ACCENT_BLOCK =
   "block rounded-[1px] bg-foreground/60 brand:bg-[#ff4d00]/80";
-const INK_BLOCK = "block rounded-[1px] bg-foreground/70";
+// Headings sit one step above body lines, never near-black.
+const INK_BLOCK = "block rounded-[1px] bg-muted-foreground/50";
 const LINE = "border-muted-foreground/25";
 const ACCENT_BORDER = "border-foreground/60 brand:border-[#ff4d00]/80";
 // The top half of a ring, the shape of every half gauge.
@@ -28,7 +29,7 @@ const DIVIDER = "stripe-divider block h-1 w-full shrink-0 opacity-60";
 function Needle({ angle }: { angle: number }) {
   return (
     <span
-      className="absolute bottom-0 left-1/2 block h-px w-[44%] origin-left bg-foreground/80"
+      className="absolute bottom-0 left-1/2 block h-px w-[44%] origin-left bg-muted-foreground/70"
       style={{ transform: `rotate(${angle}deg)` }}
     />
   );

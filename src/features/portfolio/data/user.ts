@@ -9,13 +9,13 @@ export const USER: User = {
   username: "yash14",
   gender: "male",
   pronouns: "he/him",
-  bio: "Creating with code. Small details matter.",
+  bio: "Full Stack Developer from India.",
   flipSentences: [
-    "Creating with code. Small details matter.",
+    "Full Stack Developer from India.",
     "Full Stack Developer",
     "Open Source Contributor",
   ],
-  address: "Surat, India",
+  address: "India",
   // base64 encoded
   phoneNumberB64: "KzkxODc5OTQ0MjEwMQ==", // +91 87994 42101
   emailB64: "aGVsbG9AeWFzaDE0LmNvbQ==", // hello@yash14.com
@@ -24,9 +24,9 @@ export const USER: User = {
   jobs: [
     {
       title: "Full Stack Developer",
-      company: "EnactOn",
-      website: "https://www.enacton.com/?atp=yash14",
-      experienceId: "EnactOn",
+      company: "CrossEven",
+      website: "https://crosseven.com/?atp=yash14",
+      experienceId: "cross-even",
     },
   ],
   about: `

@@ -2,13 +2,8 @@
 @import "shadcn/tailwind.css";
 @import "tw-animate-css";
 
-@import "./typeset.css";
 @import "./scroll-fade-effect.css";
-@import "./gradient-border-plugin.css";
-@import "./screen-line-color.css";
 @import "./dissolve-input.css";
-
-@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -60,6 +55,66 @@
   --color-code-highlight: var(--code-highlight);
   --color-selection: var(--selection);
   --color-selection-foreground: var(--selection-foreground);
+
+  /* Site palette (defined on .home, the site layout's root). */
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-heat: var(--heat);
+  --color-on-heat: var(--on-heat);
+  --shadow-lift: var(--lift);
+  --ease-snappy: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-rise: rise 800ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-morph: morph 5s cubic-bezier(0.8, 0, 0.2, 1) infinite;
+  --animate-spark: spark 5s ease-in-out infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      translate: 0 14px;
+    }
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* One square splits into a shape, holds it, collapses into a dot, then
+     grows back into the square. Every piece of the shape stacks on the
+     centre at the start and end, so together they read as one square.
+     Each piece sets its offset (--x, --y), its scales as the square
+     (--sx0, --sy0) and as the dot (--dx, --dy); --u is the grid unit. */
+  @keyframes morph {
+    0%,
+    10%,
+    100% {
+      transform: translate(-50%, -50%) scale(var(--sx0), var(--sy0));
+    }
+    22%,
+    58% {
+      transform: translate(
+          calc(-50% + var(--x) * var(--u)),
+          calc(-50% + var(--y) * var(--u))
+        )
+        scale(1);
+    }
+    68%,
+    80% {
+      transform: translate(-50%, -50%) scale(var(--dx), var(--dy));
+    }
+  }
+
+  @keyframes spark {
+    50% {
+      opacity: 0.7;
+      scale: 0.8;
+    }
+  }
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -121,20 +176,8 @@
   }
 }
 
-@utility link {
-  @apply decoration-1 underline-offset-3 hover:underline;
-}
-
 @utility link-underline {
   @apply underline decoration-current/30 decoration-1 underline-offset-3 transition-colors hover:decoration-current;
-}
-
-@utility screen-line-top {
-  @apply relative;
-  &:before {
-    content: "";
-    @apply absolute top-0 left-[-100vw] -z-1 h-px w-[200vw] bg-line;
-  }
 }
 
 @utility screen-line-bottom {
@@ -143,30 +186,6 @@
     content: "";
     @apply absolute bottom-0 left-[-100vw] -z-1 h-px w-[200vw] bg-line;
   }
-}
-
-@utility screen-dashed-line-top {
-  @apply screen-line-top;
-  &:before {
-    content: "";
-    @apply bg-inherit bg-[linear-gradient(to_right,var(--line)_4px,transparent_2px)] bg-size-[6px_1px] bg-repeat-x;
-  }
-}
-
-@utility screen-dashed-line-bottom {
-  @apply screen-line-bottom;
-  &:after {
-    content: "";
-    @apply bg-inherit bg-[linear-gradient(to_right,var(--line)_4px,transparent_2px)] bg-size-[6px_1px] bg-repeat-x;
-  }
-}
-
-@utility screen-line-top-none {
-  @apply before:content-none;
-}
-
-@utility screen-line-bottom-none {
-  @apply after:content-none;
 }
 
 @utility diagonal-stripes {
@@ -179,51 +198,6 @@
   &:before {
     content: "";
     @apply absolute left-[-100vw] -z-1 h-full w-[200vw] diagonal-stripes;
-  }
-}
-
-@utility step {
-  counter-increment: step;
-  @apply max-md:pl-10;
-
-  &:before {
-    content: counter(step);
-    @apply absolute inline-flex size-6 items-center justify-center rounded-lg bg-muted text-center indent-0 text-[0.8125rem]/6 font-normal text-foreground max-md:left-0 md:-ml-10;
-  }
-}
-
-@utility prose-ncdai {
-  @apply prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-pretty md:prose-headings:text-balance prose-h2:text-xl prose-h3:text-lg;
-  @apply prose-a:font-normal prose-a:wrap-break-word prose-a:text-foreground prose-a:link-underline;
-  @apply prose-code:rounded-md prose-code:border prose-code:bg-muted/50 prose-code:px-1 prose-code:py-px prose-code:text-sm prose-code:font-normal prose-code:before:content-none prose-code:after:content-none retina:prose-code:border-[0.5px];
-  @apply prose-strong:font-medium;
-  @apply prose-hr:border-line;
-  @apply prose-blockquote:border-l prose-blockquote:border-line prose-blockquote:font-normal prose-blockquote:text-muted-foreground prose-blockquote:not-italic prose-blockquote:[&_p:first-of-type]:before:content-none prose-blockquote:[&_p:last-of-type]:after:content-none;
-  @apply prose-ul:marker:text-xs/none;
-}
-
-@utility code-inline {
-  @apply rounded-md border bg-muted/50 px-1 py-px font-mono text-sm font-normal whitespace-pre-wrap in-data-table-nowrap:whitespace-nowrap retina:border-[0.5px];
-}
-
-@utility prose-no-margin {
-  & > :first-child {
-    @apply mt-0;
-  }
-
-  & > :last-child {
-    @apply mb-0;
-  }
-
-  :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)),
-  :where([data-rehype-pretty-code-figure]) {
-    @apply mt-3 mb-3;
-  }
-}
-
-@utility extend-touch-target {
-  @media (pointer: coarse) {
-    @apply relative touch-manipulation after:absolute after:-inset-2;
   }
 }
 
@@ -531,127 +505,6 @@
   }
 }
 
-@layer components {
-  [data-rehype-pretty-code-figure] {
-    @apply relative my-[1.25em] rounded-xl bg-surface p-1 text-surface-foreground inset-ring-1 inset-ring-border/64;
-    @apply has-data-rehype-pretty-code-title:pt-0;
-    @apply has-data-[slot=code-block-command]:pt-0;
-
-    pre {
-      @apply no-scrollbar overflow-x-auto overscroll-x-contain py-4 outline-none;
-    }
-
-    code {
-      @apply min-w-full font-mono text-sm;
-    }
-
-    [data-line] {
-      @apply pr-(--code-padding-right,0) pl-4;
-    }
-  }
-
-  [data-line] span {
-    @apply text-(--shiki-light) dark:text-(--shiki-dark);
-  }
-
-  [data-rehype-pretty-code-title] {
-    @apply flex items-center gap-3 py-2.5 pr-8.5 pl-3 font-mono text-sm text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground;
-  }
-
-  [data-line-numbers] {
-    counter-reset: line;
-  }
-
-  [data-line-numbers] [data-line] {
-    @apply pl-0;
-  }
-
-  [data-line-numbers] [data-line]::before {
-    counter-increment: line;
-    content: counter(line);
-    @apply sticky left-0 z-1 inline-block w-16 bg-code pe-6 text-right text-sm text-code-number;
-  }
-
-  [data-highlighted-line] {
-    @apply relative after:pointer-events-none after:absolute after:inset-0 after:z-2 after:bg-code-highlight;
-  }
-
-  [data-highlighted-chars] {
-    @apply relative bg-transparent before:pointer-events-none before:absolute before:inset-0 before:rounded-sm before:bg-code-highlight;
-  }
-
-  [data-fade-overlay] {
-    @apply pointer-events-none absolute top-0 right-0 z-1 rounded-tr-lg;
-
-    --fade-linear-gradient: linear-gradient(
-      to right,
-      transparent 0,
-      color-mix(in oklab, var(--fade-color, var(--background)) 20%, transparent)
-        10px,
-      color-mix(in oklab, var(--fade-color, var(--background)) 50%, transparent)
-        25px,
-      color-mix(in oklab, var(--fade-color, var(--background)) 80%, transparent)
-        35px,
-      var(--fade-color, var(--background)) 45px
-    );
-
-    --fade-radial-gradient: radial-gradient(
-      ellipse at top right,
-      var(--fade-color, var(--background)) 30%,
-      color-mix(in oklab, var(--fade-color, var(--background)) 80%, transparent)
-        40%,
-      color-mix(in oklab, var(--fade-color, var(--background)) 50%, transparent)
-        50%,
-      color-mix(in oklab, var(--fade-color, var(--background)) 20%, transparent)
-        60%,
-      transparent 70%
-    );
-
-    width: var(--fade-width, 5rem);
-    height: var(--fade-height, 2.25rem);
-    background: var(--fade-background, var(--fade-linear-gradient));
-  }
-
-  /* .duck-follower {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 50;
-
-    pointer-events: none;
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
-
-    will-change: transform;
-    transition: none;
-  } */
-
-  .twemoji {
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-    margin: 0 0.05em 0 0.1em;
-    vertical-align: -0.1em;
-  }
-}
-
-.typeset-description {
-  --typeset-size: 15px;
-  --typeset-leading: 1.6;
-  --typeset-flow: 1em;
-
-  font-size: var(--typeset-size);
-}
-
-.typeset-timescale {
-  --typeset-size: 0.875rem;
-  --typeset-leading: 1.5;
-  --typeset-flow: 1em;
-
-  font-size: var(--typeset-size);
-}
-
 /*
  * GitHub contribution graph. Styled from the wrapper instead of per block, so
  * the ~365 blocks carry no classes or inline styles of their own.
@@ -744,4 +597,185 @@
 .contribution-levels[data-selected-level="3"] g > :not([data-level="3"]),
 .contribution-levels[data-selected-level="4"] g > :not([data-level="4"]) {
   opacity: 0.15;
+}
+
+/*
+ * Site design tokens. The site layout's root carries `.home`; everything under
+ * it uses these through the Tailwind colors above (`bg-paper`, `text-ink/56`,
+ * `text-heat`...). It also re-declares the shadcn tokens so shared components
+ * pick up this palette. The whole accent comes from `--heat`.
+ */
+.home {
+  --paper: #f9f9f9;
+  --surface: #ffffff;
+  --ink: #262626;
+  --hairline: #ededed;
+  --hairline-strong: #e2e2e2;
+  --heat: #ff5400;
+  --on-heat: #ffffff;
+  --lift:
+    0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent), 0 28px 48px -20px
+    color-mix(in srgb, var(--ink) 16%, transparent);
+  /* Four-point star used where the frame rails cross the rules. */
+  --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0c0 6.6 5.4 12 12 12-6.6 0-12 5.4-12 12 0-6.6-5.4-12-12-12C6.6 12 12 6.6 12 0z'/%3E%3C/svg%3E");
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: color-mix(in srgb, var(--ink) 4%, transparent);
+  --secondary-foreground: var(--ink);
+  --muted: color-mix(in srgb, var(--ink) 4%, transparent);
+  --muted-foreground: color-mix(in srgb, var(--ink) 72%, transparent);
+  --accent: color-mix(in srgb, var(--ink) 4%, transparent);
+  --accent-muted: color-mix(in srgb, var(--ink) 4%, transparent);
+  --accent-foreground: var(--ink);
+  --border: var(--hairline);
+  --line: var(--hairline);
+  --input: var(--hairline);
+  --font-sans: var(--home-font-sans);
+  --font-heading: var(--home-font-sans);
+}
+
+@supports (color: color(display-p3 1 1 1)) {
+  .home {
+    --heat: color(display-p3 0.98 0.365 0.098);
+  }
+}
+
+.dark .home {
+  --paper: #0e0e0e;
+  --surface: #161616;
+  --ink: #ededed;
+  --hairline: #232323;
+  --hairline-strong: #2e2e2e;
+  --on-heat: #ffffff;
+  --lift: 0 0 0 1px oklch(1 0 0 / 0.02), 0 32px 64px -24px oklch(0 0 0 / 0.8);
+}
+
+/* The brand colors toggle turns the whole accent monochrome. */
+[data-brand-colors="false"] .home {
+  --heat: var(--ink);
+  --on-heat: var(--paper);
+}
+
+/* Overscroll and the area behind the page match the paper. */
+html:has(.home) {
+  background-color: #f9f9f9;
+}
+
+html.dark:has(.home) {
+  background-color: #0e0e0e;
+}
+
+/* The hero's branching tree (see `hero-cells.tsx`), on a 6s loop. Each
+   node and link sets its value for every stage (--x0 to --x3 and so on);
+   these registered numbers carry the current one, so they can animate
+   between stages and drive size, position and the ticks around a node. */
+@property --hx {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --hy {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --hs {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --lx {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ly {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --la {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ll {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes tree-node {
+  0%,
+  8%,
+  86%,
+  100% {
+    --hx: var(--x0);
+    --hy: var(--y0);
+    --hs: var(--s0);
+  }
+  18%,
+  26% {
+    --hx: var(--x1);
+    --hy: var(--y1);
+    --hs: var(--s1);
+  }
+  36%,
+  44% {
+    --hx: var(--x2);
+    --hy: var(--y2);
+    --hs: var(--s2);
+  }
+  54%,
+  72% {
+    --hx: var(--x3);
+    --hy: var(--y3);
+    --hs: var(--s3);
+  }
+}
+
+@keyframes tree-link {
+  0%,
+  8%,
+  86%,
+  100% {
+    --lx: var(--lx0);
+    --ly: var(--ly0);
+    --la: var(--la0);
+    --ll: var(--ll0);
+  }
+  18%,
+  26% {
+    --lx: var(--lx1);
+    --ly: var(--ly1);
+    --la: var(--la1);
+    --ll: var(--ll1);
+  }
+  36%,
+  44% {
+    --lx: var(--lx2);
+    --ly: var(--ly2);
+    --la: var(--la2);
+    --ll: var(--ll2);
+  }
+  54%,
+  72% {
+    --lx: var(--lx3);
+    --ly: var(--ly3);
+    --la: var(--la3);
+    --ll: var(--ll3);
+  }
 }

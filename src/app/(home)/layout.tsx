@@ -1,25 +1,43 @@
+import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { Inter } from "next/font/google";
 import { SiteBottomNav } from "@/components/site-bottom-nav";
+import { HomeFooter } from "@/features/home/components/home-footer";
+import {
+  AnnouncementBar,
+  HomeHeader,
+} from "@/features/home/components/home-header";
 
 const ScrollToTop = dynamic(() =>
   import("@/components/scroll-to-top").then((mod) => mod.ScrollToTop),
 );
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+// Loaded only on this route. No weight list: listing weights breaks Turbopack's
+// dev font loader.
+const sans = Inter({
+  subsets: ["latin"],
+  variable: "--home-font-sans",
+  display: "swap",
+  axes: ["opsz"],
+});
+
+export default function SiteLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="group/layout relative isolate">
-      <SiteHeader />
-      <main className="max-w-screen overflow-x-clip px-2">{children}</main>
-      <SiteFooter />
-      <div
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-50"
-        aria-hidden
-      >
-        <div className="h-(--fade-bottom-height) bg-linear-to-b from-transparent to-background mask-linear-[to_top,var(--background)_25%,transparent] backdrop-blur-[1px]" />
-        <div className="bg-background pb-[env(safe-area-inset-bottom,0)]" />
-      </div>
+    // `.home` carries the site's design tokens (see globals.css).
+    <div
+      className={cn(
+        "home group/layout relative isolate min-h-dvh overflow-x-clip bg-paper font-sans tracking-[-0.006em] text-ink [font-optical-sizing:auto]",
+        sans.variable,
+      )}
+    >
+      <AnnouncementBar />
+      <HomeHeader />
+      <main>{children}</main>
+      <HomeFooter />
       <SiteBottomNav />
       <ScrollToTop />
     </div>

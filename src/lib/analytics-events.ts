@@ -47,6 +47,7 @@ export const ANALYTICS_EVENTS = {
   DOWNLOAD_BRAND_ASSETS: "download_brand_assets",
   DOWNLOAD_MARK_SVG: "download_mark_svg",
   DOWNLOAD_LOGOTYPE_SVG: "download_logotype_svg",
+  COPY_BRAND_COLOR: "copy_brand_color",
 
   // Page actions: copy page and its options menu
   COPY_PAGE: "copy_page",

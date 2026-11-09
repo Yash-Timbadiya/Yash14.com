@@ -77,9 +77,6 @@ importers:
       posthog-js:
         specifier: ^1.438.12
         version: 1.438.12(@types/react@19.2.17)(react@19.2.8)
-      qss:
-        specifier: ^3.0.0
-        version: 3.0.0
       radix-ui:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -3402,10 +3399,6 @@ packages:
   qs@6.15.2:
     resolution: {integrity: sha512-Rzq0KEyX/w/tEybncDgdkZrJgVUsUMk3xjh3t5bv3S1HTAtg+uOYt72+ZfwiQwKdysThkTBdL/rTi6HDmX9Ddw==}
     engines: {node: '>=0.6'}
-
-  qss@3.0.0:
-    resolution: {integrity: sha512-ZHoCB3M/3Voev64zhLLUOKDtaEdJ/lymsJJ7R3KBusVZ2ovNiIB7XOq3Xh6V1a8O+Vho+g2B5YElq9zW7D8aQw==}
-    engines: {node: '>=4'}
 
   query-selector-shadow-dom@1.0.1:
     resolution: {integrity: sha512-lT5yCqEBgfoMYpf3F2xQRK7zEr1rhIIZuceDK6+xRkJQ4NMbHTwXqk4NkwDwQMNqXgG9r9fyHnzwNVs6zV5KRw==}
@@ -7228,8 +7221,6 @@ snapshots:
   qs@6.15.2:
     dependencies:
       side-channel: 1.1.1
-
-  qss@3.0.0: {}
 
   query-selector-shadow-dom@1.0.1: {}
 

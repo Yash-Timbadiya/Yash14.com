@@ -2,10 +2,11 @@
 
 import type { BookmarkListEntry } from "../types";
 
+import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { BookmarkList } from "./bookmark-list";
-import { Button } from "@/components/ui/button";
 import { useBookmarkFilters } from "../lib/search-params";
+import { BTN, BTN_SOFT } from "@/features/home/lib/styles";
 import {
   ANALYTICS_EVENTS,
   ANALYTICS_SECTIONS,
@@ -27,12 +28,14 @@ export function BookmarkListFiltered({
 
   if (filteredEntries.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-2 p-4">
-        <p className="font-mono text-sm">No bookmarks match this filter.</p>
+      <div className="flex flex-col items-start gap-3 px-6 py-8 lg:px-14">
+        <p className="font-mono text-[0.8125rem] text-ink/56">
+          No bookmarks match this filter.
+        </p>
 
-        <Button
-          variant="secondary"
-          size="sm"
+        <button
+          type="button"
+          className={cn(BTN, BTN_SOFT)}
           onClick={() => {
             trackEvent(ANALYTICS_EVENTS.BOOKMARK_FILTER_CLEARED, {
               section: ANALYTICS_SECTIONS.BOOKMARKS_PAGE,
@@ -43,7 +46,7 @@ export function BookmarkListFiltered({
           }}
         >
           Clear filter
-        </Button>
+        </button>
       </div>
     );
   }

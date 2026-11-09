@@ -14,9 +14,7 @@ export function BookmarkList({
   return (
     <ul>
       {entries.map((entry) => (
-        <li key={entry.url} className="border-b border-line last:border-none">
-          {entry.card}
-        </li>
+        <li key={entry.url}>{entry.card}</li>
       ))}
 
       {/* Invisible copies of a real card keep each blank row exactly one row tall. */}
