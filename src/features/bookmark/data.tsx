@@ -133,6 +133,7 @@ export const BOOKMARKS: Bookmark[] = [
   {
     title: "Vibrant Design",
     url: "https://vibrant.design",
+    author: "Manu Arora",
     category: BookmarkCategory.OTHER,
     bookmarkedAt: "2026-10-21",
   },

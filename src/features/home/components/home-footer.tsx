@@ -98,9 +98,9 @@ export function HomeFooter() {
               {packageJson.description}
             </p>
             <AsciiField
-              variant="terrain"
+              variant="embers"
               seed={9}
-              className="absolute inset-x-0 bottom-0 h-36 w-full text-heat mask-[linear-gradient(to_top,black_30%,transparent)]"
+              className="absolute inset-x-0 bottom-0 h-36 w-full text-ink/24 [--ascii-hot:var(--heat)] mask-[linear-gradient(to_top,black_30%,transparent)]"
             />
           </div>
 
