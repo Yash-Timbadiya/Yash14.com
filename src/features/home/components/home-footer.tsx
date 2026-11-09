@@ -44,6 +44,7 @@ const INSPIRED_BY = [
   "Skiper UI",
   "Making Software",
   "shadcncraft",
+  "Vibrant Design by Manu Arora",
 ];
 
 const CV_URL = "https://cv.yash14.com";
